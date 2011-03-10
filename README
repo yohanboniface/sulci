@@ -1,0 +1,31 @@
+=====
+Sulci
+=====
+
+Sulci is a French textmining based on Libération corpus and thesaurus.
+
+This is the version 0.1, not yet used in production. Work in progress.
+
+It yet provides:
+
+- POS tagging (Brill algo like), and specific trainer
+
+- lemmatization, and specific trainer
+
+- semantical tagging (lite neural network), and specific trainer
+
+It could be used like this::
+
+ >> from sulci.textmining import SemanticalTagger
+ 
+ >> my_text = "Voici mon magnifique texte en français qui parle de Charlie Chaplin en Europe."
+ 
+ >> S = SemanticalTagger(my_text)
+ 
+ >> S.descriptors()
+ 
+ Charlie Chaplin
+ 
+ Europe
+
+Any help is welcome !
