@@ -85,11 +85,12 @@ def main():
     if SUBPROCESSES:
         import subprocess
         training_kind = LEXICAL_TRAIN_TAGGER and "-l" or "-c"
-        #Create slaves
+        # Create slaves
         for i in xrange(0,SUBPROCESSES):
             log(u"Opening slave subprocess %d" % i, "BLUE", True)
-            subprocess.Popen(["python", "manage.py", training_kind, "--trainer_mode=slave"])
-        #Set the mode to the trainer
+            python_kind = not __debug__ and ["-O"] or []
+            subprocess.Popen(["python"] + python_kind + ["manage.py", training_kind, "--trainer_mode=slave"])
+        # Set the mode to the trainer
         TRAINER_MODE = "master"
     if LEXICAL_TRAIN_TAGGER:
         T = LexicalTrainer(P,C,TRAINER_MODE)
@@ -110,7 +111,7 @@ def main():
             S.train(a.content, a.keywords)
         else:
             S.begin()
-            if FORCE:#otherwise it has no sens, as the list will not be overwrited
+            if FORCE:# otherwise it has no sens, as the list will not be overwrited
                 for a in Article.objects.filter(editorial_source=Article.EDITORIAL_SOURCE.PRINT).exclude(keywords__isnull=True).exclude(keywords=""):
                     S.train(a.title + ". " + a.subtitle + ". " + a.content, a.keywords)
         S.export(FORCE)

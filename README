@@ -18,7 +18,7 @@ It could be used like this::
 
  >> from sulci.textmining import SemanticalTagger
  
- >> my_text = "Voici mon magnifique texte en français qui parle de Charlie Chaplin en Europe."
+ >> my_text = u"Voici mon magnifique texte en français qui parle de Charlie Chaplin en Europe."
  
  >> S = SemanticalTagger(my_text)
  
