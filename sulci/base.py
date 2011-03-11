@@ -6,7 +6,7 @@ import re
 
 from Stemmer import Stemmer
 
-from utils import save_to_file, load_file
+from utils import save_to_file, load_file, get_dir
 from textminingutils import normalize_token, tokenize_text
 from stopwords import stop_words, usual_words
 
@@ -20,7 +20,7 @@ class TextManager(object):
     PENDING_EXT = None#To be overwrited
     
     def get_files(self, kind):
-        return [x for x in os.listdir(self.PATH) if x.endswith(kind)]
+        return [x for x in os.listdir(get_dir(__file__) + self.PATH) if x.endswith(kind)]
     
     def instantiate_text(self, text):
         """

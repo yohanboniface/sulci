@@ -1,5 +1,6 @@
 # -*- coding:Utf-8 -*-
 import codecs
+import os
 
 def save_to_file(filename, content, verbose = False):
     if verbose:
@@ -10,10 +11,18 @@ def save_to_file(filename, content, verbose = False):
     f.close()    
 
 def load_file(path):
-    f = codecs.open(path, "r", "utf-8")
+    pwd = not path.startswith("/") and get_dir() or ""
+    f = codecs.open(pwd + path, "r", "utf-8")
     c = f.read()
     f.close()
     return c
+
+def get_dir(fileref=__file__):
+    """
+    Return absolute path of a file with the trailing slash.
+    """
+    pwd = os.path.realpath(os.path.dirname(fileref))
+    return "%s/" % pwd
 
 def sort(seq, attr, reverse=True):
     intermed = [ (getattr(seq[i],attr), i, seq[i]) for i in xrange(len(seq)) ]
