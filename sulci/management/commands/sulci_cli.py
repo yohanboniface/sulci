@@ -4,6 +4,7 @@
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
+from django.conf import settings
 
 from sulci.pos_tagger import PosTagger, LexicalTrainer, ContextualTrainer, Trainer
 from sulci.lexicon import Lexicon
@@ -13,6 +14,7 @@ from sulci.thesaurus import Thesaurus
 from sulci.utils import log
 from sulci.trainers import SemanticalTrainer, LemmatizerTrainer
 from sulci.lemmatizer import Lemmatizer
+from __init__ import content_model# ugly
 
 class Command(BaseCommand):
     """
@@ -25,7 +27,7 @@ class Command(BaseCommand):
                     action="store_true", 
                     dest="makedict", 
                     help = "Build the lexicon"),
-        make_option("-l", 
+        make_option("-i", 
                     "--lexical_traintagger", 
                     action="store_true", 
                     dest="lexical_traintagger", 
@@ -35,17 +37,19 @@ class Command(BaseCommand):
                     action="store_true", 
                     dest="contextual_traintagger", 
                     help = "Train tagger"),
-        make_option("-d",
-                    "--debug", 
-                    action="store_true", 
-                    dest="debug", 
-                    help = "Print detailed result"),
+        make_option("-l",
+                    "--limit", 
+                    type="int", 
+                    action="store", 
+                    dest="limit",
+                    default=None,
+                    help = "Limit the process."),
         make_option("-f", 
                     "--force", 
                     action="store_true", 
                     dest="force", 
                     help="Some options can take a FORCE option"),
-        make_option("-i", 
+        make_option("-d", 
                     "--ipdb", 
                     action="store_true", 
                     dest="ipdb", 
@@ -142,9 +146,9 @@ class Command(BaseCommand):
         CHECK_WORD = options.get("checkword")
         CHECK_ENTRY = options.get("checkentry")
         DISPLAY_ERRORS = options.get("display_errors")
-    #    __debug__ = options.get("debug")
         FORCE = options.get("force")
         IPDB = options.get("ipdb")
+        LIMIT = options.get("limit")
         PK = options.get("pk")
         TRAINER_MODE = options.get("trainer_mode")
         SUBPROCESSES = options.get("subprocesses")
@@ -168,11 +172,13 @@ class Command(BaseCommand):
             if not PK:
                 print "A PK is needed."
             else:
-                C.add_candidate(Article.objects.get(pk=PK).content, PK)
+                a = content_model.objects.get(pk=PK)
+                t = getattr(a, settings.SULCI_CONTENT_PROPERTY)
+                C.add_candidate(t, PK)
                 C.prepare_candidate(PK)
         if SUBPROCESSES:
             import subprocess
-            training_kind = LEXICAL_TRAIN_TAGGER and "-l" or "-c"
+            training_kind = LEXICAL_TRAIN_TAGGER and "-i" or "-c"
             # Create slaves
             for i in xrange(0,SUBPROCESSES):
                 log(u"Opening slave subprocess %d" % i, "BLUE", True)
@@ -200,8 +206,13 @@ class Command(BaseCommand):
             else:
                 S.begin()
                 if FORCE:# otherwise it has no sens, as the list will not be overwrited
-                    for a in Article.objects.filter(editorial_source=Article.EDITORIAL_SOURCE.PRINT).exclude(keywords__isnull=True).exclude(keywords=""):
-                        S.train(a.title + ". " + a.subtitle + ". " + a.content, a.keywords)
+                    manager = getattr(content_model, settings.SULCI_CONTENT_MANAGER_METHOD_NAME)
+                    qs = manager.all()
+                    if LIMIT:
+                        qs = qs[:LIMIT]
+#                    for a in Article.objects.filter(editorial_source=Article.EDITORIAL_SOURCE.PRINT).exclude(keywords__isnull=True).exclude(keywords=""):
+                    for a in qs:
+                        S.train(getattr(a, settings.SULCI_CONTENT_PROPERTY), getattr(a, settings.SULCI_KEYWORDS_PROPERTY))
             S.export(FORCE)
         if CHECK_ENTRY:
             L.get_entry(CHECK_ENTRY.decode("utf-8"))
@@ -216,8 +227,9 @@ class Command(BaseCommand):
             T = LemmatizerTrainer(L)
             T.train()
         if SEMANTICAL_TAGGER and PK:
-            a = Article.objects.get(pk=PK)
-            t = a.title + ". " + a.subtitle + ". " + a.content#Make some method
+            a = content_model.objects.get(pk=PK)
+#            t = a.title + ". " + a.subtitle + ". " + a.content#Make some method
+            t = getattr(a, settings.SULCI_CONTENT_PROPERTY)
             T = Thesaurus()
             S = SemanticalTagger(t, T, P)
             if __debug__:

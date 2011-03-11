@@ -6,7 +6,8 @@ def save_to_file(filename, content, verbose = False):
     if verbose:
         print "INFOS **** Writing to file: %s" % filename
 #    print content
-    f = codecs.open(filename, 'w', "utf-8") 
+    pwd = not filename.startswith("/") and get_dir() or ""
+    f = codecs.open(pwd + filename, 'w', "utf-8") 
     f.write(content)
     f.close()    
 

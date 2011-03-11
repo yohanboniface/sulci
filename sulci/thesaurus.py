@@ -9,7 +9,7 @@ from Stemmer import Stemmer#DRY ALERT
 
 from textminingutils import tokenize_text, normalize_token, lev
 from base import RetrievableObject
-from utils import log, save_to_file
+from utils import log, save_to_file, get_dir
 
 class Thesaurus(object):
 
@@ -17,7 +17,7 @@ class Thesaurus(object):
         self._triggers = None
         log("loading thesaurus", "BLUE", True)
         self.descriptors = {}
-        f = codecs.open(path, "r", "utf-8")
+        f = codecs.open(get_dir() + path, "r", "utf-8")
         for idx, line in enumerate(f.readlines()):
             cleaned_line, options = self.split_line(line)
             if cleaned_line is not None:
@@ -85,7 +85,7 @@ class Thesaurus(object):
     
     def load_triggers(self):
         log("Loading triggers...", "YELLOW", True)
-        f = codecs.open("corpus/triggers.trg", "r", "utf-8")
+        f = codecs.open(get_dir() + "corpus/triggers.trg", "r", "utf-8")
         for idx, line in enumerate(f.readlines()):
             #TODO check line validity
             t, created = Trigger.get_or_create(line, self, parent=self, original=line)
