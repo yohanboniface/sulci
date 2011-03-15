@@ -183,7 +183,7 @@ class Command(BaseCommand):
             for i in xrange(0,SUBPROCESSES):
                 log(u"Opening slave subprocess %d" % i, "BLUE", True)
                 python_kind = not __debug__ and ["-O"] or []
-                subprocess.Popen(["python"] + python_kind + ["manage.py", training_kind, "--trainer_mode=slave"])
+                subprocess.Popen(["python"] + python_kind + ["manage.py", "sulci_cli", training_kind, "--trainer_mode=slave"])
             # Set the mode to the trainer
             TRAINER_MODE = "master"
         if LEXICAL_TRAIN_TAGGER:
@@ -201,19 +201,20 @@ class Command(BaseCommand):
             T = Thesaurus()
             S = SemanticalTrainer(T,P)
             if PK:
-                a = Article.objects.get(pk=PK)
-                S.train(a.content, a.keywords)
+                a = content_model.objects.get(pk=PK)
+                S.train(getattr(a, settings.SULCI_CLI_CONTENT_PROPERTY), getattr(a, settings.SULCI_CLI_KEYWORDS_PROPERTY))
             else:
                 S.begin()
                 if FORCE:# otherwise it has no sens, as the list will not be overwrited
-                    manager = getattr(content_model, settings.SULCI_CONTENT_MANAGER_METHOD_NAME)
+                    manager = getattr(content_model, settings.SULCI_CLI_CONTENT_MANAGER_METHOD_NAME)
                     qs = manager.all()
                     if LIMIT:
                         qs = qs[:LIMIT]
 #                    for a in Article.objects.filter(editorial_source=Article.EDITORIAL_SOURCE.PRINT).exclude(keywords__isnull=True).exclude(keywords=""):
                     for a in qs:
-                        S.train(getattr(a, settings.SULCI_CONTENT_PROPERTY), getattr(a, settings.SULCI_KEYWORDS_PROPERTY))
-            S.export(FORCE)
+                        S.train(getattr(a, settings.SULCI_CLI_CONTENT_PROPERTY), getattr(a, settings.SULCI_CLI_KEYWORDS_PROPERTY))
+#                S.clean_connections()
+#            S.export(FORCE)
         if CHECK_ENTRY:
             L.get_entry(CHECK_ENTRY.decode("utf-8"))
         if LEXICON_COUNT:
