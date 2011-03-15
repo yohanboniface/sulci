@@ -13,6 +13,7 @@ a training routine and an analysis routine:
 
 * POS (part-of-speech) tagging -- using an algorithm similar to Brill's;
 * lemmatization;
+* collocations extraction;
 * semantical tagging (somehow similar to a neural network).
 
 
