@@ -9,16 +9,17 @@ except (IOError, OSError):
     reqs = ''
 
 setup(
-    name = 'sulci',
+    name='sulci',
     version=sulci.get_version(),
-    description = 'A French textminig based on Liberation corpus and thesaurus.',
-    author = 'Yohan Boniface',
-    author_email = 'y.boniface@liberation.fr',
-    url = 'https://github.com/yohanboniface/sulci',
-    packages = find_packages(),
-    include_package_data = True,
-    install_requires = reqs,
-    classifiers = [
+    description='A French textminig based on Liberation corpus and thesaurus.',
+    author='Yohan Boniface',
+    author_email='y.boniface@liberation.fr',
+    url='https://github.com/yohanboniface/sulci',
+    packages=find_packages(),
+    include_package_data=True,
+    package_data={'sulci': 'corpus'},
+    install_requires=reqs,
+    classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
