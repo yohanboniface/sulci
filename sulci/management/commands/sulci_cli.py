@@ -6,13 +6,14 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from sulci.pos_tagger import PosTagger, LexicalTrainer, ContextualTrainer, Trainer
+from sulci.pos_tagger import PosTagger
 from sulci.lexicon import Lexicon
 from sulci.corpus import Corpus
 from sulci.textmining import SemanticalTagger
 from sulci.thesaurus import Thesaurus
 from sulci.utils import log
-from sulci.trainers import SemanticalTrainer, LemmatizerTrainer
+from sulci.trainers import SemanticalTrainer, LemmatizerTrainer, LexicalTrainer,\
+                                                   ContextualTrainer, POSTrainer
 from sulci.lemmatizer import Lemmatizer
 from __init__ import content_model# ugly
 
@@ -193,7 +194,7 @@ class Command(BaseCommand):
             T = ContextualTrainer(P,C,TRAINER_MODE)
             T.do()
         if DISPLAY_ERRORS:
-            T = Trainer(P,C)
+            T = POSTrainer(P,C)
             T.display_errors()
         if SEMANTICAL_TRAINER:
             if FORCE:
