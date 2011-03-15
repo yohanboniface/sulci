@@ -17,7 +17,7 @@ setup(
     url='https://github.com/yohanboniface/sulci',
     packages=find_packages(),
     include_package_data=True,
-    package_data={'sulci': ['corpus']},
+    package_data={'sulci': ['corpus/*']},
     install_requires=reqs,
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
