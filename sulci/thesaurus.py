@@ -7,6 +7,8 @@ import os
 
 from Stemmer import Stemmer#DRY ALERT
 
+from django.db import models
+
 from textminingutils import tokenize_text, normalize_token, lev
 from base import RetrievableObject
 from utils import log, save_to_file, get_dir
@@ -14,44 +16,45 @@ from utils import log, save_to_file, get_dir
 class Thesaurus(object):
 
     def __init__(self, path="thesaurus.txt"):
-        self._triggers = None
-        log("loading thesaurus", "BLUE", True)
-        self.descriptors = {}
-        f = codecs.open(get_dir() + path, "r", "utf-8")
-        for idx, line in enumerate(f.readlines()):
-            cleaned_line, options = self.split_line(line)
-            if cleaned_line is not None:
-    #                if idx == 9: print cleaned_line
-                dpt, created = Descriptor.get_or_create(tokenize_text(cleaned_line),
-                                                        self,
-                                                        original=tokenize_text(cleaned_line),
-                                                        options=options,
-                                                        line=idx)
-                dpt_indexes = dpt.aliases
-                for dpt_index in dpt_indexes:
-    #                    if "Fini" in line: print dpt_index
-                    if not dpt_index in self:
-                        self.descriptors[dpt_index] = []
-                    if not dpt in self.descriptors[dpt_index]:
-                        self.descriptors[dpt_index].append(dpt)
-        f.close()
-        log("thesaurus loaded", "BLUE", True)
+        self.descriptors = Descriptor.objects.all()
+#        self._triggers = None
+#        log("loading thesaurus", "BLUE", True)
+#        self.descriptors = {}
+#        f = codecs.open(get_dir() + path, "r", "utf-8")
+#        for idx, line in enumerate(f.readlines()):
+#            cleaned_line, options = self.split_line(line)
+#            if cleaned_line is not None:
+#    #                if idx == 9: print cleaned_line
+#                dpt, created = Descriptor.get_or_create(tokenize_text(cleaned_line),
+#                                                        self,
+#                                                        original=tokenize_text(cleaned_line),
+#                                                        options=options,
+#                                                        line=idx)
+#                dpt_indexes = dpt.aliases
+#                for dpt_index in dpt_indexes:
+#    #                    if "Fini" in line: print dpt_index
+#                    if not dpt_index in self:
+#                        self.descriptors[dpt_index] = []
+#                    if not dpt in self.descriptors[dpt_index]:
+#                        self.descriptors[dpt_index].append(dpt)
+#        f.close()
+#        log("thesaurus loaded", "BLUE", True)
     
     def __contains__(self, item):
         """
-        The idea is to get a tuple, en compare it with each aliases.
+        TODO.
         """
-#        print "contains", item
-        return self.normalize_item(item) in self.descriptors
+        try:
+            d = self[item]
+            return True
+        except Descriptor.DoesNotExist:
+            return False
     
     def __iter__(self): 
         return self.descriptors.__iter__()
     
     def __getitem__(self, key):
-        idx = self.normalize_item(key)
-        return self.descriptors[key][0]
-        #Not sure we need it anymore, when using triggers
-#        return sorted(((lev(u" ".join(d.original), u" ".join(unicode(stemm) for stemm in idx)), d) for d in self.descriptors[idx]), key=lambda tup: tup[0])[0][1]
+        return Descriptor.objects.get(name=unicode(key))
     
     def normalize_item(self, item):
         from textmining import KeyEntity#Sucks...
@@ -99,34 +102,46 @@ class Thesaurus(object):
         """
         save_to_file("corpus/triggers.trg", "")
 
-class Descriptor(RetrievableObject): 
+class Descriptor(models.Model): 
     """
-    Entries of the Thésaurus.
+    Entries of the Thesaurus.
     """
-    def __init__(self, pk, **kwargs):
-        self.id = pk
-        self.original = kwargs["original"]
-#        self.line = kwargs["line"]
-        self.options = {}
-        if "options" in kwargs:
-            self.get_options(kwargs["options"])
-        self.make_aliases()
+    parent = models.ForeignKey('self', 
+        blank=True, 
+        null=True, 
+        related_name="children")
+    name = models.CharField(max_length=200, db_index=True)
+    description = models.TextField(blank=True, null=True)
+
+#    def __init__(self, pk, **kwargs):
+#        self.id = pk
+#        self.original = kwargs["original"]
+##        self.line = kwargs["line"]
+#        self.options = {}
+#        if "options" in kwargs:
+#            self.get_options(kwargs["options"])
+#        self.make_aliases()
+    
+    @property
+    def original(self):
+        # Retrocompatibility
+        return self.name
     
     def __unicode__(self):
-        return u" ".join([unicode(t) for t in self.original])
+        return unicode(self.original)
     
-    def __hash__(self):
-        return self.id.__hash__()
+#    def __hash__(self):
+#        return self.id.__hash__()
     
-    def make_aliases(self):
-        self.aliases = []
-        candidates = [self.id]
-        stemmer = Stemmer("french")#DRY ALERT !!!
-        if "aliases" in self.options:
-            for alias in self.options["aliases"].split(","):
-                candidates.append(tuple([stemmer.stemWord(normalize_token(w)) for w in tokenize_text(alias.strip())]))
-        for candidate in candidates:
-            self.aliases.append(tuple(sorted(candidate)))
+#    def make_aliases(self):
+#        self.aliases = []
+#        candidates = [self.id]
+#        stemmer = Stemmer("french")#DRY ALERT !!!
+#        if "aliases" in self.options:
+#            for alias in self.options["aliases"].split(","):
+#                candidates.append(tuple([stemmer.stemWord(normalize_token(w)) for w in tokenize_text(alias.strip())]))
+#        for candidate in candidates:
+#            self.aliases.append(tuple(sorted(candidate)))
 #        #Original graph
 #        self.aliases.append(self.id)
 #        #Ordered
@@ -135,26 +150,46 @@ class Descriptor(RetrievableObject):
 #            l = sorted(l)
 #            self.aliases.append(tuple(l))
     
-    def get_options(self, options):
-        if options is not None:
-            pattern = re.compile("([\w]+)=([\w ,_\-'\(\)&]+)")
-            r = pattern.findall(options)
-            for tup in r:
-                self.options[tup[0]] = tup[1]
+#    def get_options(self, options):
+#        if options is not None:
+#            pattern = re.compile("([\w]+)=([\w ,_\-'\(\)&]+)")
+#            r = pattern.findall(options)
+#            for tup in r:
+#                self.options[tup[0]] = tup[1]
 
-class Trigger(RetrievableObject):
+class TriggerToDescriptor(models.Model):
+    """
+    This is the "sinapse" of the trigger to descriptor relation.
+    """
+    descriptor = models.ForeignKey(Descriptor)
+    trigger = models.ForeignKey("Trigger")
+    weight = models.FloatField(default=0, db_index=True)
+
+    class Meta:
+        unique_together = ("descriptor", "trigger")
+
+    def __unicode__(self):
+        return u"%s =(%f)=> %s" % (self.trigger, self.weight, self.descriptor)
+
+
+class Trigger(models.Model):
     """
     The trigger is a keyentity who suggest some descriptors when in a text.
     It is linked to one or more descriptors, and the distance of the link
     between the trigger and a descriptor is stored in the relation.
     This score is populated during the sementical training.
     """
-    def __init__(self, pk, **kwargs):
-        self.id = pk#Tuple of original string
-        self.original = u" ".join(pk)
-        self.parent = kwargs["parent"]
-        self._descriptors = {}
-        self.init_descriptors(**kwargs)
+    original = models.CharField(max_length=500, db_index=True, unique=True)
+    descriptors = models.ManyToManyField("Descriptor", 
+                through="TriggerToDescriptor", 
+                blank=True, 
+                null=True)    
+#    def __init__(self, pk, **kwargs):
+#        self.id = pk#Tuple of original string
+#        self.original = u" ".join(pk)
+#        self.parent = kwargs["parent"]
+#        self._descriptors = {}
+#        self.init_descriptors(**kwargs)
     
     @classmethod
     def make_key(cls, line):
@@ -170,32 +205,37 @@ class Trigger(RetrievableObject):
         return unicode(self.original)
     
     def __contains__(self, key):
-        return key in self._descriptors
+        return key in self.descriptors.all()
     
     def __setitem__(self, key, value):
-        return self._descriptors.__setitem__(key, value)
+        if not isinstance(key, Descriptor):
+            raise ValueError("Key must be Descriptor instance, got %s (%s) instead" 
+                                                        % (str(key), type(key)))
+        return TriggerToDescriptor.objects.create(descriptor=key, 
+                                                  trigger=self,
+                                                  weight=value)
     
     def __getitem__(self, key):
-        return self._descriptors.__getitem__(key)
+        return TriggerToDescriptor.objects.get(descriptor=key, trigger=self)
     
     def __delitem__(self, key):
         return self._descriptors.__delitem__(key)
     
     def __iter__(self):
-        return self._descriptors.__iter__()
+        return self.triggertodescriptor_set.all().__iter__()
     
     def __len__(self):
-        return self._descriptors.__len__()
+        return self.descriptors.count()
     
     def items(self):
-        return self._descriptors.items()
+        return self.descriptors.all()
     
     def __hash__(self):
         return self.original.__hash__()
     
     @property
     def max_score(self):
-        return max(self[d] for d in self)
+        return max(self[d.descriptor].weight for d in self)
     
     def init_descriptors(self, **kwargs):
         """
@@ -218,7 +258,9 @@ class Trigger(RetrievableObject):
         if not descriptor in self:
 #            log(u"Creating connection %s - %s" % (self, descriptor), "CYAN")
             self[descriptor] = 0.0
-        self[descriptor] += score
+        rel = self[descriptor]
+        rel.weight += score
+        rel.save()
 #        if self[descriptor] < 0:
 #            del self[descriptor]
 #            log(u"Removed connection %s - %s" % (self, descriptor), "RED")
@@ -231,6 +273,10 @@ class Trigger(RetrievableObject):
             if self[descriptor] < 0:
                 del self[descriptor]
                 log(u"Removed connection %s - %s" % (self, descriptor), "RED")        
+    
+    @classmethod
+    def clean_all_connections(cls):
+        TriggerToDescriptor.objects.filter(score__lte=0).delete()
     
     def export(self):
         """

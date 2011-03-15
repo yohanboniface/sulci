@@ -213,7 +213,7 @@ class Command(BaseCommand):
 #                    for a in Article.objects.filter(editorial_source=Article.EDITORIAL_SOURCE.PRINT).exclude(keywords__isnull=True).exclude(keywords=""):
                     for a in qs:
                         S.train(getattr(a, settings.SULCI_CLI_CONTENT_PROPERTY), getattr(a, settings.SULCI_CLI_KEYWORDS_PROPERTY))
-#                S.clean_connections()
+                S.clean_connections()
 #            S.export(FORCE)
         if CHECK_ENTRY:
             L.get_entry(CHECK_ENTRY.decode("utf-8"))

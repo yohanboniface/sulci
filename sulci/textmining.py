@@ -37,6 +37,7 @@ class SemanticalTagger(TextManager):
         self.postagger = pos_tagger or PosTagger(lexicon=Lexicon())
         self.lemmatizer = lemmatizer or Lemmatizer()
         self.make()
+        self._triggers = None
 
     def __iter__(self):
         return self.words.__iter__()
@@ -187,31 +188,44 @@ class SemanticalTagger(TextManager):
         return sorted(self.keyentities, key=lambda kp: kp.frequency_relative_pmi_confidence * kp._confidences["pos"], reverse=True)[:20]
     
     @property
+    def triggers(self):
+        """
+        Select triggers available for the current keyentities.
+        """
+        if self._triggers is None:
+            self._triggers = set()
+            for kp in self.keyentities:
+                try:
+                    t = Trigger.objects.select_related("descriptors").get(original=unicode(kp))
+                    self._triggers.add((t, kp.trigger_score))
+                except Trigger.DoesNotExist:
+                    pass
+        return self._triggers
+    
+    @property
     def descriptors(self):
         """
         Final descriptors for the text.
         """
-        #Loading triggers...
-        self.thesaurus.triggers
-        self._scored_descriptors = set()
+        self._scored_descriptors = {}
         total_score = 0
-        for kp in self.keyentities:
-            t, created = Trigger.get_or_create(unicode(kp), self.thesaurus, parent=self.thesaurus, original=unicode(kp))
-            if not created:
+        for t, score in self.triggers:
 #                log(u"%s => (%s)" % (repr(kp), unicode(t)), "YELLOW")
-                for d in t:
-                    if t[d] > 0:
-                        if not d in self._scored_descriptors:
-                            self._scored_descriptors.add(d)
-                            d.score = 0
-                        d.score += (t[d] / t.max_score) * kp.trigger_score
-            total_score += kp.trigger_score
-        for d in self._scored_descriptors:
-            d.score = d.score / total_score * 100.0
+            # Take the trigger relations
+            for d in t:
+                if d.weight > 0:
+                    # Add the descriptor if needed
+                    if not d.descriptor in self._scored_descriptors:
+                        self._scored_descriptors[d.descriptor] = 0
+                    # Update descriptor final score
+                    self._scored_descriptors[d.descriptor] += (d.weight / t.max_score) * score
+            total_score += score
+        for d, value in self._scored_descriptors.items():
+            self._scored_descriptors[d] = value / total_score * 100.0
         #This also means that only the descriptors triggered up to this min 
         #will be considered by trainer.
         min_score = 1
-        return [d for d in sorted(self._scored_descriptors, key=lambda d: d.score, reverse=True) if d.score > min_score]
+        return [(d, value) for d,value in sorted(self._scored_descriptors.items(), key=lambda t: t[1], reverse=True) if value > min_score]
     
     
     def debug(self):
@@ -272,21 +286,19 @@ class SemanticalTagger(TextManager):
             log(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
         log(u"Keyentities from triggers", "BLUE", True)
         #Loading...
-        self.thesaurus.triggers
+#        self.thesaurus.triggers
         scored_descriptors = defaultdict(float)
-        for kp in self.keyentities:
-            t, created = Trigger.get_or_create(unicode(kp), self.thesaurus, parent=self.thesaurus, original=unicode(kp))
-            if not created:
-                log(u"%s => (%s)" % (repr(kp), unicode(t)), "YELLOW")
-                for d in sorted(t._descriptors, key=lambda ds: t._descriptors[ds], reverse=True):
-                    log(u"%s %f" % (unicode(d), t._descriptors[d] / t.max_score * 100), "CYAN")
+        for t, score in self.triggers:
+            log(u"%s => %f" % (unicode(t), score), "YELLOW")
+            for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
+                log(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_score * 100), "CYAN")
 #        log(u"Scored descriptors", "YELLOW", True)
 #        for d, v in sorted(scored_descriptors.iteritems(), key=itemgetter(1), reverse=True):
 #            if scored_descriptors[d] > 0.001:#Test
 #                log(u"%s %f" % (unicode(d), scored_descriptors[d]), "WHITE")
         log(u"Scored descriptors", "YELLOW", True)
-        for d in self.descriptors:
-            log(u"%s %f" % (unicode(d), d.score), "WHITE")
+        for d, value in self.descriptors:
+            log(u"%s %f" % (unicode(d), value), "WHITE")
 
 
 class KeyEntity(RetrievableObject):

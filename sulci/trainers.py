@@ -22,7 +22,7 @@ class SemanticalTrainer(object):
     def __init__(self, thesaurus, pos_tagger):
         self.thesaurus = thesaurus
         self.pos_tagger = pos_tagger
-        self._triggers = self.thesaurus.triggers
+#        self._triggers = self.thesaurus.triggers
     
     def begin(self):
         """
@@ -30,34 +30,33 @@ class SemanticalTrainer(object):
         Have to be called one time at the begining, and that's all.
         """
         #TODO Add aliases...
-        self._triggers = set()#do not use previous
-        for idx in self.thesaurus:
-            d = self.thesaurus[idx]
-            t, created = Trigger.get_or_create(unicode(d), self, original=unicode(d), parent=self.thesaurus)
+        for d in self.thesaurus:
+            t = Trigger.objects.create(original=unicode(d))
             t.connect(d, 1)
-            self._triggers.add(t)
+#            self._triggers.add(t)
     
     def train(self, text, descriptors):
         """
         For the moment, descriptors are a string with "," separator.
         """
         validated_descriptors = set()
-        #Retrieve descriptors
+        # Retrieve descriptors
         for d in descriptors.split(","):
-            #Get this tokenize_text out of my eyes !
+            # Get this tokenize_text out of my eyes !
             d = d.strip().replace(u"’", u"'")
             if not d == "":
-                dsc, created = Descriptor.get_or_create(tokenize_text(d), self.thesaurus, original=tokenize_text(d))
+                # We create the descriptor not in thesaurus for now
+                dsc, created = Descriptor.objects.get_or_create(name=d)
                 validated_descriptors.add(dsc)
                 if created:
                     log(u"Lairning descriptor not in thesaurus : %s" % unicode(dsc), "RED")
-        #Retrieve keytentities :
+        # Retrieve keytentities :
         S = SemanticalTagger(text, self.thesaurus, self.pos_tagger)
         current_triggers = set()
         for ke in S.keyentities:
-            #Retrieve or create triggers
-            t, created = Trigger.get_or_create(unicode(ke), self.thesaurus, original=unicode(ke), parent=self.thesaurus)
-            self._triggers.add(t)
+            # Retrieve or create triggers
+            t, created = Trigger.objects.get_or_create(original=unicode(ke))
+#            self._triggers.add(t)
             current_triggers.add(t)
             t.current_score = ke.trigger_score
             #Attache descriptor
@@ -66,7 +65,7 @@ class SemanticalTrainer(object):
         log(u"Descriptors validated by human", "WHITE")
         log([unicode(d) for d in validated_descriptors], "YELLOW")
         #Descriptors calculated by SemanticalTagger
-        calculated_descriptors = set(S.descriptors)
+        calculated_descriptors = set(d for d, value in S.descriptors)
         log(u"Descriptors calculated", "WHITE")
         log([unicode(d) for d in calculated_descriptors], "YELLOW")
         #Descriptors that where tagged by humans, but not calculated
@@ -93,15 +92,21 @@ class SemanticalTrainer(object):
                 t.connect(d, t.current_score)#guess the relation
                 log(u"Connecting %s and %s" % (t, d), "WHITE")
     
-    def export(self, force):
-        ext = force and self.VALID_EXT or self.PENDING_EXT
-        final = []
-        for t in self._triggers:
-            t.clean_connections()
-            e = t.export()
-            if e:
-                final.append(e)
-        save_to_file("corpus/triggers%s" % ext, "\n".join(final) )
+    def clean_connections(self):
+        """
+        Delete all the connection where score < 0.
+        """
+        Trigger.clean_all_connections()
+    
+#    def export(self, force):
+#        ext = force and self.VALID_EXT or self.PENDING_EXT
+#        final = []
+#        for t in self._triggers:
+#            t.clean_connections()
+#            e = t.export()
+#            if e:
+#                final.append(e)
+#        save_to_file("corpus/triggers%s" % ext, "\n".join(final) )
 
 class LemmatizerTrainer(object):
     """
