@@ -46,6 +46,8 @@ class RuleTemplate(RetrievableObject):
             if self.is_candidate(token, rule):
 #                print unicode(token), token.verified_tag, rule
                 token.tag = to_tag
+                # Maybe we should do this only in training mode
+                token.sample.reset_trainer_status()
         
     @classmethod
     def select_one(cls, rules, MAX, minval=2):

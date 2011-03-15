@@ -30,7 +30,7 @@ class SemanticalTrainer(object):
         Make one trigger for each descriptor of the thesaurus.
         Have to be called one time at the begining, and that's all.
         """
-        #TODO Add aliases...
+        # TODO Add aliases...
         for d in self.thesaurus:
             t = Trigger.objects.create(original=unicode(d))
             t.connect(d, 1)
@@ -38,7 +38,7 @@ class SemanticalTrainer(object):
     
     def train(self, text, descriptors):
         """
-        For the moment, descriptors are a string with "," separator.
+        For the moment, human defined descriptors are a string with "," separator.
         """
         validated_descriptors = set()
         # Retrieve descriptors
@@ -60,7 +60,6 @@ class SemanticalTrainer(object):
 #            self._triggers.add(t)
             current_triggers.add(t)
             t.current_score = ke.trigger_score
-            #Attache descriptor
         log(u"Current triggers", "WHITE")
         log([unicode(d) for d in current_triggers], "YELLOW")
         log(u"Descriptors validated by human", "WHITE")
@@ -240,6 +239,10 @@ class POSTrainer(object):
                     #We have applied a rule, we can try another run
                     tag_errors = self.get_errors()
                     break#break the for
+                else:#No rule applied for this error
+                    # We don't want to reprocess this error another time
+                    # unless the sample (so the context) as changed.
+                    tag_error.sample.set_trained_position(tag_error.position)
             if run_applied_rule: continue#go back to while
             tag_errors = None#Nothing applied, we stop here.
         self.display_errors()
@@ -303,17 +306,14 @@ class POSTrainer(object):
         log(u"%s g: %d b : %d" % (rule, good, bad), "GRAY")
         return rule, good, bad
     
-    def get_first_error(self, tokens):
-        for token in tokens:
-            if token.tag != token.verified_tag:
-                return token
-        return None
-    
     def get_errors(self):
+        """
+        Retrieve token where tag !== verified_tag.
+        """
         final = []
-        for token in self.corpus:
-            if token.tag != token.verified_tag:
-                final.append(token)
+        for sample in self.corpus.samples:
+            # We don't take in count sample yet processed and not modified.
+            final += sample.get_tag_errors()
         return final
     
     def display_errors(self):
@@ -339,12 +339,13 @@ class LexicalTrainer(POSTrainer):
         self.tagger.tag_all(self.corpus.tokens, lexical=False, contextual=False)
     
     def get_errors(self):
+        """
+        We don't care about token in Lexicon, for lexical trainer.
+        """
         final = []
-        for token in self.corpus:
-#            if token.tag != token.verified_tag:
-            if token.tag != token.verified_tag \
-               and not token in self.tagger.lexicon:
-                final.append(token)
+        for sample in self.corpus.samples:
+            # We don't take in count sample yet processed and not modified.
+            final += [t for t in sample.get_tag_errors() if not t in self.tagger.lexicon]
         return final
 
 class ContextualTrainer(POSTrainer):

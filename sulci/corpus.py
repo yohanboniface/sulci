@@ -26,7 +26,7 @@ class Corpus(TextManager):
         self.tagger = tagger
         self._raw_content = None
         self._tokens = None
-        self._samples = []
+        self._samples = None
     
     @property
     def content(self):
@@ -45,6 +45,12 @@ class Corpus(TextManager):
             log("Loading corpus...", "RED", True)
             self._samples, self._tokens = self.instantiate_text(self.content.split())
         return self._tokens
+    
+    @property
+    def samples(self):
+        if self._samples is None:
+            self.tokens # Load tokens and samples
+        return self._samples
     
     def __iter__(self):
         return self.tokens.__iter__()

@@ -123,6 +123,16 @@ class Sample(RetrievableObject):
         self.tokens = []#Otherwise all the objects have the same reference
         self._len = None#caching
         self.tag = None
+        # This field is used  just in training mode.
+        # The idea is : every time a token with wrong tag is processed but
+        # not corrected, we store his index, to prevent from reprocessing it until 
+        # the sample has changed.
+        # Maybe, for design purpose, this field can be added by trainer or 
+        # whe should subclass the Sample with a TrainerSample...
+        self._trainer_processed = set()
+        # If each errors in the sample are processed but not corrected, it's not
+        # necessary to reprocess there errors until the sample hasn't changed.
+        self._trainer_candidate = True
     
     def __unicode__(self):
         return u" ".join([unicode(t) for t in self.tokens])
@@ -159,6 +169,40 @@ class Sample(RetrievableObject):
         begin = max(0, position - 5)
         end = min(len(self), position + 5)
         return [repr(t) for t in self[begin:end]]
+    
+    def get_tag_errors(self):
+        final = []
+        # Squeeze the loop if False.
+        if not self._trainer_candidate: return final
+        for token in self:
+            if token.tag != token.verified_tag \
+                and not token.position in self._trainer_processed:
+                # If the position is in _trainer_processed, this means
+                # that the error was yet processed but not corrected
+                # and the sample has not changed until then.
+                final.append(token)
+        if final == []:
+            # We use this as a cache, to prevent from looping over the errors
+            # each time.
+            # Remember that if some token is changed in the sample, the method
+            # reset_trainer_status is normaly called.
+            self._trainer_candidate = False
+        return final
+    
+    def reset_trainer_status(self):
+        """
+        This method has to be called by the trainer each time a token of
+        this sample is modified.
+        """
+        self._trainer_candidate = True
+        self._trainer_processed = set()
+    
+    def set_trained_position(self, pos):
+        """
+        This method has to be called by trainer each time a token is processed
+        but not corrected.
+        """
+        self._trainer_processed.add(pos)
 
 class Token(RetrievableObject):
     """
@@ -193,6 +237,13 @@ class Token(RetrievableObject):
     
     def lower(self):
         return self.original.lower()
+    
+    @property
+    def sample(self):
+        """
+        For retrocompatibility.
+        """
+        return self.parent
     
     @property
     def previous_bigram(self):
