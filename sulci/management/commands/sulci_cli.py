@@ -15,7 +15,7 @@ from sulci.utils import log
 from sulci.trainers import SemanticalTrainer, LemmatizerTrainer, LexicalTrainer,\
                                                    ContextualTrainer, POSTrainer
 from sulci.lemmatizer import Lemmatizer
-from __init__ import content_model# ugly
+from sulci import content_model
 
 class Command(BaseCommand):
     """
@@ -181,7 +181,8 @@ class Command(BaseCommand):
             import subprocess
             training_kind = LEXICAL_TRAIN_TAGGER and "-i"\
                             or LEMMATIZER_TRAINING and "-r"\
-                            or "-c"
+                            or SEMANTICAL_TRAINER and "-n"\
+                            or "-c" # CONTEXTUAL_TRAIN_TAGGER
             # Create slaves
             for i in xrange(0,SUBPROCESSES):
                 log(u"Opening slave subprocess %d" % i, "BLUE", True)
@@ -203,25 +204,18 @@ class Command(BaseCommand):
             T = POSTrainer(P,C)
             T.display_errors()
         if SEMANTICAL_TRAINER:
-            if FORCE:
-                Thesaurus.reset_triggers()
             T = Thesaurus()
-            S = SemanticalTrainer(T,P)
+            S = SemanticalTrainer(T,P,TRAINER_MODE)
             if PK:
+                # Should not have PK in TRAINER_MODE == "master"
                 a = content_model.objects.get(pk=PK)
-                S.train(getattr(a, settings.SULCI_CLI_CONTENT_PROPERTY), getattr(a, settings.SULCI_CLI_KEYWORDS_PROPERTY))
+                S.train(a)
             else:
-                S.begin()
-                if FORCE:# otherwise it has no sens, as the list will not be overwrited
-                    manager = getattr(content_model, settings.SULCI_CLI_CONTENT_MANAGER_METHOD_NAME)
-                    qs = manager.all()
-                    if LIMIT:
-                        qs = qs[:LIMIT]
-#                    for a in Article.objects.filter(editorial_source=Article.EDITORIAL_SOURCE.PRINT).exclude(keywords__isnull=True).exclude(keywords=""):
-                    for a in qs:
-                        S.train(getattr(a, settings.SULCI_CLI_CONTENT_PROPERTY), getattr(a, settings.SULCI_CLI_KEYWORDS_PROPERTY))
-                S.clean_connections()
-#            S.export(FORCE)
+                if FORCE:
+                    S.begin()
+                S.do()
+                if TRAINER_MODE == "master":
+                    S.clean_connections()
         if CHECK_ENTRY:
             L.get_entry(CHECK_ENTRY.decode("utf-8"))
         if LEXICON_COUNT:
