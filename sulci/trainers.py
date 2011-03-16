@@ -81,28 +81,37 @@ class SemanticalTrainer(object):
             t_init = time.time()
             if self.mode == "master":
                 self.setup_socket_master()
-            qs = content_manager.all().only("id")[:]
-            for a in qs:
+            qs = content_manager.all().only("id")
+            # We make it by step, to limit RAM consuming
+            step = 1000
+            for loop in range(len(qs) / step + 1):
+                _from = loop*step
+                _to = _from + step
+                current_qs = qs[_from:_to]
+                print "MASTER -- Processing qs from %d to %d" % (_from, _to)
+                for a in current_qs:
+                    if self.mode == "master":
+                        self.reqsocket.send_multipart([str(a.pk)])
+                    # We are training all objects, but without slaves.
+                    else:
+                        self.train(a)
                 if self.mode == "master":
-                    self.reqsocket.send_multipart([str(a.pk)])
-                # We are training all objects, but without slaves.
-                else:
-                    self.train(a)
-            # This can't work, as pusher don't wait for response...
+                    forloop_remaining = total = len(current_qs)
+                    # Waiting for answers
+                    # The need is also to send the "stop" action only at the end
+                    for idx in current_qs:
+                        status = self.reqsocket.recv()
+                        # Calculating ETA
+                        forloop_remaining -= 1
+                        t_now = time.time()
+                        t_diff = t_now - t_init
+                        time_remaining = (t_diff / (total - forloop_remaining) * forloop_remaining)
+                        ETA = datetime.datetime.now() + datetime.timedelta(0,time_remaining)
+                        # Using print, as I launch this huge script
+                        # with python -O (so not __debug__, so no log)
+                        print "MASTER -- %s -- %s remaining to process -- ETA : %s" %\
+                               (status, forloop_remaining, ETA.strftime("%a %d %R"))
             if self.mode == "master":
-                forloop_remaining = total = len(qs)
-                for idx in qs:
-                    status = self.reqsocket.recv()
-                    # Calculating ETA
-                    forloop_remaining -= 1
-                    t_now = time.time()
-                    t_diff = t_now - t_init
-                    time_remaining = (t_diff / (total - forloop_remaining) * forloop_remaining)
-                    ETA = datetime.datetime.now() + datetime.timedelta(0,time_remaining)
-                    # Using print, as I launch this huge script
-                    # with python -O (so not __debug__, so no log)
-                    print "%s -- %s remaining to process -- ETA : %s" %\
-                           (status, forloop_remaining, ETA.strftime("%a %d %R"))
                 self.pubsocket.send(" stop")
     
     def slave(self):
