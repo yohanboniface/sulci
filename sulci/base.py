@@ -170,12 +170,18 @@ class Sample(RetrievableObject):
         end = min(len(self), position + 5)
         return [repr(t) for t in self[begin:end]]
     
-    def get_tag_errors(self):
+    def get_errors(self, attr="tag"):
+        """
+        Retrieve errors, comparing attr and verified_attr.
+        Possible values are : tag, lemme.
+        """
         final = []
         # Squeeze the loop if False.
         if not self._trainer_candidate: return final
         for token in self:
-            if token.tag != token.verified_tag \
+            test_attr = getattr(token, attr)
+            verified_attr = getattr(token, "verified_%s" % attr)
+            if test_attr != verified_attr \
                 and not token.position in self._trainer_processed:
                 # If the position is in _trainer_processed, this means
                 # that the error was yet processed but not corrected

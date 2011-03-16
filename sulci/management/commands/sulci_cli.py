@@ -179,7 +179,9 @@ class Command(BaseCommand):
                 C.prepare_candidate(PK)
         if SUBPROCESSES:
             import subprocess
-            training_kind = LEXICAL_TRAIN_TAGGER and "-i" or "-c"
+            training_kind = LEXICAL_TRAIN_TAGGER and "-i"\
+                            or LEMMATIZER_TRAINING and "-r"\
+                            or "-c"
             # Create slaves
             for i in xrange(0,SUBPROCESSES):
                 log(u"Opening slave subprocess %d" % i, "BLUE", True)
@@ -192,6 +194,10 @@ class Command(BaseCommand):
             T.do()
         if CONTEXTUAL_TRAIN_TAGGER:
             T = ContextualTrainer(P,C,TRAINER_MODE)
+            T.do()
+        if LEMMATIZER_TRAINING:
+            L = Lemmatizer()
+            T = LemmatizerTrainer(L,TRAINER_MODE)
             T.do()
         if DISPLAY_ERRORS:
             T = POSTrainer(P,C)
@@ -224,10 +230,6 @@ class Command(BaseCommand):
             log(u"Words in corpus : %d" % len(C), "WHITE")
         if TAGS_STATS:
             C.tags_stats()
-        if LEMMATIZER_TRAINING:
-            L = Lemmatizer()
-            T = LemmatizerTrainer(L)
-            T.train()
         if SEMANTICAL_TAGGER and PK:
             a = content_model.objects.get(pk=PK)
 #            t = a.title + ". " + a.subtitle + ". " + a.content#Make some method

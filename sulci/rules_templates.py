@@ -785,6 +785,9 @@ class LemmatizerBaseTemplate(RetrievableObject):
     
     def uncompile_rule(self, rule):
         return rule.split(" ")
+    
+    def __unicode__(self):
+        return u"<%s %s>" % (self.__class__.__name__, self.id)
 
 class MAKELOWER(LemmatizerBaseTemplate):
     """
@@ -806,6 +809,7 @@ class MAKELOWER(LemmatizerBaseTemplate):
 #               and token[0].isupper()#the first letter is upper
     
     def test_rule(self, token, rule):
+#        print token, token.lemme, token.verified_lemme, rule, token.tag
         if not self.is_candidate(token, rule): return 0
         elif token.verified_lemme[0] == token.lemme[0].lower(): return 1
         else: return -1
@@ -814,6 +818,8 @@ class MAKELOWER(LemmatizerBaseTemplate):
         for token in tokens:
             if self.is_candidate(token, rule):
                 token.lemme = token.lemme.lower()
+                # Maybe we should do this only in training mode
+                token.sample.reset_trainer_status()
 
 class CHANGESUFFIX(LemmatizerBaseTemplate):
     """
@@ -857,6 +863,8 @@ class CHANGESUFFIX(LemmatizerBaseTemplate):
         for token in tokens:
             if self.is_candidate(token, rule):
                 token.lemme = token.lemme[:-len(to_delete)] + to_add
+                # Maybe we should do this only in training mode
+                token.sample.reset_trainer_status()
 
 class FORCELEMME(LemmatizerBaseTemplate):
     """
@@ -883,3 +891,6 @@ class FORCELEMME(LemmatizerBaseTemplate):
         for token in tokens:
             if self.is_candidate(token, rule):
                 token.lemme = lemme
+                # Maybe we should do this only in training mode
+                token.sample.reset_trainer_status()
+

@@ -37,6 +37,12 @@ class Lemmatizer(TextManager):
             self._samples, self._tokens = self.instantiate_text(self.content.split())
         return self._tokens
     
+    @property
+    def samples(self):
+        if self._samples is None:
+            self.tokens # Load tokens and samples
+        return self._samples
+    
     def do(self, token):
         """
         A Token object or a list of token objects is expected.
