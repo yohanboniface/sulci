@@ -276,7 +276,7 @@ class Trigger(models.Model):
     
     @classmethod
     def clean_all_connections(cls):
-        TriggerToDescriptor.objects.filter(score__lte=0).delete()
+        TriggerToDescriptor.objects.filter(weight__lte=0).delete()
     
     def export(self):
         """
