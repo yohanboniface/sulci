@@ -167,6 +167,7 @@ class TriggerToDescriptor(models.Model):
 
     class Meta:
         unique_together = ("descriptor", "trigger")
+        ordering = ["-weight"]
 
     def __unicode__(self):
         return u"%s =(%f)=> %s" % (self.trigger, self.weight, self.descriptor)
