@@ -2,9 +2,13 @@
 # -*- coding:Utf-8 -*-
 
 import os
+import time
+import datetime
 
 #from collections import defaultdict
 #from operator import itemgetter
+
+from django.conf import settings
 
 from utils import load_file, save_to_file, log
 from thesaurus import Trigger, Descriptor
@@ -12,6 +16,7 @@ from textmining import SemanticalTagger
 from textminingutils import tokenize_text
 from rules_templates import LemmatizerTemplateGenerator, RuleTemplate,\
                            ContextualTemplateGenerator, LexicalTemplateGenerator
+from sulci import content_model, content_manager
 
 class SemanticalTrainer(object):
     """
@@ -20,10 +25,10 @@ class SemanticalTrainer(object):
     PENDING_EXT = ".pdg"
     VALID_EXT = ".trg"
     
-    def __init__(self, thesaurus, pos_tagger):
+    def __init__(self, thesaurus, pos_tagger, mode="full"):
         self.thesaurus = thesaurus
         self.pos_tagger = pos_tagger
-#        self._triggers = self.thesaurus.triggers
+        self.mode = mode
     
     def begin(self):
         """
@@ -34,19 +39,106 @@ class SemanticalTrainer(object):
         for d in self.thesaurus:
             t = Trigger.objects.create(original=unicode(d))
             t.connect(d, 1)
-#            self._triggers.add(t)
     
-    def train(self, text, descriptors):
+    def setup_socket_master(self):
+        """
+        Configure the sockets for the master trainer.
+        """
+        import zmq
+        # This is a socket load-balanced to every workers
+        # listening the canal.
+        context = zmq.Context()
+        self.reqsocket = context.socket(zmq.XREQ)
+        self.reqsocket.bind("ipc:///tmp/sulci.action")
+        # This is a publisher socket, used to distribute data.
+        # No response is expected.
+        self.pubsocket = zmq.Socket(zmq.Context(), zmq.PUB)
+        self.pubsocket.bind("ipc:///tmp/sulci.apply")
+    
+    def setup_socket_slave(self):
+        """
+        Configure sockets for the workers (slaves).
+        """
+        import zmq
+        context = zmq.Context()
+        # Socket to receive messages on
+        self.repsocket = context.socket(zmq.XREP)
+        self.repsocket.connect("ipc:///tmp/sulci.action")
+        # This is the subscriber socket. Its used to subscribe to a canal
+        # to receive data.
+        self.subsocket = zmq.Socket(zmq.Context(), zmq.SUB)
+        self.subsocket.connect("ipc:///tmp/sulci.apply")
+        self.subpoller = zmq.Poller()
+        self.subpoller.register(self.subsocket, zmq.POLLIN)
+#        self.reppoller = zmq.Poller()
+#        self.reppoller.register(self.repsocket, zmq.POLLIN)
+        self.subsocket.setsockopt(zmq.SUBSCRIBE, "")
+    
+    def do(self, *args):
+        if self.mode == "slave":
+            self.slave()
+        else:
+            t_init = time.time()
+            if self.mode == "master":
+                self.setup_socket_master()
+            qs = content_manager.all().only("id")[:]
+            for a in qs:
+                if self.mode == "master":
+                    self.reqsocket.send_multipart([str(a.pk)])
+                # We are training all objects, but without slaves.
+                else:
+                    self.train(a)
+            # This can't work, as pusher don't wait for response...
+            if self.mode == "master":
+                forloop_remaining = total = len(qs)
+                for idx in qs:
+                    status = self.reqsocket.recv()
+                    # Calculating ETA
+                    forloop_remaining -= 1
+                    t_now = time.time()
+                    t_diff = t_now - t_init
+                    time_remaining = (t_diff / (total - forloop_remaining) * forloop_remaining)
+                    ETA = datetime.datetime.now() + datetime.timedelta(0,time_remaining)
+                    # Using print, as I launch this huge script
+                    # with python -O (so not __debug__, so no log)
+                    print "%s -- %s remaining to process -- ETA : %s" %\
+                           (status, forloop_remaining, ETA.strftime("%a %d %R"))
+                self.pubsocket.send(" stop")
+    
+    def slave(self):
+        self.setup_socket_slave()
+        while True:
+            if self.subpoller.poll(0):
+                # This is subscription mode
+                # Used just to stop the process
+                # All the subprocess receive the same socket
+                action = self.subsocket.recv()[1:]
+                if action == "stop": return
+            # This is the REP mode
+            # We receive an action to do, with a pk
+            idx, pk = self.repsocket.recv_multipart()
+            self.train(int(pk))
+            self.repsocket.send_multipart([idx, "Processed pk %s" % pk])
+    
+    def train(self, inst):
         """
         For the moment, human defined descriptors are a string with "," separator.
         """
+        if isinstance(inst, int):
+            #We guess we have a pk here
+            inst = content_model.objects.get(pk=inst)
+        text = getattr(inst, settings.SULCI_CLI_CONTENT_PROPERTY)
+        descriptors = getattr(inst, settings.SULCI_CLI_KEYWORDS_PROPERTY)
+        # hack
+        if descriptors == "": return
         validated_descriptors = set()
         # Retrieve descriptors
         for d in descriptors.split(","):
-            # Get this tokenize_text out of my eyes !
             d = d.strip().replace(u"’", u"'")
             if not d == "":
                 # We create the descriptor not in thesaurus for now
+                # because descriptors in article and thesaurus are not
+                # always matching. Will be improved.
                 dsc, created = Descriptor.objects.get_or_create(name=d)
                 validated_descriptors.add(dsc)
                 if created:

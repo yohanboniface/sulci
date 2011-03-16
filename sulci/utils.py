@@ -93,5 +93,5 @@ def log(s, color=None, highlight=False, mode=None):
         prefix = u"\033[1;%sm" % (base + colors[color])
         suffix = u"\033[1;m"
     if __debug__:
-        print u"%s%s%s" % (prefix, s, suffix)
+        print u"*%s* - %s%s%s" % (os.getpid(),prefix, s, suffix)
 

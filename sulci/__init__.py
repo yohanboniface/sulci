@@ -1,8 +1,11 @@
+from django.db.models import loading
+from django.conf import settings
+
 __version_info__ = {
     'major': 0,
     'minor': 1,
     'micro': 0,
-    'releaselevel': 'alpha',
+    'releaselevel': 'pre-alpha',
     'serial': 0
 }
 
@@ -16,3 +19,22 @@ def get_version():
     return '.'.join(vers)
 
 __version__ = get_version()
+
+#def get_model_for_descriptor():
+#    try:
+#        return loading.get_model(settings.SULCI_DESCRIPTOR_APP_NAME, settings.SULCI_DESCRIPTOR_MODEL_NAME)
+#    except:
+#        return None # Fail silently for now.
+
+#descriptor_model = get_model_for_descriptor()
+def get_model_for_content():
+    return loading.get_model(settings.SULCI_CLI_CONTENT_APP_NAME, settings.SULCI_CLI_CONTENT_MODEL_NAME)
+content_model = get_model_for_content()
+
+def get_manager_for_content():
+    name = getattr(settings, 'SULCI_CLI_CONTENT_MANAGER_NAME', 'objects')
+    manager = getattr(content_model, name)
+    return manager
+content_manager = get_manager_for_content()
+
+
