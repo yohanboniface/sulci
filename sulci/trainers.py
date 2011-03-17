@@ -81,6 +81,7 @@ class SemanticalTrainer(object):
             t_init = time.time()
             if self.mode == "master":
                 self.setup_socket_master()
+                print "MASTER -- ready"
 #            qs = content_manager.all().filter(pk__lte=602400).order_by("-id")
             qs = content_manager.all().order_by("id")
             if self.mode == "master":
@@ -119,6 +120,7 @@ class SemanticalTrainer(object):
     
     def slave(self):
         self.setup_socket_slave()
+        print "SLAVE %s -- ready" % os.getpid()
         while True:
             if self.subpoller.poll(0):
                 # This is subscription mode

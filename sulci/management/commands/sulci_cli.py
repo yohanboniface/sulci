@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:Utf-8 -*-
+import time
 
 from optparse import make_option
 
@@ -130,7 +131,7 @@ class Command(BaseCommand):
                     "--semantical_trainer", 
                     action="store_true", 
                     dest="semantical_trainer", 
-                    help = "Launch the sementical training"),
+                    help = "Launch the sementical training. Launch it with python -O."),
         make_option("-z", 
                     "--semantical_tagger", 
                     action="store_true", 
@@ -190,6 +191,8 @@ class Command(BaseCommand):
                 subprocess.Popen(["python"] + python_kind + ["manage.py", "sulci_cli", training_kind, "--trainer_mode=slave"])
             # Set the mode to the trainer
             TRAINER_MODE = "master"
+            # Wait to leave time to slave to launch
+            time.sleep(1)
         if LEXICAL_TRAIN_TAGGER:
             T = LexicalTrainer(P,C,TRAINER_MODE)
             T.do()
