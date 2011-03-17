@@ -7,7 +7,8 @@ import os
 
 from Stemmer import Stemmer#DRY ALERT
 
-from django.db import models
+from django.db import models, transaction
+from django.db.utils import IntegrityError
 
 from textminingutils import tokenize_text, normalize_token, lev
 from base import RetrievableObject
@@ -187,6 +188,10 @@ class Trigger(models.Model):
                 null=True)    
     def __init__(self, *args, **kwargs):
         self._max_score = None
+        # We cache relatins to descriptors. But during training, some other processes
+        # could create and modify relations. This is a potential source of
+        # bad behaviour, but at the moment I prefer to have good performance
+        # cause I launch very often the script for testing it...
         self._cached_descriptors = None
         super(Trigger, self).__init__(*args, **kwargs)
 #        self.id = pk#Tuple of original string
@@ -223,9 +228,17 @@ class Trigger(models.Model):
                                                         % (str(key), type(key)))
         # Flush descriptors cache
         self._cached_descriptors = None
-        return TriggerToDescriptor.objects.create(descriptor=key, 
-                                                  trigger=self,
-                                                  weight=value)
+        # As we cache, and some other process could have created the 
+        # relation between this trigger and this descriptor
+        # we catch IntegrityErrors. Maybe a get_or_create should do the job ?
+        try:
+            return TriggerToDescriptor.objects.get_or_create(descriptor=key, 
+                                                      trigger=self,
+                                                      weight=value)
+        except IntegrityError:
+            # Another process has created the relation.
+            # It we return self[key], we get a DatabaseError from psycho...
+            pass
     
     def __getitem__(self, key):
         return TriggerToDescriptor.objects.get(descriptor=key, trigger=self)
