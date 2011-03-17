@@ -81,9 +81,13 @@ class SemanticalTrainer(object):
             t_init = time.time()
             if self.mode == "master":
                 self.setup_socket_master()
-            qs = content_manager.all().only("id")
+#            qs = content_manager.all().filter(pk__lte=602400).order_by("-id")
+            qs = content_manager.all().order_by("id")
+            if self.mode == "master":
+                qs = qs.only("id")
             # We make it by step, to limit RAM consuming
             step = 1000
+            forloop_remaining = total = len(qs)
             for loop in range(len(qs) / step + 1):
                 _from = loop*step
                 _to = _from + step
@@ -96,7 +100,6 @@ class SemanticalTrainer(object):
                     else:
                         self.train(a)
                 if self.mode == "master":
-                    forloop_remaining = total = len(current_qs)
                     # Waiting for answers
                     # The need is also to send the "stop" action only at the end
                     for idx in current_qs:
@@ -126,6 +129,7 @@ class SemanticalTrainer(object):
             # This is the REP mode
             # We receive an action to do, with a pk
             idx, pk = self.repsocket.recv_multipart()
+            print "SLAVE %s processing pk %s" % (os.getpid(), pk)
             self.train(int(pk))
             self.repsocket.send_multipart([idx, "Processed pk %s" % pk])
     
@@ -139,7 +143,7 @@ class SemanticalTrainer(object):
         text = getattr(inst, settings.SULCI_CLI_CONTENT_PROPERTY)
         descriptors = getattr(inst, settings.SULCI_CLI_KEYWORDS_PROPERTY)
         # hack
-        if descriptors == "": return
+        if descriptors == "" or text == "": return
         validated_descriptors = set()
         # Retrieve descriptors
         for d in descriptors.split(","):
@@ -153,7 +157,11 @@ class SemanticalTrainer(object):
                 if created:
                     log(u"Lairning descriptor not in thesaurus : %s" % unicode(dsc), "RED")
         # Retrieve keytentities :
-        S = SemanticalTagger(text, self.thesaurus, self.pos_tagger)
+        try:
+            S = SemanticalTagger(text, self.thesaurus, self.pos_tagger)
+        # SemanticalTagger raise ValueError if text is empty
+        except ValueError:
+            return
         current_triggers = set()
         for ke in S.keyentities:
             # Retrieve or create triggers
