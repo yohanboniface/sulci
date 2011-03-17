@@ -98,7 +98,7 @@ class RetrievableObject(object):
         maching possibilities.
         expression must be a list or tuple, or string or unicode
         """
-        stemmer = Stemmer("french")
+#        stemmer = Stemmer("french")
         if not isinstance(expression, (list, tuple)):
             expression = unicode(expression).split()
 #        expression = [stemmer.stemWord(normalize_token(w)) for w in expression]

@@ -162,7 +162,7 @@ class TriggerToDescriptor(models.Model):
     This is the "sinapse" of the trigger to descriptor relation.
     """
     descriptor = models.ForeignKey(Descriptor)
-    trigger = models.ForeignKey("Trigger")
+    trigger = models.ForeignKey("Trigger", db_index=True)
     weight = models.FloatField(default=0, db_index=True)
 
     class Meta:
@@ -187,6 +187,7 @@ class Trigger(models.Model):
                 null=True)    
     def __init__(self, *args, **kwargs):
         self._max_score = None
+        self._cached_descriptors = None
         super(Trigger, self).__init__(*args, **kwargs)
 #        self.id = pk#Tuple of original string
 #        self.original = u" ".join(pk)
@@ -203,17 +204,25 @@ class Trigger(models.Model):
         #Tuple of original string
         expression = tuple(line.split("\t")[0].split())
         return "%s__%s" % (cls.__name__, expression), expression
-
+    
+    @property
+    def _descriptors(self):
+        if self._cached_descriptors is None:
+            self._cached_descriptors = list(self.descriptors.all())
+        return self._cached_descriptors
+    
     def __unicode__(self):
         return unicode(self.original)
     
     def __contains__(self, key):
-        return key in self.descriptors.all()
+        return key in self._descriptors
     
     def __setitem__(self, key, value):
         if not isinstance(key, Descriptor):
             raise ValueError("Key must be Descriptor instance, got %s (%s) instead" 
                                                         % (str(key), type(key)))
+        # Flush descriptors cache
+        self._cached_descriptors = None
         return TriggerToDescriptor.objects.create(descriptor=key, 
                                                   trigger=self,
                                                   weight=value)
@@ -221,17 +230,17 @@ class Trigger(models.Model):
     def __getitem__(self, key):
         return TriggerToDescriptor.objects.get(descriptor=key, trigger=self)
     
-    def __delitem__(self, key):
-        return self._descriptors.__delitem__(key)
+#    def __delitem__(self, key):
+#        return self._descriptors.__delitem__(key)
     
     def __iter__(self):
         return self.triggertodescriptor_set.all().__iter__()
     
     def __len__(self):
-        return self.descriptors.count()
+        return len(self._descriptors)
     
     def items(self):
-        return self.descriptors.all()
+        return self._descriptors
     
     def __hash__(self):
         return self.original.__hash__()
@@ -248,17 +257,17 @@ class Trigger(models.Model):
         return self._max_score
 #        return max(self[d.descriptor].weight for d in self)
     
-    def init_descriptors(self, **kwargs):
-        """
-        Take a text descriptors storage and create the links.
-        """
-        #original may be the full orginal line
-        if "original" in kwargs:
-            for d in kwargs["original"].split("\t")[1:]:#TODO check errors
-                ds = d.split()
-                original = ds[:-1]
-                dsc, created = Descriptor.get_or_create(original, self.parent, original=original)
-                self.connect(dsc, float(ds[-1]))
+#    def init_descriptors(self, **kwargs):
+#        """
+#        Take a text descriptors storage and create the links.
+#        """
+#        #original may be the full orginal line
+#        if "original" in kwargs:
+#            for d in kwargs["original"].split("\t")[1:]:#TODO check errors
+#                ds = d.split()
+#                original = ds[:-1]
+#                dsc, created = Descriptor.get_or_create(original, self.parent, original=original)
+#                self.connect(dsc, float(ds[-1]))
     
     def connect(self, descriptor, score):
         """
