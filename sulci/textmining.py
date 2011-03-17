@@ -32,6 +32,11 @@ class SemanticalTagger(TextManager):
         self.thesaurus = thesaurus
         self._raw_text = text
         self.normalized_text = normalize_text(text)
+        if len(self.normalized_text) == 0:
+            # For now, raise value error, because an empty text create
+            # too much problems here and there (zero division, etc.)
+            # TODO : make empty texts possible.
+            raise ValueError("Can't process an empty text.")
         self.samples = []
         self.keyentities = []
         self.postagger = pos_tagger or PosTagger(lexicon=Lexicon())
