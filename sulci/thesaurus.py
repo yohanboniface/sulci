@@ -185,7 +185,9 @@ class Trigger(models.Model):
                 through="TriggerToDescriptor", 
                 blank=True, 
                 null=True)    
-#    def __init__(self, pk, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self._max_score = None
+        super(Trigger, self).__init__(*args, **kwargs)
 #        self.id = pk#Tuple of original string
 #        self.original = u" ".join(pk)
 #        self.parent = kwargs["parent"]
@@ -236,7 +238,15 @@ class Trigger(models.Model):
     
     @property
     def max_score(self):
-        return max(self[d.descriptor].weight for d in self)
+        if self._max_score is None: # Thread cache
+            try:
+                #Ordered by -weight by default
+                self._max_score = self.triggertodescriptor_set.all()[0].weight
+            except TriggerToDescriptor.DoesNotExist:
+                # Should not occur.
+                self._max_score = 0
+        return self._max_score
+#        return max(self[d.descriptor].weight for d in self)
     
     def init_descriptors(self, **kwargs):
         """
