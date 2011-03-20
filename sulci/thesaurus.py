@@ -114,14 +114,9 @@ class Descriptor(models.Model):
     name = models.CharField(max_length=200, db_index=True)
     description = models.TextField(blank=True, null=True)
 
-#    def __init__(self, pk, **kwargs):
-#        self.id = pk
-#        self.original = kwargs["original"]
-##        self.line = kwargs["line"]
-#        self.options = {}
-#        if "options" in kwargs:
-#            self.get_options(kwargs["options"])
-#        self.make_aliases()
+    def __init__(self, *args, **kwargs):
+        self._max_weight = None
+        super(Descriptor, self).__init__(*args, **kwargs)
     
     @property
     def original(self):
@@ -131,41 +126,34 @@ class Descriptor(models.Model):
     def __unicode__(self):
         return unicode(self.original)
     
-#    def __hash__(self):
-#        return self.id.__hash__()
-    
-#    def make_aliases(self):
-#        self.aliases = []
-#        candidates = [self.id]
-#        stemmer = Stemmer("french")#DRY ALERT !!!
-#        if "aliases" in self.options:
-#            for alias in self.options["aliases"].split(","):
-#                candidates.append(tuple([stemmer.stemWord(normalize_token(w)) for w in tokenize_text(alias.strip())]))
-#        for candidate in candidates:
-#            self.aliases.append(tuple(sorted(candidate)))
-#        #Original graph
-#        self.aliases.append(self.id)
-#        #Ordered
-#        if len(self.id) > 1:
-#            l = list(self.id)
-#            l = sorted(l)
-#            self.aliases.append(tuple(l))
-    
-#    def get_options(self, options):
-#        if options is not None:
-#            pattern = re.compile("([\w]+)=([\w ,_\-'\(\)&]+)")
-#            r = pattern.findall(options)
-#            for tup in r:
-#                self.options[tup[0]] = tup[1]
+    @property
+    def max_weight(self):
+        if self._max_weight is None: # Thread cache
+            try:
+                #Ordered by -weight by default
+                self._max_weight = self.triggertodescriptor_set.all()[0].weight
+            except TriggerToDescriptor.DoesNotExist:
+                # Should not occur.
+                self._max_weight = 0
+        return self._max_weight
 
 class TriggerToDescriptor(models.Model):
     """
-    This is the "sinapse" of the trigger to descriptor relation.
+    This is the "synapse" of the trigger to descriptor relation.
     """
-    descriptor = models.ForeignKey(Descriptor)
+    descriptor = models.ForeignKey(Descriptor, db_index=True)
     trigger = models.ForeignKey("Trigger", db_index=True)
     weight = models.FloatField(default=0, db_index=True)
-
+    
+    @property
+    def pondered_weight(self):
+        """
+        Give the weight of the relation, relative to the max weight of the
+        trigger and the max weight of the descriptor.
+        """
+        return self.weight / self.trigger.max_weight \
+               * self.weight / self.descriptor.max_weight
+    
     class Meta:
         unique_together = ("descriptor", "trigger")
         ordering = ["-weight"]
@@ -182,17 +170,19 @@ class Trigger(models.Model):
     This score is populated during the sementical training.
     """
     original = models.CharField(max_length=500, db_index=True, unique=True)
+    count = models.IntegerField(default=0,blank=True)
     descriptors = models.ManyToManyField("Descriptor", 
                 through="TriggerToDescriptor", 
                 blank=True, 
                 null=True)    
     def __init__(self, *args, **kwargs):
-        self._max_score = None
+        self._max_weight = None
         # We cache relatins to descriptors. But during training, some other processes
         # could create and modify relations. This is a potential source of
         # bad behaviour, but at the moment I prefer to have good performance
         # cause I launch very often the script for testing it...
         self._cached_descriptors = None
+        self._cached_synapses = None
         super(Trigger, self).__init__(*args, **kwargs)
 #        self.id = pk#Tuple of original string
 #        self.original = u" ".join(pk)
@@ -200,21 +190,17 @@ class Trigger(models.Model):
 #        self._descriptors = {}
 #        self.init_descriptors(**kwargs)
     
-    @classmethod
-    def make_key(cls, line):
-        """
-        We receive a full line of file storage here, or the original string
-        when comming from descriptors file.
-        """
-        #Tuple of original string
-        expression = tuple(line.split("\t")[0].split())
-        return "%s__%s" % (cls.__name__, expression), expression
-    
     @property
     def _descriptors(self):
         if self._cached_descriptors is None:
             self._cached_descriptors = list(self.descriptors.all())
         return self._cached_descriptors
+    
+    @property
+    def _synapses(self):
+        if self._cached_synapses is None:
+            self._cached_synapses = list(self.triggertodescriptor_set.select_related().all()[:20])
+        return self._cached_synapses
     
     def __unicode__(self):
         return unicode(self.original)
@@ -238,6 +224,7 @@ class Trigger(models.Model):
         except IntegrityError:
             # Another process has created the relation.
             # It we return self[key], we get a DatabaseError from psycho...
+            # I've tried a transaction.rollback(), but got an error too.
             pass
     
     def __getitem__(self, key):
@@ -247,10 +234,12 @@ class Trigger(models.Model):
 #        return self._descriptors.__delitem__(key)
     
     def __iter__(self):
-        return self.triggertodescriptor_set.all().__iter__()
+        return self._synapses.__iter__()
     
-    def __len__(self):
-        return len(self._descriptors)
+    # Django call the __len__ method for every related model when using
+    # select_related...
+#    def __len__(self):
+#        return len(self._descriptors)
     
     def items(self):
         return self._descriptors
@@ -259,15 +248,15 @@ class Trigger(models.Model):
         return self.original.__hash__()
     
     @property
-    def max_score(self):
-        if self._max_score is None: # Thread cache
+    def max_weight(self):
+        if self._max_weight is None: # Thread cache
             try:
                 #Ordered by -weight by default
-                self._max_score = self.triggertodescriptor_set.all()[0].weight
+                self._max_weight = self.triggertodescriptor_set.all().only('weight')[0].weight
             except TriggerToDescriptor.DoesNotExist:
                 # Should not occur.
-                self._max_score = 0
-        return self._max_score
+                self._max_weight = 0
+        return self._max_weight
 #        return max(self[d.descriptor].weight for d in self)
     
 #    def init_descriptors(self, **kwargs):

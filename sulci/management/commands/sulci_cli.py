@@ -217,8 +217,8 @@ class Command(BaseCommand):
                 if FORCE:
                     S.begin()
                 S.do()
-                if TRAINER_MODE == "master":
-                    S.clean_connections()
+#                if TRAINER_MODE == "master" and FORCE:
+#                    S.clean_connections()
         if CHECK_ENTRY:
             L.get_entry(CHECK_ENTRY.decode("utf-8"))
         if LEXICON_COUNT:
@@ -235,6 +235,10 @@ class Command(BaseCommand):
             S = SemanticalTagger(t, T, P)
             if __debug__:
                 S.debug()
+            log(u"Scored descriptors", "YELLOW", True)
+            for d, value in S.descriptors:
+                print u"%s %f" % (unicode(d), value)
+            
         if IPDB:
             import ipdb; ipdb.set_trace()
 

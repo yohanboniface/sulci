@@ -20,7 +20,7 @@ from sulci import content_model, content_manager
 
 class SemanticalTrainer(object):
     """
-    Create and update triggers.
+    Create and update triggers. And make triggertodescription ponderation.
     """
     PENDING_EXT = ".pdg"
     VALID_EXT = ".trg"
@@ -82,8 +82,8 @@ class SemanticalTrainer(object):
             if self.mode == "master":
                 self.setup_socket_master()
                 print "MASTER -- ready"
-#            qs = content_manager.all().filter(pk__lte=602400).order_by("-id")
-            qs = content_manager.all().order_by("id")
+            qs = content_manager.all().filter(pk__gt=705969).order_by("id")
+#            qs = content_manager.all().order_by("id")
             if self.mode == "master":
                 qs = qs.only("id")
             # We make it by step, to limit RAM consuming
@@ -168,45 +168,52 @@ class SemanticalTrainer(object):
         for ke in S.keyentities:
             # Retrieve or create triggers
             t, created = Trigger.objects.get_or_create(original=unicode(ke))
-#            self._triggers.add(t)
             current_triggers.add(t)
-            t.current_score = ke.trigger_score
-        log(u"Current triggers", "WHITE")
-        log([unicode(d) for d in current_triggers], "YELLOW")
-        log(u"Descriptors validated by human", "WHITE")
-        log([unicode(d) for d in validated_descriptors], "YELLOW")
-        #Descriptors calculated by SemanticalTagger
-        calculated_descriptors = set(d for d, value in S.descriptors)
-        log(u"Descriptors calculated", "WHITE")
-        log([unicode(d) for d in calculated_descriptors], "YELLOW")
-        #Descriptors that where tagged by humans, but not calculated
-        false_negative = validated_descriptors.difference(calculated_descriptors)
-        #Descriptors that where not tagged by humans, but where calculated
-        false_positive = calculated_descriptors.difference(validated_descriptors)
-        #Validated descriptors that where also calculated
-        true_positive = calculated_descriptors.intersection(validated_descriptors)
-        
-        for d in true_positive:
+            t.count += 1
+            t.save()
+#            t.current_score = ke.trigger_score
+        # For now, only create all the relations
+        for d in validated_descriptors:
             for t in current_triggers:
-                if d in t:
-                    t.connect(d, 2 + t.current_score)#trust the relation
-                    log(u"Adding 2 to connection %s - %s" % (t, d), "YELLOW")
-        
-        for d in false_positive:
-            for t in current_triggers:
-                if d in t:
-                    t.connect(d, -(1 + t.current_score))#untrust the relation
-                    log(u"Removing 1 to connection %s - %s" % (t, d), "BLUE")
-        
-        for d in false_negative:
-            for t in current_triggers:
-                t.connect(d, t.current_score)#guess the relation
-                log(u"Connecting %s and %s" % (t, d), "WHITE")
+                t.connect(d, 1)
+#                log(u"Connecting %s and %s" % (t, d), "WHITE")
+#        log(u"Current triggers", "WHITE")
+#        log([unicode(d) for d in current_triggers], "YELLOW")
+#        log(u"Descriptors validated by human", "WHITE")
+#        log([unicode(d) for d in validated_descriptors], "YELLOW")
+#        #Descriptors calculated by SemanticalTagger
+#        calculated_descriptors = set(d for d, value in S.descriptors)
+#        log(u"Descriptors calculated", "WHITE")
+#        log([unicode(d) for d in calculated_descriptors], "YELLOW")
+#        #Descriptors that where tagged by humans, but not calculated
+#        false_negative = validated_descriptors.difference(calculated_descriptors)
+#        #Descriptors that where not tagged by humans, but where calculated
+#        false_positive = calculated_descriptors.difference(validated_descriptors)
+#        #Validated descriptors that where also calculated
+#        true_positive = calculated_descriptors.intersection(validated_descriptors)
+#        
+#        for d in true_positive:
+#            for t in current_triggers:
+#                if d in t:
+#                    t.connect(d, t.current_score)#trust the relation
+#                    log(u"Adding 2 to connection %s - %s" % (t, d), "YELLOW")
+#        
+#        for d in false_positive:
+#            for t in current_triggers:
+#                if d in t:
+#                    t.connect(d, -t.current_score)#untrust the relation
+#                    log(u"Removing 1 to connection %s - %s" % (t, d), "BLUE")
+#        
+#        for d in false_negative:
+#            for t in current_triggers:
+#                t.connect(d, t.current_score)#guess the relation
+#                log(u"Connecting %s and %s" % (t, d), "WHITE")
     
     def clean_connections(self):
         """
         Delete all the connection where score < 0.
         """
+        # We maybe have to clean connections where pondered_weigth is < 0.1.
         Trigger.clean_all_connections()
 
 class RuleTrainer(object):

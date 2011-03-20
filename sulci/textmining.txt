@@ -670,6 +670,22 @@ Ressources en ligne
 
 http://www.christian-faure.net/2007/05/30/introduction-au-text-mining/
 
+Troisième algo :
+# we create and ponderate all relation with a default weight (number of relations)
+for text in semantical_tagged_corpus:
+    for trigger in text:
+        trigger.count += 1
+        for validated_descriptor in text:
+            #here we can maybe take number of trigger occurrences in the text
+            triggertodescriptor += 1
+compute pondered_weith by :
+the weight of the connection / the max_weight of the trigger
+*
+the weight of the connection / the max_weight of the descriptor
+=> this means that a connection has a 100 % weight (1.0) when it's the higher 
+connection for the triiger AND the higher connection for the descriptor.
+clean connections pondered_weight < 0.01
+
 ================================================
 Natural Language Processing with Python - résumé
 ================================================

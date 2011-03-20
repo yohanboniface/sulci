@@ -32,11 +32,15 @@ class PosTagger(object):
             return "SBC:sg"
     
     def lexical_tag(self, token):
+        """
+        Apply lexical tag to a token or list of tokens
+        """
         tks = hasattr(token, "__iter__") and token or [token]
         rules = LexicalTemplateGenerator.load()
         for rule in rules:
             template, _ = LexicalTemplateGenerator.get_instance(rule, self.lexicon)
             template.apply_rule(tks, rule)
+        # Return a list if a list was given
         return hasattr(token, "__iter__") and tks or tks[0]
     
     def contextual_tag(self, token):

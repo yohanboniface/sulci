@@ -18,7 +18,7 @@ from textminingutils import lev, normalize_text, words_occurrences
 from base import RetrievableObject, Sample, Token, TextManager
 from pos_tagger import PosTagger
 from lexicon import Lexicon
-from thesaurus import Trigger
+from thesaurus import Trigger, Thesaurus
 from lemmatizer import Lemmatizer
 
 #Cache
@@ -28,8 +28,8 @@ class SemanticalTagger(TextManager):
     """
     Main class.
     """
-    def __init__(self, text, thesaurus, pos_tagger=None, lemmatizer=None):
-        self.thesaurus = thesaurus
+    def __init__(self, text, thesaurus=None, pos_tagger=None, lemmatizer=None):
+        self.thesaurus = thesaurus or Thesaurus()
         self._raw_text = text
         self.normalized_text = normalize_text(text)
         if len(self.normalized_text) == 0:
@@ -201,7 +201,7 @@ class SemanticalTagger(TextManager):
             self._triggers = set()
             for kp in self.keyentities:
                 try:
-                    t = Trigger.objects.select_related("descriptors").get(original=unicode(kp))
+                    t = Trigger.objects.get(original=unicode(kp))
                     self._triggers.add((t, kp.trigger_score))
                 except Trigger.DoesNotExist:
                     pass
@@ -218,19 +218,31 @@ class SemanticalTagger(TextManager):
 #                log(u"%s => (%s)" % (repr(kp), unicode(t)), "YELLOW")
             # Take the trigger relations
             for d in t:
-                if d.weight > 0:
+                # Preventing from rehiting the db
+                # By him-self, Django to retrieve the reverse FK in the cache...
+                d.trigger = t
+                if d.weight > 2: # How to define this min ?
+                    key = d.descriptor.pk
                     # Add the descriptor if needed
-                    if not d.descriptor in self._scored_descriptors:
-                        self._scored_descriptors[d.descriptor] = 0
+                    if not key in self._scored_descriptors:
+                        self._scored_descriptors[key] = {"weight":0, "descriptor": d.descriptor}
+                    # Trying to keep the same instance when the same
+                    # descriptor is seen few times (should occurs)
+                    d.descriptor = self._scored_descriptors[key]["descriptor"]
                     # Update descriptor final score
-                    self._scored_descriptors[d.descriptor] += (d.weight / t.max_score) * score
+                    self._scored_descriptors[key]["weight"] += d.pondered_weight * score
             total_score += score
-        for d, value in self._scored_descriptors.items():
-            self._scored_descriptors[d] = value / total_score * 100.0
+        # We make a percentage of the max score possible
+        for key, d in self._scored_descriptors.items():
+            self._scored_descriptors[key]["weight"] = d["weight"] / total_score * 100.0
         #This also means that only the descriptors triggered up to this min 
         #will be considered by trainer.
         min_score = 1
-        return [(d, value) for d,value in sorted(self._scored_descriptors.items(), key=lambda t: t[1], reverse=True) if value > min_score]
+        return [
+            (d["descriptor"], d["weight"]) for key,d in 
+            sorted(self._scored_descriptors.items(), key=lambda t: t[1]["weight"], reverse=True) 
+            if d["weight"] > min_score
+               ]
     
     
     def debug(self):
@@ -296,14 +308,11 @@ class SemanticalTagger(TextManager):
         for t, score in self.triggers:
             log(u"%s => %f" % (unicode(t), score), "YELLOW")
             for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
-                log(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_score * 100), "CYAN")
+                log(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
 #        log(u"Scored descriptors", "YELLOW", True)
 #        for d, v in sorted(scored_descriptors.iteritems(), key=itemgetter(1), reverse=True):
 #            if scored_descriptors[d] > 0.001:#Test
 #                log(u"%s %f" % (unicode(d), scored_descriptors[d]), "WHITE")
-        log(u"Scored descriptors", "YELLOW", True)
-        for d, value in self.descriptors:
-            log(u"%s %f" % (unicode(d), value), "WHITE")
 
 
 class KeyEntity(RetrievableObject):
