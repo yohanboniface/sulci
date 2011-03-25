@@ -168,9 +168,9 @@ class SemanticalTagger(TextManager):
                                                   count=candidate.count,
                                                   text=self)
             keyentities.append(kp)
-        #If a KeyEntity is contained in an other (same stemms in same place) longuer
-        #delete the one with the smaller confidence, or the shortest if same confidence
-        #We have to begin from the shortest ones
+        # If a KeyEntity is contained in an other (same stemms in same place) longuer
+        # delete the one with the smaller confidence, or the shortest if same confidence
+        # We have to begin from the shortest ones
         log(u"Deduplicating keyentities", "WHITE")
         tmp_keyentities = sorted(keyentities, key=lambda kp: len(kp))
         log([unicode(kp) for kp in tmp_keyentities], "GRAY")
@@ -214,6 +214,7 @@ class SemanticalTagger(TextManager):
         """
         self._scored_descriptors = {}
         total_score = 0
+        max_score = 0
         for t, score in self.triggers:
 #                log(u"%s => (%s)" % (repr(kp), unicode(t)), "YELLOW")
             # Take the trigger relations
@@ -232,12 +233,13 @@ class SemanticalTagger(TextManager):
                     # Update descriptor final score
                     self._scored_descriptors[key]["weight"] += d.pondered_weight * score
             total_score += score
+            max_score = max(max_score,score)
         # We make a percentage of the max score possible
         for key, d in self._scored_descriptors.items():
-            self._scored_descriptors[key]["weight"] = d["weight"] / total_score * 100.0
+            self._scored_descriptors[key]["weight"] = d["weight"] / max_score * 100.0
         #This also means that only the descriptors triggered up to this min 
         #will be considered by trainer.
-        min_score = 1
+        min_score = 10
         return [
             (d["descriptor"], d["weight"]) for key,d in 
             sorted(self._scored_descriptors.items(), key=lambda t: t[1]["weight"], reverse=True) 

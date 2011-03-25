@@ -29,4 +29,4 @@ usual_words = stop_words + [u'pourquoi', u'chez', u"avant", u"après", u"plus",
                             u"ensuite", u"autant", u"surtout", u"plutôt", u"car",
                             u"toujours", u"encore", u"parmi", u"malgré", u"depuis",
                             u"donc", u"tout", u"tous", u"toute", u"toutes", u"aussi",
-                            u"très",]
+                            u"très", u"avoir"]
