@@ -30,6 +30,12 @@ Voici une vue schématique du processus :
     
     * pour extraire les descripteurs d'un nouveau texte, on refait les étapes 1-4, et là encore avec des stats on extraie les descripteurs les plus pertinents selon les déclencheurs rencontrés (entités clés) => SemanticalTagger
 
+Install:
+
+You have to unzip the SQL fixtures (52Mo) and load it in DB.
+After that, setup.py install or put the sulci folder in your pythonpath.
+And add "sulci" into your INSTALLED_APPS.
+
 Sample usage::
 
   >> from sulci.textmining import SemanticalTagger
