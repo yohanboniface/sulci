@@ -1,6 +1,7 @@
 # -*- coding:Utf-8 -*-
 import codecs
 import os
+from django.conf import settings
 
 def save_to_file(filename, content, verbose = False):
     if verbose:
@@ -92,6 +93,6 @@ def log(s, color=None, highlight=False, mode=None):
         base = highlight and 40 or 30
         prefix = u"\033[1;%sm" % (base + colors[color])
         suffix = u"\033[1;m"
-    if __debug__:
+    if settings.DEBUG:
         print u"*%s* - %s%s%s" % (os.getpid(),prefix, s, suffix)
 
