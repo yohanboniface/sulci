@@ -29,7 +29,8 @@ try:
     from django.db.models import loading
     from django.conf import settings
     def get_model_for_content():
-        return loading.get_model(settings.SULCI_CLI_CONTENT_APP_NAME, settings.SULCI_CLI_CONTENT_MODEL_NAME)
+        return loading.get_model(settings.SULCI_CLI_CONTENT_APP_NAME,
+                                 settings.SULCI_CLI_CONTENT_MODEL_NAME)
     content_model = get_model_for_content()
 
     def get_manager_for_content():

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding:Utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import os
 
@@ -13,7 +13,7 @@ from base import Token
 
 class PosTagger(object):
     """
-    Part-of-Speach tagger.
+    Part-of-speech tagger.
     """
 
     def __init__(self, lexicon):
