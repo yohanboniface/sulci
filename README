@@ -16,6 +16,19 @@ a training routine and an analysis routine:
 * collocations extraction;
 * semantical tagging (somehow similar to a neural network).
 
+Voici une vue schématique du processus :
+
+    D'abord l'apprentissage:
+    
+    * on prend un texte, on le découpe en phrases et en "mots" (mots, symboles, ponctuations, etc. - using regex)
+    * on donne à chaque mot une catégorie lexicale (genre verbe, nom, adjectif, singulier / pluriel, etc.) (using a custom Brill based algoritm) => PosTagger
+    * on détermine le lemme de chaque mot (pour un verbe, c'est l'infinitif, pour un nom, le singulier, pour un adjectif, le masculin singulier, etc.) (using a custom lemmatizer algorithm) => Lemmatizer
+    * on extrait les "collocations / entités clés", c'est-à-dire les mots ou ensemble de mots qui semblent représenter le texte (en utilisant des stats et probabilités) (using Mutual Pointwise Information, and more) => SemanticalTagger
+    * on fait ça pour 25 000 textes déjà tagués par un être humain, et on lie chaque entité clé (triggers) aux tags qui ont été posés (descriptors) => SemanticalTrainer
+
+    Puis l'utilisation :
+    
+    * pour extraire les descripteurs d'un nouveau texte, on refait les étapes 1-4, et là encore avec des stats on extraie les descripteurs les plus pertinents selon les déclencheurs rencontrés (entités clés) => SemanticalTagger
 
 Sample usage::
 
