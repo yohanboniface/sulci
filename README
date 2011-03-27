@@ -9,24 +9,48 @@ french newspaper.
 This code is "work in progress"; it's not used (nor usable) in production yet.
 
 It provides 4 algorithms, designed to be run in sequence: each algorithm
-needs the data provided by the previous one.
+needs the data provided by the previous one :
 
-Each algorithm must be *trained*. What does that mean?
+#. Part of Speech tagging
+#. Lemmatization
+#. Collocation and key entities extraction
+#. Semantical tagging
 
-#. The algorithm will process your input, and give you some output.
-#. You check the output, and if you find invalid results, you fix them.
-#. You submit the corrected output to the algorithm. The algorithm will
-   analyze its mistakes, and change its processing rules/weights/triggers/...
-   in order to avoid making those mistakes again in the future.
-#. Repeat from step 1 with another input, until you are satisfied with the
-   result.
+Each algorithm must be *trained* to be operational. Therefore, a trained set of 
+data is provided (see fixtures/). This is the result of a training with the
+Libération corpus.
 
-.. note:: 
-   You can also skip step 1 & 2, and directly submit "correct output" to
-   the algorithm; it will compare your (supposedly) valid output to 
-   his calculated output, and adjust accordingly.
+Therefore, if you want a textmining most accurate to your own texts, you must
+should train it.
 
-.. FIXME: le semanticaltagger, comment il utilise les infos grammaticales?
+What does "training" mean?
+
+#. You first need to prepare a corpus, for each of the algorithm. A corpus is a 
+   set of texts with the final output you want : for example, the corpus for the 
+   PosTagger is some texts where each word is pos tagged, with a verified value.
+#. You then have to launch the training with the command line.
+#. Each algorithm has it's own trainer. This trainer will take the input texts, 
+   remove the verified output, and begin to find the best rules to determine the
+   right ouput. The trainer will analyze its mistakes, and change its processing
+   rules/weights/triggers/... in order to avoid making those mistakes again in 
+   the future. The trainer will loop over the corpus untill it concider that no 
+   more rules could be infered.
+
+.. note::
+   You can also use the algorithm to help you create the corpus : give a text to the
+   algorithm, and correct the output.
+
+.. warning: each algorithm needs the previous algorithm to work, so remember
+   to train the algorithms in the order they are called.
+
+.. note::
+   The trained datas provided with the Sulci alpha version has been made with a
+   corpus of :
+   #. 15500 POS tagged words
+   #. 2000 words in lexicon (lexicon must be smaller than POS corpus)
+   #. FIXME: 2000 lemmatized words
+   #. 28000 semantical tagged words
+   #. 17000 descriptors in thesaurus
 
 Before running the first algorithm, the text is split into tokens
 (words, symbols, punctuation marks, etc.), using simple regular expressions.
@@ -47,7 +71,10 @@ Some possible classes are:
 * PREP (PREPosition),
 * etc.
 
-To see more available classes, see in base.py the methods named is_<something>.
+To see more available classes, see in base.py the methods named is_<something> or
+run the following command (it provides the tag stats in corpus)::
+
+ python manage.py sulci_cli -g
 
 The format used is a plain text file; tokens are separated by spaces;
 each token is annotated with its POS tag, separated with a slash. Example::
@@ -69,30 +96,29 @@ is almost similar to its stem. A few examples:
 
 * "mangerons" lemma is "manger" (infinitive form of the verb)
 * "bonnes" lemma is "bon" (masculine singular form of the adjective)
-* "meilleur" lemma is "bon" (superlative form; this one cannot be inferred
-  by stemming only, and requires a dictionary lookup)
-
-.. FIXME: ce dernier exemple est-il valide ?
+* "filles" lemma is "fille" (singular form of the noun)
 
 The format used is similar to the one of the PosTagger, but each token
 is annotated by both its POS tag and its lemma. Example::
 
   «/« Ce/PRV:sg/ce n'/ADV/ne est/ECJ:sg/être pas/ADV à/PREP moi/PRO:sg 
   de/PREP partir/VNCFF ./. Je/PRV:sg/je me/PRV:sg battrai/VCJ:sg/battre 
-  jusqu'/PREP au/DTC:sg bout/SBC:sg ./. »/» 
+  jusqu'/PREP/jusque au/DTC:sg bout/SBC:sg ./. »/» 
 
 If a word and its lemma are identical, the lemma is omitted. Note that
 this is case-sensitive (as you can see on the first word of the above
 excerpt).
 
+Check "corpus/*.lem.lxc.crp" to see more examples of "valid output".
 
 Semantical tagging
 ------------------
 
 The SemanticalTagger tries to find "collocations" -- i.e., sequence of tokens
-that have a higher chance of appearing together. A bit like a keyword is 
-a word with a high significance, a collocation is a sequence with high
-significance. A few examples:
+that have a higher chance of appearing together -- and key entities -- i.e. words
+the may help to find the significance of the text : proper nouns, for example, or
+ones with many occurrences in the text, etc.
+A few examples:
 
 * Président de la République
 * voiture électrique
@@ -100,21 +126,28 @@ significance. A few examples:
 
 The SemanticalTagger will actually use two different algorithms:
 
-* an heuristics-based algorithm, scoring n-grams (sequences of words) with
-  hand-crafted rules;
 * a purely statistical algorithm, scoring n-grams according to their
   relatives frequences in the corpus.
+* an heuristics-based algorithm, scoring n-grams (sequences of words) with
+  hand-crafted rules;
 
 The statistical algorithm uses `Pointwise mutual information 
 <http://en.wikipedia.org/wiki/Pointwise_mutual_information>`_.
 
-The efficiency of both algorithms is compared and FIXME: then what?
+The first one is mainly used do determine weither or not a séquence of words is 
+a collocation ; the second one, to determine weither or not a word or a collocation
+is representative of the text.
 
 
 Semantical training
 -------------------
 
-..     * on fait ça pour 25 000 textes déjà tagués par un être humain, et on lie chaque entité clé (triggers) aux tags qui ont été posés (descriptors) => SemanticalTrainer
+*  each text of the semantical corpus is processed by the previous algorithm, to
+find the key entities (triggers)
+* each of the triggers found are linked with a weight to the descriptors to the
+text processed
+* finally, the more a trigger was linked to a descriptors, the more this trigger
+will trigger the descriptors in the tagging process.
 
 
 After the training phase...
@@ -124,9 +157,8 @@ Once all algorithms have been trained to a satisfactory level, they are
 ready to analyze new texts without your guidance (i.e., you won't have
 to pre-tag those texts, indeed).
 
-Steps 1 to 4 are run in sequence, and ...
-
-    * pour extraire les descripteurs d'un nouveau texte, on refait les étapes 1-4, et là encore avec des stats on extraie les descripteurs les plus pertinents selon les déclencheurs rencontrés (entités clés) => SemanticalTagger
+Steps 1 to 4 are run in sequence, and trigger to descriptors relations are used
+to extract the must pertinent descriptors.
 
 
 Installation
@@ -134,9 +166,20 @@ Installation
 
 You have to unzip the SQL fixtures (52Mo) and load them in DB.
 After that, "python setup.py install" or put the sulci folder in your 
-PYTHONPATH.
+PYTHONPATH::
+
+ $ export PYTHONPATH=$PYTHONPATH:`pwd`
 
 Add "sulci" to your INSTALLED_APPS.
+
+If you plan to train you own Sulci or to use the command line,
+you have to add these settings (with you own values, of course)::
+
+ SULCI_CLI_CONTENT_MANAGER_METHOD_NAME = 'objects'
+ SULCI_CLI_CONTENT_APP_NAME = 'libe'
+ SULCI_CLI_CONTENT_MODEL_NAME = 'article'
+ SULCI_CLI_KEYWORDS_PROPERTY = 'keywords'
+ SULCI_CLI_CONTENT_PROPERTY = "content"
 
 Sample usage::
 
@@ -144,7 +187,7 @@ Sample usage::
   >> my_text = u"Voici mon magnifique texte en français qui parle de Charlie Chaplin en Europe."
   >> S = SemanticalTagger(my_text)
   >> S.descriptors()
-  Charlie Chaplin
-  Europe
+  ((Charlie Chaplin, 87.8984),
+  (Europe, 78.4387))
 
 Feel free to contribute any help!
