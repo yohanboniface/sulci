@@ -334,7 +334,7 @@ class Token(RetrievableObject):
         # We take words < 2 letters only if it's a number
         # We don't take tools words (by tag)
         # We don't take être and avoir
-        return self.lemme not in stop_words \
+        return self.lemme not in usual_words \
                and (len(self.lemme) >= 2 or self.lemme.isdigit())\
                and not self.is_tool_word() \
                and not self.is_etre() \
@@ -366,10 +366,9 @@ class Token(RetrievableObject):
         return self.has_meaning() and len(self.lemme) >= 2
 
     def istitle(self):
-#        return self.original.istitle() #very very fastest
-#        if "jours" in self.original: print self.original, self.original.lower(), self.original.lower() in usual_words
-#        if self.original.lower() in usual_words and self.position == 0:
-#            return False
+        """
+        Determine if the token is a title, using its tag.
+        """
         return self.tag[:3] == "SBP"
 
     def is_neighbor(self, candidates):
