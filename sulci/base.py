@@ -330,15 +330,17 @@ class Token(RetrievableObject):
         """
         What about isdigit ?
         """
-        #If token is in first position, we can try in lower to maximise.
-        pattern = re.compile(ur"[\w]{1}[’'\u2019]{1}", re.U)
-        original = self.position == 0 and self.original.lower() or self.original
-        return original not in stop_words and (len(original) >= 2 or original.isdigit())\
-               and not self.is_tool_word() and not pattern.match(original)
+        # We don't take stop words (by lemme)
+        # We take words < 2 letters only if it's a number
+        # We don't take tools words (by tag)
+        # We don't take être and avoir
+        return self.lemme not in stop_words \
+               and (len(self.lemme) >= 2 or self.lemme.isdigit())\
+               and not self.is_tool_word()
     
     def is_tool_word(self):
         """
-        Try to define is this word is a "mot outil".
+        Try to define if this word is a "mot outil".
         """
         return self.tag in ["DTN:sg", "DTN:pl", "DTC:sg", "DTC:pl", "PLU", "COO", "PREP"]
     
@@ -358,11 +360,10 @@ class Token(RetrievableObject):
         """
         Do we take it in count if alone?
         """
-        #If token is in first position, we can try in lower to maximise.
-        pattern = re.compile(ur"[\w]{1}[’'\u2019]{1}", re.U)
-        original = self.position == 0 and self.original.lower() or self.original
-        return original not in usual_words and (len(original) >= 2 or original.isdigit())\
-               and not pattern.match(original)
+        # We don't take the usual words
+        # We take only words > 2 letters
+        return self.lemme not in usual_words \
+               and len(self.lemme) >= 2
 
     def istitle(self):
 #        return self.original.istitle() #very very fastest
