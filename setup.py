@@ -23,7 +23,7 @@ setup(
     package_data={'sulci': ['corpus/*']},
     install_requires=reqs,
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
