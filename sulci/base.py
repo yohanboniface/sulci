@@ -336,7 +336,9 @@ class Token(RetrievableObject):
         # We don't take être and avoir
         return self.lemme not in stop_words \
                and (len(self.lemme) >= 2 or self.lemme.isdigit())\
-               and not self.is_tool_word()
+               and not self.is_tool_word() \
+               and not self.is_etre() \
+               and not self.is_avoir()
     
     def is_tool_word(self):
         """
@@ -360,10 +362,8 @@ class Token(RetrievableObject):
         """
         Do we take it in count if alone?
         """
-        # We don't take the usual words
-        # We take only words > 2 letters
-        return self.lemme not in usual_words \
-               and len(self.lemme) >= 2
+        # Similar to has_meaning, but we don't want numbers < 2
+        return self.has_meaning() and len(self.lemme) >= 2
 
     def istitle(self):
 #        return self.original.istitle() #very very fastest
