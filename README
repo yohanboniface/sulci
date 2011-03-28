@@ -8,7 +8,11 @@ french newspaper.
 
 This code is "work in progress"; it's not used (nor usable) in production yet.
 
-It provides 4 algorithms, designed to be run in sequence: each algorithm
+Therefore, here is a demo page with the freezed 0.1 alpha version:
+ 
+ http://alpha.sulci.dotcloud.com
+
+Sulci provides 4 algorithms, designed to be run in sequence: each algorithm
 needs the data provided by the previous one :
 
 #. Part of Speech tagging
