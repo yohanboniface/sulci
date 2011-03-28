@@ -87,7 +87,6 @@ def log(s, color=None, highlight=False, mode=None):
               "WHITE": 7,
               "CRIMSON": 8
              }
-    DEBUG = True
     prefix = suffix = u""
     if color is not None:
         base = highlight and 40 or 30
