@@ -167,18 +167,19 @@
     <div class="col12">
         <h1>Sulci : open text mining</h1>
     </div>
-    <div class="col8">
+    <div class="col8" id="content">
         {% if content %}
-            <h3>Texte analysé</h3>
-            {{ content|safe }}
+            <h2>Texte analysé</h2>
+            {{ content|safe|linebreaks }}
         {% endif %}
-        <div>Entrez du texte dans le champ ci-dessous, avec ou sans balises.</div>
-        <form action="{% url sulci_demo %}" method="post" />
-        <div>{{ form.content }}</div>
-        <div><label>Afficher le debug ?</label> {{ form.debug }}</div>
-        {% csrf_token %} 
-        <br /><input type="submit" />
-        </form>
+        <div id="main_form">
+            <p>Entrez du texte dans le champ ci-dessous, avec ou sans balises.</p>
+            <form action="{% url sulci_demo %}" method="post" />
+            {{ form.content }}
+            {% csrf_token %} 
+            <br /><input type="submit" />
+            </form>
+        </div>
     </div>
     <div class="col4">
         {% if descriptors %}
