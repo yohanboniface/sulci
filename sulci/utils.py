@@ -1,7 +1,11 @@
 # -*- coding:Utf-8 -*-
 import codecs
 import os
+import logging
+
 from django.conf import settings
+
+from sulci.log import sulci_logger
 
 def save_to_file(filename, content, verbose = False):
     if verbose:
@@ -73,25 +77,7 @@ class Memoize:
             self.mem[args, str(kwargs)] = tmp
             return tmp
 
-
 # Utils functions
 def log(s, color=None, highlight=False, mode=None):
-    colors = {
-              "GRAY": 0,
-              "RED": 1,
-              "GREEN": 2,
-              "YELLOW": 3,
-              "BLUE": 4,
-              "MAGENTA": 5,
-              "CYAN": 6,
-              "WHITE": 7,
-              "CRIMSON": 8
-             }
-    prefix = suffix = u""
-    if color is not None:
-        base = highlight and 40 or 30
-        prefix = u"\033[1;%sm" % (base + colors[color])
-        suffix = u"\033[1;m"
-    if settings.DEBUG:
-        print u"*%s* - %s%s%s" % (os.getpid(),prefix, s, suffix)
+    sulci_logger.log(logging.DEBUG, s, color, highlight)    
 
