@@ -41,8 +41,8 @@ What does "training" mean?
    more rules could be infered.
 
 .. note::
-   You can also use the algorithm to help you create the corpus : give a text to the
-   algorithm, and correct the output.
+   You can also use the algorithm to help you create the corpus : give a text to
+   the algorithm, and correct the output.
 
 .. warning: each algorithm needs the previous algorithm to work, so remember
    to train the algorithms in the order they are called.
@@ -193,5 +193,27 @@ Sample usage::
   >> S.descriptors()
   ((Charlie Chaplin, 87.8984),
   (Europe, 78.4387))
+
+Generic roadmap for the beta version
+------------------------------------
+
+* More categorized texts for the POS tagger corpus (15000 words now, I'd like to
+have almost 30000)
+
+* Find a way to build unittests for every algorithm
+
+* Refine the key entities extraction
+
+* Make a documentation (Sphinx)
+
+* Find a way to remove useless relations in triggertodescriptors
+
+* Clean thesaurus
+
+* Be able to train the algorithm for one new descriptor
+
+* Generic python optimisation
+
+* Generic algorithm optimisation
 
 Feel free to contribute any help!
