@@ -217,3 +217,16 @@ have almost 30000)
 * Generic algorithm optimisation
 
 Feel free to contribute any help!
+
+How can I help?
+---------------
+
+* You're a python killer: there is many optimisations to do in the actual code
+
+* You're a language expert: all the algorithm can be optimized
+
+* You know well french language: you can add texts in the POS corpus, or make a 
+proof read of the actual texts (in corpus/*.crp)
+
+* You're an enthousiast: you can play with the demo, with the debug, and make
+tickets for the bug seen ; you can help for making the doc, etc.
