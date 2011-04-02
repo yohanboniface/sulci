@@ -12,7 +12,7 @@ from operator import itemgetter
 from GenericCache.GenericCache import GenericCache
 from GenericCache.decorators import cached
 
-from utils import uniqify, sort, product, log
+from utils import uniqify, sort, product
 from stopwords import stop_words, usual_words
 from textminingutils import lev, normalize_text, words_occurrences
 from base import RetrievableObject, Sample, Token, TextManager
@@ -20,6 +20,8 @@ from pos_tagger import PosTagger
 from lexicon import Lexicon
 from thesaurus import Trigger, Thesaurus
 from lemmatizer import Lemmatizer
+
+from sulci.log import sulci_logger
 
 #Cache
 cache = GenericCache()
@@ -124,7 +126,7 @@ class SemanticalTagger(TextManager):
                     idxg = tuple([w.stemm for w in g])
                     if not g[0].has_meaning() or not g[len(g)-1].has_meaning():
                         continue#continuing just this for loop. Good ?
-#                    if "projet" in g: log(g, RED)
+#                    if "projet" in g: sulci_logger.debug(g, RED)
 #                    if g[1].original == "Bourreau" and len(g) == 2: print g
                     if not idxg in final:
                         final[idxg] = {"count": 1, "stemms": [t.stemm for t in g]}
@@ -146,11 +148,11 @@ class SemanticalTagger(TextManager):
                or False
 
     def make_keyentities(self, min_length = 2, max_length = 10, min_count = 2):
-        #From ngrams
+        # From ngrams
         keyentities = []
         candidates = self.ngrams()
-        #Candidates are tuples : (ngram, ngram_score)
-        log([[unicode(s) for s in c[0]] for c in candidates], "CYAN")
+        # Candidates are tuples : (ngram, ngram_score)
+        sulci_logger.debug([[unicode(s) for s in c[0]] for c in candidates], "CYAN")
         for candidate in candidates:
             kp, created = KeyEntity.get_or_create([unicode(s.main_occurrence) for s in candidate[0]],
                                                   self,
@@ -158,9 +160,9 @@ class SemanticalTagger(TextManager):
                                                   count=candidate[1],
                                                   text=self)
             keyentities.append(kp)
-        #From frequency
+        # From frequency
         candidates = self.frequents_stemms()
-        log([unicode(c) for c in candidates], "MAGENTA")
+        sulci_logger.debug([unicode(c) for c in candidates], "MAGENTA")
         for candidate in candidates:
             kp, created = KeyEntity.get_or_create([unicode(candidate.main_occurrence)], 
                                                   self,
@@ -171,22 +173,22 @@ class SemanticalTagger(TextManager):
         # If a KeyEntity is contained in an other (same stemms in same place) longuer
         # delete the one with the smaller confidence, or the shortest if same confidence
         # We have to begin from the shortest ones
-        log(u"Deduplicating keyentities", "WHITE")
+        sulci_logger.debug(u"Deduplicating keyentities", "WHITE")
         tmp_keyentities = sorted(keyentities, key=lambda kp: len(kp))
-        log([unicode(kp) for kp in tmp_keyentities], "GRAY")
+        sulci_logger.debug([unicode(kp) for kp in tmp_keyentities], "GRAY")
         for idx, one in enumerate(tmp_keyentities):
             for two in tmp_keyentities[idx+1:]:
                 if one in keyentities and two in keyentities:
                     if one.is_duplicate(two):
-                        log(u"%s is duplicate %s" % (unicode(one), unicode(two)), "MAGENTA")
+                        sulci_logger.debug(u"%s is duplicate %s" % (unicode(one), unicode(two)), "MAGENTA")
                         if one > two:#and not two.is_strong()
-                            log(u"%s will be deleted" % unicode(two), "RED")
+                            sulci_logger.debug(u"%s will be deleted" % unicode(two), "RED")
                             keyentities.remove(two)
                         elif two > one:
-                            log(u"%s will be deleted" % unicode(one), "RED")
+                            sulci_logger.debug(u"%s will be deleted" % unicode(one), "RED")
                             keyentities.remove(one)
                         else:
-                            log(u"Equal, no deletion")
+                            sulci_logger.debug(u"Equal, no deletion")
         self.keyentities = keyentities
     
     def keyentities_for_trainer(self):
@@ -216,7 +218,7 @@ class SemanticalTagger(TextManager):
         total_score = 0
         max_score = 0
         for t, score in self.triggers:
-#                log(u"%s => (%s)" % (repr(kp), unicode(t)), "YELLOW")
+#                sulci_logger.debug(u"%s => (%s)" % (repr(kp), unicode(t)), "YELLOW")
             # Take the trigger relations
             for d in t:
                 # Preventing from rehiting the db
@@ -248,73 +250,73 @@ class SemanticalTagger(TextManager):
     
     
     def debug(self):
-        log("Normalized text", "WHITE")
-        log(self.normalized_text, "WHITE")
-        log("Number of words", "WHITE")
-        log(self.words_count(), "GRAY")
-        log("Number of meaning words", "WHITE")
-        log(self.meaning_words_count(), "GRAY")
-        log("Number of differents words", "WHITE")
-        log(len(self.distinct_words()), "GRAY")
-        log("Frequents stemms", "WHITE")
-        log([(unicode(s), s.count) for s in self.frequents_stemms()], "GRAY")
-        log("Lexical diversity", "WHITE")
-        log(1.0 * len(self.words) / len(set(self.distinct_words())), "GRAY")
-        log("Tagged words", "WHITE")
-        log([(unicode(t), t.tag) for t in self.tokens], "GRAY")
-        log("Sentences", "WHITE")
+        sulci_logger.debug("Normalized text", "WHITE")
+        sulci_logger.debug(self.normalized_text, "WHITE")
+        sulci_logger.debug("Number of words", "WHITE")
+        sulci_logger.debug(self.words_count(), "GRAY")
+        sulci_logger.debug("Number of meaning words", "WHITE")
+        sulci_logger.debug(self.meaning_words_count(), "GRAY")
+        sulci_logger.debug("Number of differents words", "WHITE")
+        sulci_logger.debug(len(self.distinct_words()), "GRAY")
+        sulci_logger.debug("Frequents stemms", "WHITE")
+        sulci_logger.debug([(unicode(s), s.count) for s in self.frequents_stemms()], "GRAY")
+        sulci_logger.debug("Lexical diversity", "WHITE")
+        sulci_logger.debug(1.0 * len(self.words) / len(set(self.distinct_words())), "GRAY")
+        sulci_logger.debug("Tagged words", "WHITE")
+        sulci_logger.debug([(unicode(t), t.tag) for t in self.tokens], "GRAY")
+        sulci_logger.debug("Sentences", "WHITE")
         for sample in self.samples:
-            log(sample, "GRAY")
-#        log("Ngrams", "WHITE")
-#        log(self.ngrams(), GRAY)
-#        log("Thesaurus", "WHITE")
+            sulci_logger.debug(sample, "GRAY")
+#        sulci_logger.debug("Ngrams", "WHITE")
+#        sulci_logger.debug(self.ngrams(), GRAY)
+#        sulci_logger.debug("Thesaurus", "WHITE")
 #        for kp in self.keyentities:
 #            if kp in self.thesaurus:
-#                log(u"%s in thesaurus => %s" % (unicode(kp), self.thesaurus[kp]), "BLUE")
-        log("Final keyentities", "WHITE")
+#                sulci_logger.debug(u"%s in thesaurus => %s" % (unicode(kp), self.thesaurus[kp]), "BLUE")
+        sulci_logger.debug("Final keyentities", "WHITE")
         for kp in sorted(self.keyentities, key=lambda kp: kp.keyconcept_confidence):
-            log(u"%s (%f)" % (unicode(kp), kp.confidence), "YELLOW")
+            sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.confidence), "YELLOW")
 #            if kp.collocation_confidence > 1:
-#                log(u"Collocation confidence => %f" % kp.collocation_confidence, "BLUE")
+#                sulci_logger.debug(u"Collocation confidence => %f" % kp.collocation_confidence, "BLUE")
 ##                    print self.thesaurus[kp].id, self.thesaurus[kp].line
 #            if kp.keyconcept_confidence > 0.01:
-#                log(u"Keyconcept confidence (%f)" % kp.keyconcept_confidence, "CYAN")
+#                sulci_logger.debug(u"Keyconcept confidence (%f)" % kp.keyconcept_confidence, "CYAN")
 #            if kp.descriptor is not None:
-#                log(u"%s in thesaurus => %s" % (unicode(kp), unicode(kp.descriptor)), "MAGENTA")
-            log(kp._confidences, "GRAY")
-        log(u"Keyentities by keyconcept_confidence", "BLUE", True)
+#                sulci_logger.debug(u"%s in thesaurus => %s" % (unicode(kp), unicode(kp.descriptor)), "MAGENTA")
+            sulci_logger.debug(kp._confidences, "GRAY")
+        sulci_logger.debug(u"Keyentities by keyconcept_confidence", "BLUE", True)
         for kp in sorted(self.keyentities, key=lambda kp: kp.keyconcept_confidence, reverse=True)[:10]:
-            log(u"%s (%f)" % (unicode(kp), kp.keyconcept_confidence), "YELLOW")
-        log(u"Keyentities by statistical_mutual_information_confidence", "BLUE", True)
+            sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.keyconcept_confidence), "YELLOW")
+        sulci_logger.debug(u"Keyentities by statistical_mutual_information_confidence", "BLUE", True)
         for kp in sorted(self.keyentities, key=lambda kp: kp._confidences["statistical_mutual_information"], reverse=True)[:10]:
-            log(u"%s (%f)" % (unicode(kp), kp._confidences["statistical_mutual_information"]), "YELLOW")
-        log(u"Keyentities by pos_confidence", "BLUE", True)
+            sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp._confidences["statistical_mutual_information"]), "YELLOW")
+        sulci_logger.debug(u"Keyentities by pos_confidence", "BLUE", True)
         for kp in sorted(self.keyentities, key=lambda kp: kp._confidences["pos"], reverse=True)[:10]:
-            log(u"%s (%f)" % (unicode(kp), kp._confidences["pos"]), "YELLOW")
-#        log(u"Keyentities by thesaurus_confidence", "BLUE", True)
+            sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp._confidences["pos"]), "YELLOW")
+#        sulci_logger.debug(u"Keyentities by thesaurus_confidence", "BLUE", True)
 #        for kp in sorted((kp for kp in self.keyentities if kp.descriptor is not None), key=lambda kp: kp._confidences["thesaurus"], reverse=True):
-#            log(u"%s (%s)" % (unicode(kp), unicode(kp.descriptor)), "YELLOW")
-        log(u"Keyentities by frequency_relative_pmi_confidence", "BLUE", True)
+#            sulci_logger.debug(u"%s (%s)" % (unicode(kp), unicode(kp.descriptor)), "YELLOW")
+        sulci_logger.debug(u"Keyentities by frequency_relative_pmi_confidence", "BLUE", True)
         for kp in sorted(self.keyentities, key=lambda kp: kp.frequency_relative_pmi_confidence, reverse=True)[:10]:
-            log(u"%s (%f)" % (unicode(kp), kp.frequency_relative_pmi_confidence), "YELLOW")
-        log(u"Keyentities by keyconcept_confidence * pos confidence", "BLUE", True)
+            sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.frequency_relative_pmi_confidence), "YELLOW")
+        sulci_logger.debug(u"Keyentities by keyconcept_confidence * pos confidence", "BLUE", True)
         for kp in sorted(self.keyentities, key=lambda kp: kp.keyconcept_confidence * kp._confidences["pos"], reverse=True)[:10]:
-            log(u"%s (%f)" % (unicode(kp), kp.keyconcept_confidence * kp._confidences["pos"]), "YELLOW")
-        log(u"Keyentities by nrelative * pos confidence", "BLUE", True)
+            sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.keyconcept_confidence * kp._confidences["pos"]), "YELLOW")
+        sulci_logger.debug(u"Keyentities by nrelative * pos confidence", "BLUE", True)
         for kp in sorted(self.keyentities, key=lambda kp: kp.trigger_score, reverse=True)[:20]:
-            log(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
-        log(u"Keyentities from triggers", "BLUE", True)
+            sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
+        sulci_logger.debug(u"Keyentities from triggers", "BLUE", True)
         #Loading...
 #        self.thesaurus.triggers
         scored_descriptors = defaultdict(float)
         for t, score in self.triggers:
-            log(u"%s => %f" % (unicode(t), score), "YELLOW")
+            sulci_logger.debug(u"%s => %f" % (unicode(t), score), "YELLOW")
             for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
-                log(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
-#        log(u"Scored descriptors", "YELLOW", True)
+                sulci_logger.debug(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
+#        sulci_logger.debug(u"Scored descriptors", "YELLOW", True)
 #        for d, v in sorted(scored_descriptors.iteritems(), key=itemgetter(1), reverse=True):
 #            if scored_descriptors[d] > 0.001:#Test
-#                log(u"%s %f" % (unicode(d), scored_descriptors[d]), "WHITE")
+#                sulci_logger.debug(u"%s %f" % (unicode(d), scored_descriptors[d]), "WHITE")
 
 
 class KeyEntity(RetrievableObject):
@@ -385,9 +387,9 @@ class KeyEntity(RetrievableObject):
         #First of all, we check that both are competitors
         if not self in other and not other in self:
             raise ValueError("keyentities must be parent for this comparison.")
-        log(u"Comparing '%s' and '%s'" % (unicode(self), unicode(other)), "GRAY")
-        log(self._confidences, "GRAY")
-        log(other._confidences, "GRAY")
+        sulci_logger.debug(u"Comparing '%s' and '%s'" % (unicode(self), unicode(other)), "GRAY")
+        sulci_logger.debug(self._confidences, "GRAY")
+        sulci_logger.debug(other._confidences, "GRAY")
         if not self.statistical_mutual_information_confidence() == other.statistical_mutual_information_confidence():
             return self.statistical_mutual_information_confidence() > other.statistical_mutual_information_confidence()
         elif not self.heuristical_mutual_information_confidence() == other.heuristical_mutual_information_confidence():
@@ -466,16 +468,16 @@ class KeyEntity(RetrievableObject):
                * self._confidences["nrelative_frequency"]
     
     def compute_confidence(self):
-        log(u"KeyEntity : %s" % unicode(self), "YELLOW")
-        log(u"KeyEntity count : %d" % self.count, "GRAY")
+        sulci_logger.debug(u"KeyEntity : %s" % unicode(self), "YELLOW")
+        sulci_logger.debug(u"KeyEntity count : %d" % self.count, "GRAY")
         self._confidences["frequency"] = self.frequency_confidence()
-        log(u"Frequency confidence : %f" % self._confidences["frequency"], "GRAY")
+        sulci_logger.debug(u"Frequency confidence : %f" % self._confidences["frequency"], "GRAY")
         self._confidences["nrelative_frequency"] = self.nrelative_frequency_confidence()
-        log(u"Nrelative frequency confidence : %f" % self._confidences["nrelative_frequency"], "GRAY")
+        sulci_logger.debug(u"Nrelative frequency confidence : %f" % self._confidences["nrelative_frequency"], "GRAY")
         self._confidences["title"] = self.title_confidence()
-        log(u"Title confidence : %f" % self._confidences["title"], "GRAY")
+        sulci_logger.debug(u"Title confidence : %f" % self._confidences["title"], "GRAY")
         self._confidences["pos"] = self.pos_confidence()
-        log(u"POS confidence : %f" % self._confidences["pos"], "GRAY")
+        sulci_logger.debug(u"POS confidence : %f" % self._confidences["pos"], "GRAY")
         #As we have currently two PMI, we use the medium of each one
 #        pmi_factor = math.sqrt(
 #                     (self.heuristical_mutual_information_confidence() +
@@ -486,12 +488,12 @@ class KeyEntity(RetrievableObject):
 #                      self.statistical_mutual_information_confidence())
 #                    )
         self._confidences["heuristical_mutual_information"] = self.heuristical_mutual_information_confidence()
-        log(u"MI confidence : %f" % self._confidences["heuristical_mutual_information"], "GRAY")
+        sulci_logger.debug(u"MI confidence : %f" % self._confidences["heuristical_mutual_information"], "GRAY")
         self._confidences["statistical_mutual_information"] = self.statistical_mutual_information_confidence()
-        log(u"PMI confidence : %f" % self._confidences["statistical_mutual_information"], "GRAY")
+        sulci_logger.debug(u"PMI confidence : %f" % self._confidences["statistical_mutual_information"], "GRAY")
 #        self._confidences["thesaurus"] = self.thesaurus_confidence()
-#        log(u"Thesaurus confidence : %f" % self._confidences["thesaurus"], "GRAY")
-        log(u"Computed confidence : %f" % self.confidence, "BLUE")
+#        sulci_logger.debug(u"Thesaurus confidence : %f" % self._confidences["thesaurus"], "GRAY")
+        sulci_logger.debug(u"Computed confidence : %f" % self.confidence, "BLUE")
 
     def frequency_confidence(self):
         """

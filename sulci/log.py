@@ -58,12 +58,15 @@ class ColoredLogger(logging.Logger):
     An optional highlight parameter define if the color will be of the font
     or the background.
     """
-    def log(self, lvl, msg, color, highlight):
+    def log(self, lvl, msg, color, highlight=False):
         """
         Add color parameter and pass it to log via extra parameter.
         This parameter will be added as property to the LogRecord.
         """
         logging.Logger.log(self, lvl, msg, extra={"color":color, "highlight": highlight})
+    
+    def debug(self, msg, color, highlight=False):
+        self.log(logging.DEBUG, msg, color, highlight)
 
 logging.setLoggerClass(ColoredLogger)
 

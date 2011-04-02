@@ -79,5 +79,5 @@ class Memoize:
 
 # Utils functions
 def log(s, color=None, highlight=False, mode=None):
-    sulci_logger.log(logging.DEBUG, s, color, highlight)    
+    sulci_logger.debug(s, color, highlight)    
 
