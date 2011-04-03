@@ -12,15 +12,14 @@ from operator import itemgetter
 from GenericCache.GenericCache import GenericCache
 from GenericCache.decorators import cached
 
-from utils import uniqify, sort, product
-from stopwords import stop_words, usual_words
-from textminingutils import lev, normalize_text, words_occurrences
-from base import RetrievableObject, Sample, Token, TextManager
-from pos_tagger import PosTagger
-from lexicon import Lexicon
-from thesaurus import Trigger, Thesaurus
-from lemmatizer import Lemmatizer
-
+from sulci.utils import uniqify, sort, product
+from sulci.stopwords import stop_words, usual_words
+from sulci.textutils import lev, normalize_text, words_occurrences
+from sulci.base import RetrievableObject, Sample, Token, TextManager
+from sulci.pos_tagger import PosTagger
+from sulci.lexicon import Lexicon
+from sulci.thesaurus import Trigger, Thesaurus
+from sulci.lemmatizer import Lemmatizer
 from sulci.log import sulci_logger
 
 #Cache

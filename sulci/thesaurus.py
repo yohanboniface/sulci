@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding:Utf-8 -*-
 
 import re
@@ -10,9 +9,9 @@ from Stemmer import Stemmer#DRY ALERT
 from django.db import models, transaction
 from django.db.utils import IntegrityError
 
-from textminingutils import tokenize_text, normalize_token, lev
-from base import RetrievableObject
-from utils import save_to_file, get_dir
+from sulci.textutils import tokenize_text, normalize_token, lev
+from sulci.base import RetrievableObject
+from sulci.utils import save_to_file, get_dir
 
 class Thesaurus(object):
 

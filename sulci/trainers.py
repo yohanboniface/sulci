@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding:Utf-8 -*-
 
 import os
@@ -10,11 +9,11 @@ import datetime
 
 from django.conf import settings
 
-from utils import load_file, save_to_file, log
-from thesaurus import Trigger, Descriptor
-from textmining import SemanticalTagger
-from textminingutils import tokenize_text
-from rules_templates import LemmatizerTemplateGenerator, RuleTemplate,\
+from sulci.utils import load_file, save_to_file, log
+from sulci.thesaurus import Trigger, Descriptor
+from sulci.textmining import SemanticalTagger
+from sulci.textutils import tokenize_text
+from sulci.rules_templates import LemmatizerTemplateGenerator, RuleTemplate,\
                            ContextualTemplateGenerator, LexicalTemplateGenerator
 from sulci import content_model, content_manager
 

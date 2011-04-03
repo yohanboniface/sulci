@@ -8,7 +8,7 @@ from operator import itemgetter
 
 from django.utils.text import unescape_entities
 
-from sulci.textminingutils import normalize_text
+from sulci.textutils import normalize_text
 from sulci.utils import load_file, save_to_file
 from sulci.base import TextManager
 from sulci.lemmatizer import Lemmatizer

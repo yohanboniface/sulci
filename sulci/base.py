@@ -6,9 +6,9 @@ import re
 
 from Stemmer import Stemmer
 
-from utils import save_to_file, load_file, get_dir
-from textminingutils import normalize_token, tokenize_text
-from stopwords import stop_words, usual_words
+from sulci.utils import save_to_file, load_file, get_dir
+from sulci.textutils import normalize_token, tokenize_text
+from sulci.stopwords import stop_words, usual_words
 
 class TextManager(object):
     """

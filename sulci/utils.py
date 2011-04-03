@@ -1,4 +1,7 @@
 # -*- coding:Utf-8 -*-
+"""
+Sulci internal generic utils.
+"""
 import codecs
 import os
 import logging

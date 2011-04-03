@@ -1,6 +1,7 @@
-#!/usr/bin/python
 # -*- coding: UTF-8 -*-
-
+"""
+Sulci text utils.
+"""
 import string
 import re
 import unicodedata
