@@ -174,26 +174,31 @@ class SemanticalTagger(TextManager):
                                                   count=candidate.count,
                                                   text=self)
             keyentities.append(kp)
-        # If a KeyEntity is contained in an other (same stemms in same place) longuer
-        # delete the one with the smaller confidence, or the shortest if same confidence
-        # We have to begin from the shortest ones
+        self.keyentities = keyentities
+        self.deduplicate_keyentities()
+    
+    def deduplicate_keyentities(self):
+        """
+        If a KeyEntity is contained in an other (same stemms in same place) longuer
+        delete the one with the smaller confidence, or the shortest if same confidence
+        We have to begin from the shortest ones.
+        """
         sulci_logger.debug(u"Deduplicating keyentities", "WHITE")
-        tmp_keyentities = sorted(keyentities, key=lambda kp: len(kp))
+        tmp_keyentities = sorted(self.keyentities, key=lambda kp: len(kp))
         sulci_logger.debug([unicode(kp) for kp in tmp_keyentities], "GRAY")
         for idx, one in enumerate(tmp_keyentities):
             for two in tmp_keyentities[idx+1:]:
-                if one in keyentities and two in keyentities:
+                if one in self.keyentities and two in self.keyentities:
                     if one.is_duplicate(two):
                         sulci_logger.debug(u"%s is duplicate %s" % (unicode(one), unicode(two)), "MAGENTA")
                         if one > two:#and not two.is_strong()
                             sulci_logger.debug(u"%s will be deleted" % unicode(two), "RED")
-                            keyentities.remove(two)
+                            self.keyentities.remove(two)
                         elif two > one:
                             sulci_logger.debug(u"%s will be deleted" % unicode(one), "RED")
-                            keyentities.remove(one)
+                            self.keyentities.remove(one)
                         else:
                             sulci_logger.debug(u"Equal, no deletion")
-        self.keyentities = keyentities
     
     def keyentities_for_trainer(self):
         return sorted(self.keyentities, key=lambda kp: kp.frequency_relative_pmi_confidence * kp._confidences["pos"], reverse=True)[:20]
