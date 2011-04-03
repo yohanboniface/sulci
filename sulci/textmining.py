@@ -73,8 +73,8 @@ class SemanticalTagger(TextManager):
             stm.occurrences.append(tkn)
             tkn.stemm = stm
             self._stemms.add(stm)
-        sulci_logger.debug("Stemms", "BLUE", highlight=True)
-        sulci_logger.debug([unicode(s) for s in self._stemms], "GRAY")
+        sulci_logger.debug("Initial stemms", "BLUE", highlight=True)
+        sulci_logger.debug([unicode(s) for s in self._stemms], "CYAN")
     
     @property
     @cached(cache)
@@ -157,7 +157,7 @@ class SemanticalTagger(TextManager):
         keyentities = []
         candidates = self.ngrams()
         # Candidates are tuples : (ngram, ngram_score)
-        sulci_logger.debug("Ngrams candidates", "WHITE")
+        sulci_logger.debug("Ngrams candidates", "BLUE", highlight=True)
         for c in candidates:
             sulci_logger.debug([unicode(s) for s in c[0]], "CYAN")
         for candidate in candidates:
@@ -169,9 +169,9 @@ class SemanticalTagger(TextManager):
             keyentities.append(kp)
         # From frequency
         candidates = self.keystems()
-        sulci_logger.debug("Frequent stems candidates", "WHITE")
+        sulci_logger.debug("Frequent stems candidates", "BLUE", highlight=True)
         for c in candidates:
-            sulci_logger.debug(unicode(c), "MAGENTA")
+            sulci_logger.debug(unicode(c), "CYAN")
         for candidate in candidates:
             kp, created = KeyEntity.get_or_create([unicode(candidate.main_occurrence)], 
                                                   self,
@@ -188,7 +188,7 @@ class SemanticalTagger(TextManager):
         delete the one with the smaller confidence, or the shortest if same confidence
         We have to begin from the shortest ones.
         """
-        sulci_logger.debug(u"Deduplicating keyentities", "WHITE")
+        sulci_logger.debug(u"Deduplicating keyentities...", "BLUE", highlight=True)
         tmp_keyentities = sorted(self.keyentities, key=lambda kp: len(kp))
         sulci_logger.debug([unicode(kp) for kp in tmp_keyentities], "GRAY")
         for idx, one in enumerate(tmp_keyentities):
@@ -204,6 +204,7 @@ class SemanticalTagger(TextManager):
                             self.keyentities.remove(one)
                         else:
                             sulci_logger.debug(u"Equal, no deletion")
+        sulci_logger.debug(u"... keyentities deduplicated", "BLUE", highlight=True)
     
     def keyentities_for_trainer(self):
         return sorted(self.keyentities, key=lambda kp: kp.frequency_relative_pmi_confidence * kp._confidences["pos"], reverse=True)[:20]
@@ -319,9 +320,9 @@ class SemanticalTagger(TextManager):
         sulci_logger.debug(u"Keyentities by nrelative * pos confidence", "BLUE", True)
         for kp in sorted(self.keyentities, key=lambda kp: kp.trigger_score, reverse=True)[:20]:
             sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
-        sulci_logger.debug(u"Keyentities from triggers", "BLUE", True)
+        sulci_logger.debug(u"Triggers and relation with descriptors", "BLUE", True)
         for t, score in self.triggers:
-            sulci_logger.debug(u"%s => %f" % (unicode(t), score), "YELLOW")
+            sulci_logger.debug(u"%s => %f" % (unicode(t), score), "GRAY", highlight=True)
             for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
                 sulci_logger.debug(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
 
@@ -472,32 +473,16 @@ class KeyEntity(RetrievableObject):
                * self._confidences["nrelative_frequency"]
     
     def compute_confidence(self):
-        sulci_logger.debug(u"KeyEntity : %s" % unicode(self), "YELLOW")
-        sulci_logger.debug(u"KeyEntity count : %d" % self.count, "GRAY")
+        """
+        Compute scores that will be used to order, select, deduplicate 
+        keytentities.
+        """
         self._confidences["frequency"] = self.frequency_confidence()
-        sulci_logger.debug(u"Frequency confidence : %f" % self._confidences["frequency"], "GRAY")
         self._confidences["nrelative_frequency"] = self.nrelative_frequency_confidence()
-        sulci_logger.debug(u"Nrelative frequency confidence : %f" % self._confidences["nrelative_frequency"], "GRAY")
         self._confidences["title"] = self.title_confidence()
-        sulci_logger.debug(u"Title confidence : %f" % self._confidences["title"], "GRAY")
         self._confidences["pos"] = self.pos_confidence()
-        sulci_logger.debug(u"POS confidence : %f" % self._confidences["pos"], "GRAY")
-        #As we have currently two PMI, we use the medium of each one
-#        pmi_factor = math.sqrt(
-#                     (self.heuristical_mutual_information_confidence() +
-#                      self.statistical_mutual_information_confidence()) 
-#                     /
-#                     (2 * 
-#                      self.heuristical_mutual_information_confidence() *
-#                      self.statistical_mutual_information_confidence())
-#                    )
         self._confidences["heuristical_mutual_information"] = self.heuristical_mutual_information_confidence()
-        sulci_logger.debug(u"MI confidence : %f" % self._confidences["heuristical_mutual_information"], "GRAY")
         self._confidences["statistical_mutual_information"] = self.statistical_mutual_information_confidence()
-        sulci_logger.debug(u"PMI confidence : %f" % self._confidences["statistical_mutual_information"], "GRAY")
-#        self._confidences["thesaurus"] = self.thesaurus_confidence()
-#        sulci_logger.debug(u"Thesaurus confidence : %f" % self._confidences["thesaurus"], "GRAY")
-        sulci_logger.debug(u"Computed confidence : %f" % self.confidence, "BLUE")
 
     def frequency_confidence(self):
         """
