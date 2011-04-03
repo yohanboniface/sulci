@@ -106,7 +106,7 @@ class SemanticalTagger(TextManager):
     def distincts_meaning_words(self):
         return uniqify(self.meaning_words, lambda x: x.original)
 
-    def frequents_stemms(self, min_count=3):
+    def frequent_stemms(self, min_count=3):
         #Min_count may be proportionnal to text length...
 #        print self.stemms
         candidates = [s for s in self.stemms if s.has_interest_alone()]
@@ -152,7 +152,9 @@ class SemanticalTagger(TextManager):
         keyentities = []
         candidates = self.ngrams()
         # Candidates are tuples : (ngram, ngram_score)
-        sulci_logger.debug([[unicode(s) for s in c[0]] for c in candidates], "CYAN")
+        sulci_logger.debug("Ngrams candidates", "WHITE")
+        for c in candidates:
+            sulci_logger.debug([unicode(s) for s in c[0]], "CYAN")
         for candidate in candidates:
             kp, created = KeyEntity.get_or_create([unicode(s.main_occurrence) for s in candidate[0]],
                                                   self,
@@ -161,8 +163,10 @@ class SemanticalTagger(TextManager):
                                                   text=self)
             keyentities.append(kp)
         # From frequency
-        candidates = self.frequents_stemms()
-        sulci_logger.debug([unicode(c) for c in candidates], "MAGENTA")
+        candidates = self.frequent_stemms()
+        sulci_logger.debug("Frequent stems candidates", "WHITE")
+        for c in candidates:
+            sulci_logger.debug(unicode(c), "MAGENTA")
         for candidate in candidates:
             kp, created = KeyEntity.get_or_create([unicode(candidate.main_occurrence)], 
                                                   self,
@@ -259,7 +263,7 @@ class SemanticalTagger(TextManager):
         sulci_logger.debug("Number of differents words", "WHITE")
         sulci_logger.debug(len(self.distinct_words()), "GRAY")
         sulci_logger.debug("Frequents stemms", "WHITE")
-        sulci_logger.debug([(unicode(s), s.count) for s in self.frequents_stemms()], "GRAY")
+        sulci_logger.debug([(unicode(s), s.count) for s in self.frequent_stemms()], "GRAY")
         sulci_logger.debug("Lexical diversity", "WHITE")
         sulci_logger.debug(1.0 * len(self.words) / len(set(self.distinct_words())), "GRAY")
         sulci_logger.debug("Tagged words", "WHITE")
@@ -306,17 +310,10 @@ class SemanticalTagger(TextManager):
         for kp in sorted(self.keyentities, key=lambda kp: kp.trigger_score, reverse=True)[:20]:
             sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
         sulci_logger.debug(u"Keyentities from triggers", "BLUE", True)
-        #Loading...
-#        self.thesaurus.triggers
-        scored_descriptors = defaultdict(float)
         for t, score in self.triggers:
             sulci_logger.debug(u"%s => %f" % (unicode(t), score), "YELLOW")
             for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
                 sulci_logger.debug(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
-#        sulci_logger.debug(u"Scored descriptors", "YELLOW", True)
-#        for d, v in sorted(scored_descriptors.iteritems(), key=itemgetter(1), reverse=True):
-#            if scored_descriptors[d] > 0.001:#Test
-#                sulci_logger.debug(u"%s %f" % (unicode(d), scored_descriptors[d]), "WHITE")
 
 
 class KeyEntity(RetrievableObject):

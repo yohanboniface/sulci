@@ -176,6 +176,7 @@
             <p>Entrez du texte dans le champ ci-dessous, avec ou sans balises.</p>
             <form action="{% url sulci_demo %}" method="post" />
             {{ form.content }}
+            <div><label>Afficher le debug ?</label> {{ form.debug }}</div>
             {% csrf_token %} 
             <br /><input type="submit" />
             </form>

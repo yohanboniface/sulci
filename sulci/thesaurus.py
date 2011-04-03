@@ -12,34 +12,12 @@ from django.db.utils import IntegrityError
 
 from textminingutils import tokenize_text, normalize_token, lev
 from base import RetrievableObject
-from utils import log, save_to_file, get_dir
+from utils import save_to_file, get_dir
 
 class Thesaurus(object):
 
     def __init__(self, path="thesaurus.txt"):
         self.descriptors = Descriptor.objects.all()
-#        self._triggers = None
-#        log("loading thesaurus", "BLUE", True)
-#        self.descriptors = {}
-#        f = codecs.open(get_dir() + path, "r", "utf-8")
-#        for idx, line in enumerate(f.readlines()):
-#            cleaned_line, options = self.split_line(line)
-#            if cleaned_line is not None:
-#    #                if idx == 9: print cleaned_line
-#                dpt, created = Descriptor.get_or_create(tokenize_text(cleaned_line),
-#                                                        self,
-#                                                        original=tokenize_text(cleaned_line),
-#                                                        options=options,
-#                                                        line=idx)
-#                dpt_indexes = dpt.aliases
-#                for dpt_index in dpt_indexes:
-#    #                    if "Fini" in line: print dpt_index
-#                    if not dpt_index in self:
-#                        self.descriptors[dpt_index] = []
-#                    if not dpt in self.descriptors[dpt_index]:
-#                        self.descriptors[dpt_index].append(dpt)
-#        f.close()
-#        log("thesaurus loaded", "BLUE", True)
     
     def __contains__(self, item):
         """
@@ -69,17 +47,6 @@ class Thesaurus(object):
             tup = item
         return tuple(sorted(tup))
 
-    def split_line(self, line):
-        """
-        The thesaurus is currently in plain text, so...
-        """
-        pattern = re.compile("\- (?P<descriptor>[\w\-'’ ]*)(#!/\[\[(?P<options>.*)\]\])?", re.U)
-        r = pattern.search(line)
-        if r is not None:
-            return r.group("descriptor"), r.group("options")
-        else:#Non valide line
-            return None, None
-    
     @property
     def triggers(self):
         if self._triggers is None:#cached and lazy
@@ -88,7 +55,7 @@ class Thesaurus(object):
         return self._triggers
     
     def load_triggers(self):
-        log("Loading triggers...", "YELLOW", True)
+        sulci_logger.debug("Loading triggers...", "YELLOW", True)
         f = codecs.open(get_dir() + "corpus/triggers.trg", "r", "utf-8")
         for idx, line in enumerate(f.readlines()):
             #TODO check line validity
@@ -278,14 +245,14 @@ class Trigger(models.Model):
         Delete the connection if the score is negative.
         """
         if not descriptor in self:
-#            log(u"Creating connection %s - %s" % (self, descriptor), "CYAN")
+#            sulci_logger.debug(u"Creating connection %s - %s" % (self, descriptor), "CYAN")
             self[descriptor] = 0.0
         rel = self[descriptor]
         rel.weight += score
         rel.save()
 #        if self[descriptor] < 0:
 #            del self[descriptor]
-#            log(u"Removed connection %s - %s" % (self, descriptor), "RED")
+#            sulci_logger.debug(u"Removed connection %s - %s" % (self, descriptor), "RED")
     
     def clean_connections(self):
         """
@@ -294,7 +261,7 @@ class Trigger(models.Model):
         for descriptor in self._descriptors.copy().__iter__():
             if self[descriptor] < 0:
                 del self[descriptor]
-                log(u"Removed connection %s - %s" % (self, descriptor), "RED")        
+                sulci_logger.debug(u"Removed connection %s - %s" % (self, descriptor), "RED")        
     
     @classmethod
     def clean_all_connections(cls):
@@ -305,6 +272,6 @@ class Trigger(models.Model):
         Return a string for file storage.
         """
         if len(self) == 0:
-            log(u"No descriptors for %s" % unicode(self), "RED")
+            sulci_logger.debug(u"No descriptors for %s" % unicode(self), "RED")
             return None
         return u"%s\t%s" % (unicode(self), u"\t".join(u"%s %f" % (unicode(k), float(v)) for k, v in self.items()))

@@ -6,7 +6,7 @@ import os
 from collections import defaultdict
 from operator import itemgetter
 
-from utils import load_file, save_to_file, log
+from utils import load_file, save_to_file
 from rules_templates import ContextualTemplateGenerator, \
                             LexicalTemplateGenerator, RuleTemplate
 from base import Token
