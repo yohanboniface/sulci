@@ -45,7 +45,7 @@ class HTMLColorFormatter(logging.Formatter):
             color_type = record.highlight and "background-color" or "color"
             weight = record.highlight and "bold" or "normal"
             style = "%s:%s; font-weight:%s;" % (color_type, record.color, weight)
-        prefix = u'<span style="%s;">' % style
+        prefix = u'<span style="%s">' % style
         suffix = u"</span>"
         record.msg = u"%s%s%s" % (prefix, record.msg, suffix)
         return logging.Formatter.format(self, record)
