@@ -45,6 +45,7 @@ class SemanticalTagger(TextManager):
         self.lemmatizer = lemmatizer or Lemmatizer()
         self.make()
         self._triggers = None
+        self._stemms = None
 
     def __iter__(self):
         return self.words.__iter__()
@@ -63,12 +64,17 @@ class SemanticalTagger(TextManager):
         self.make_keyentities()
     
     def create_stemm(self):
+        self._stemms = set() # A set because order don't mind
+                             # And we want no duplicates
         for tkn in self.tokens:
             self.lemmatizer.do(tkn)
-            #We don't take the sg or pl in the tag name
+            # We don't take the sg or pl in the tag name
             stm, created = Stemm.get_or_create((unicode(tkn.lemme), tkn.tag.split(u":")[0]), self, original=unicode(tkn.lemme), text=self)
             stm.occurrences.append(tkn)
             tkn.stemm = stm
+            self._stemms.add(stm)
+        sulci_logger.debug("Stemms", "BLUE", highlight=True)
+        sulci_logger.debug([unicode(s) for s in self._stemms], "GRAY")
     
     @property
     @cached(cache)
@@ -86,7 +92,9 @@ class SemanticalTagger(TextManager):
 
     @property
     def stemms(self):
-        return uniqify([t.stemm for t in self.meaning_words], lambda x: x.id)
+        if self._stemms is None: # Should not occurs
+            self._stemms = uniqify([t.stemm for t in self.meaning_words], lambda x: x.id)
+        return self._stemms
 
     def words_count(self):
         """
@@ -99,20 +107,17 @@ class SemanticalTagger(TextManager):
         Return the number of words in the text.
         """
         return sum([s.meaning_words_count() for s in self.samples])
-
+    
     def distinct_words(self):
         return uniqify(self.words, lambda x: x.original)
-
+    
     def distincts_meaning_words(self):
         return uniqify(self.meaning_words, lambda x: x.original)
-
-    def frequent_stemms(self, min_count=3):
+    
+    def keystems(self, min_count=3):
         #Min_count may be proportionnal to text length...
-#        print self.stemms
-        candidates = [s for s in self.stemms if s.has_interest_alone()]
-#        print candidates
-        return sort(candidates, "count", reverse=True)
-
+        return sort([s for s in self.stemms if s.has_interest_alone()], "count", reverse=True)
+    
     def ngrams(self, min_length = 2, max_length = 15, min_count = 2):
         final = {}
     #    sentence = tuple(sentences[0])
@@ -163,7 +168,7 @@ class SemanticalTagger(TextManager):
                                                   text=self)
             keyentities.append(kp)
         # From frequency
-        candidates = self.frequent_stemms()
+        candidates = self.keystems()
         sulci_logger.debug("Frequent stems candidates", "WHITE")
         for c in candidates:
             sulci_logger.debug(unicode(c), "MAGENTA")
@@ -268,7 +273,7 @@ class SemanticalTagger(TextManager):
         sulci_logger.debug("Number of differents words", "WHITE")
         sulci_logger.debug(len(self.distinct_words()), "GRAY")
         sulci_logger.debug("Frequents stemms", "WHITE")
-        sulci_logger.debug([(unicode(s), s.count) for s in self.frequent_stemms()], "GRAY")
+        sulci_logger.debug([(unicode(s), s.count) for s in self.keystems()], "GRAY")
         sulci_logger.debug("Lexical diversity", "WHITE")
         sulci_logger.debug(1.0 * len(self.words) / len(set(self.distinct_words())), "GRAY")
         sulci_logger.debug("Tagged words", "WHITE")
@@ -338,9 +343,6 @@ class KeyEntity(RetrievableObject):
 #                            "thesaurus": None,
                             "pos": None
                            }
-#        self.descriptor = None
-#        if self.id in self.text.thesaurus:
-#            self.descriptor = self.text.thesaurus[self.id]
         self.compute_confidence()
     
     def __unicode__(self):
@@ -626,7 +628,6 @@ class KeyEntity(RetrievableObject):
             else:
                 sorig = unicode(self)
                 dorig = unicode(self.descriptor)
-#                print sorig, dorig, len(sorig), lev(dorig, sorig), math.log(max(1, (len(sorig) - lev(dorig, sorig))))
                 return math.log(max(1, (len(sorig) - lev(dorig, sorig))))
         return self._confidences["thesaurus"]
 
@@ -663,7 +664,7 @@ class Stemm(RetrievableObject):
     def __init__(self, pk, **kwargs):
         self.id = pk
         self.text = kwargs["text"]
-        self.occurrences = []#Otherwise all the objects have the same reference
+        self.occurrences = []
         self._main_occurrence = None
     
     def __unicode__(self):
@@ -684,7 +685,7 @@ class Stemm(RetrievableObject):
         """
         s = y
         if isinstance(y, Token):
-            s = s.stemm #Will turn one time.
+            s = s.stemm # Will turn one time.
         elif isinstance(y, Stemm):
             s = s.id 
         return self.id == s
