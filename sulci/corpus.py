@@ -9,8 +9,9 @@ from operator import itemgetter
 from django.utils.text import unescape_entities
 
 from textminingutils import normalize_text
-from utils import load_file, save_to_file, log
+from utils import load_file, save_to_file
 from base import TextManager
+from sulci.log import sulci_logger
 
 class Corpus(TextManager):
     """
@@ -42,7 +43,7 @@ class Corpus(TextManager):
     @property
     def tokens(self):
         if self._tokens is None:
-            log("Loading corpus...", "RED", True)
+            sulci_logger.debug("Loading corpus...", "RED", True)
             self._samples, self._tokens = self.instantiate_text(self.content.split())
         return self._tokens
     
@@ -81,10 +82,10 @@ class Corpus(TextManager):
         found = False
         for t in self.tokens:
             if word == t:
-                log(t.show_context(), "WHITE")
+                sulci_logger.info(t.show_context(), "WHITE")
                 found = True
         if not found:
-            log(u'No occurrence found for "%s"' % word, "WHITE")
+            sulci_logger.info(u'No occurrence found for "%s"' % word, "WHITE")
     
     def tags_stats(self):
         """
@@ -92,9 +93,10 @@ class Corpus(TextManager):
         """
         d = defaultdict(int)
         for t in self:
-            if t.verified_tag == None: log(u"No verified tag for %s" % unicode(t), "RED", True)
+            if t.verified_tag == None:
+                sulci_logger.info(u"No verified tag for %s" % unicode(t), "RED", True)
             d[t.verified_tag] += 1
-        log(u"Tag usage :", "WHITE")
+        sulci_logger.info(u"Tag usage :", "WHITE")
         for k, v in sorted(d.iteritems(), key=itemgetter(1), reverse=True):
-            log(u"%s => %d" % (k, v), "CYAN")
+            sulci_logger.info(u"%s => %d" % (k, v), "CYAN")
 

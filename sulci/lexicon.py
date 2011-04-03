@@ -5,7 +5,8 @@ from collections import defaultdict
 from operator import itemgetter
 
 from base import TextManager
-from utils import load_file, save_to_file, log
+from utils import load_file, save_to_file
+from sulci.log import sulci_logger
 
 class Lexicon(TextManager):
     """
@@ -44,7 +45,7 @@ class Lexicon(TextManager):
         Load lexicon in RAM, from file.
         """
         if self._loaded is None:#Caching and lazy loading
-            log("Loading lexicon...", "RED", True)
+            sulci_logger.debug("Loading lexicon...", "RED", True)
             lx = load_file("corpus/lexicon.lxc")
             self._loaded = {}
             for line in lx.split("\n"):
@@ -116,7 +117,7 @@ class Lexicon(TextManager):
     
     def get_entry(self, entry):
         if entry in self:
-            log(u"%s => %s" % (entry, self[entry]), "WHITE")
+            sulci_logger.info(u"%s => %s" % (entry, self[entry]), "WHITE")
         else:
-            log(u'No entry for "%s"' % entry, "WHITE")
+            sulci_logger.info(u'No entry for "%s"' % entry, "WHITE")
 

@@ -67,6 +67,9 @@ class ColoredLogger(logging.Logger):
     
     def debug(self, msg, color="GREEN", highlight=False):
         self.log(logging.DEBUG, msg, color, highlight)
+    
+    def info(self, msg, color="WHITE", highlight=False):
+        self.log(logging.INFO, msg, color, highlight)
 
 logging.setLoggerClass(ColoredLogger)
 

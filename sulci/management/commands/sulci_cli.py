@@ -12,7 +12,7 @@ from sulci.lexicon import Lexicon
 from sulci.corpus import Corpus
 from sulci.textmining import SemanticalTagger
 from sulci.thesaurus import Thesaurus
-from sulci.utils import log
+from sulci.log import sulci_logger
 from sulci.trainers import SemanticalTrainer, LemmatizerTrainer, LexicalTrainer,\
                                                    ContextualTrainer, POSTrainer
 from sulci.lemmatizer import Lemmatizer
@@ -186,7 +186,7 @@ class Command(BaseCommand):
                             or "-c" # CONTEXTUAL_TRAIN_TAGGER
             # Create slaves
             for i in xrange(0,SUBPROCESSES):
-                log(u"Opening slave subprocess %d" % i, "BLUE", True)
+                sulci_logger.info(u"Opening slave subprocess %d" % i, "BLUE", True)
                 python_kind = not __debug__ and ["-O"] or []
                 subprocess.Popen(["python"] + python_kind + ["manage.py", "sulci_cli", training_kind, "--trainer_mode=slave"])
             # Set the mode to the trainer
@@ -222,9 +222,9 @@ class Command(BaseCommand):
         if CHECK_ENTRY:
             L.get_entry(CHECK_ENTRY.decode("utf-8"))
         if LEXICON_COUNT:
-            log(u"Words in lexicon : %d" % len(L), "WHITE")
+            sulci_logger.info(u"Words in lexicon : %d" % len(L), "WHITE")
         if CORPUS_COUNT:
-            log(u"Words in corpus : %d" % len(C), "WHITE")
+            sulci_logger.info(u"Words in corpus : %d" % len(C), "WHITE")
         if TAGS_STATS:
             C.tags_stats()
         if SEMANTICAL_TAGGER and PK:
@@ -235,7 +235,7 @@ class Command(BaseCommand):
             S = SemanticalTagger(t, T, P)
             if __debug__:
                 S.debug()
-            log(u"Scored descriptors", "YELLOW", True)
+            sulci_logger.info(u"Scored descriptors", "YELLOW", True)
             for d, value in S.descriptors:
                 print u"%s %f" % (unicode(d), value)
             
