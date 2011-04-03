@@ -49,7 +49,7 @@ class Lemmatizer(TextManager):
         Return the token or the list.
         """
         tks = hasattr(token, "__iter__") and token or [token]
-        rules = LemmatizerTemplateGenerator.load()
+        rules = LemmatizerTemplateGenerator.load() # Cache me
         for rule in rules:
 #            print rule
             template, _ = LemmatizerTemplateGenerator.get_instance(rule)

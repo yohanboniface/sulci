@@ -75,6 +75,11 @@ class Command(BaseCommand):
                     action="store_true", 
                     dest="addcandidate", 
                     help="Prepare article for manual POS indexing"),
+        make_option("-b", 
+                    "--addlemmes", 
+                    action="store_true", 
+                    dest="addlemmes", 
+                    help="Add lemme also when preparing a text for POS indexing"),
         make_option("-k",
                     "--pk", 
                     action="store", 
@@ -160,6 +165,7 @@ class Command(BaseCommand):
         SEMANTICAL_TRAINER = options.get("semantical_trainer")
         SEMANTICAL_TAGGER = options.get("semantical_tagger")
         LEMMATIZER_TRAINING = options.get("lemmatizer_training")
+        ADD_LEMMES = options.get("addlemmes")
         C = Corpus()
         L = Lexicon()
         P = PosTagger(lexicon=L)
@@ -177,7 +183,7 @@ class Command(BaseCommand):
                 a = content_model.objects.get(pk=PK)
                 t = getattr(a, settings.SULCI_CONTENT_PROPERTY)
                 C.add_candidate(t, PK)
-                C.prepare_candidate(PK)
+                C.prepare_candidate(PK, ADD_LEMMES)
         if SUBPROCESSES:
             import subprocess
             training_kind = LEXICAL_TRAIN_TAGGER and "-i"\

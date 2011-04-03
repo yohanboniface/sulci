@@ -8,9 +8,10 @@ from operator import itemgetter
 
 from django.utils.text import unescape_entities
 
-from textminingutils import normalize_text
-from utils import load_file, save_to_file
-from base import TextManager
+from sulci.textminingutils import normalize_text
+from sulci.utils import load_file, save_to_file
+from sulci.base import TextManager
+from sulci.lemmatizer import Lemmatizer
 from sulci.log import sulci_logger
 
 class Corpus(TextManager):
@@ -66,7 +67,7 @@ class Corpus(TextManager):
         t = normalize_text(t)
         save_to_file(os.path.join(self.PATH, "%s%s" % (name, self.NEW_EXT)), unicode(t))
 
-    def prepare_candidate(self, name):
+    def prepare_candidate(self, name, add_lemmes=False):
         c = load_file(os.path.join(self.PATH, "%s%s" % (name, self.NEW_EXT)))
         tks = self.tokenize(c)
         samples, tokens = self.instantiate_text(tks)
@@ -74,7 +75,14 @@ class Corpus(TextManager):
         final = ""
         for sample in samples:
             for tgdtk in sample:
-                final += u"%s/%s " % (unicode(tgdtk.original), tgdtk.tag)
+                lemme = ""
+                if add_lemmes:
+                    L = Lemmatizer()
+                    L.do(tgdtk)
+                    # Add lemme only if different from original
+                    if tgdtk.lemme != tgdtk.original:
+                        lemme = u"/%s" % tgdtk.lemme
+                final += u"%s/%s%s " % (unicode(tgdtk.original), tgdtk.tag, lemme)
             final += u"\n"
         save_to_file(os.path.join(self.PATH, "%s%s" % (name, self.PENDING_EXT)), final)
     
