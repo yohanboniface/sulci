@@ -6,10 +6,11 @@ import os
 from collections import defaultdict
 from operator import itemgetter
 
-from utils import load_file, save_to_file
-from rules_templates import ContextualTemplateGenerator, \
+from sulci.utils import load_file, save_to_file
+from sulci.rules_templates import ContextualTemplateGenerator, \
                             LexicalTemplateGenerator, RuleTemplate
-from base import Token
+from sulci.base import Token
+from sulci.textutils import modern_istitle
 
 class PosTagger(object):
     """
@@ -24,7 +25,7 @@ class PosTagger(object):
             token = token.original
         if token in self.lexicon:
             return self.lexicon[token][0]
-        elif token[0].isupper():
+        elif modern_istitle(token):
             return "SBP:sg"
 #        elif token.endswith("s") or token.endswith("x"):
 #            return "SBC:pl"

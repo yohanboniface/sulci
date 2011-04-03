@@ -18,6 +18,19 @@ from django.conf import settings
 from utils import save_to_file, product, log
 from stopwords import stop_words
 
+def modern_istitle(word):
+    """
+    Define if a word is title or not, handling some modern cases.
+    """
+    if word[0].isupper(): return True # Basic case
+    try:
+        if word[:3] == "al-" and word[3].isupper(): return True # al-Assad
+        if word[:3] == "el-" and word[3].isupper(): return True # el-Assad
+        if word[0] in ["e","i"] and word[1].isupper(): return True # eMac, iPhone
+    except IndexError:
+        pass
+    return False
+
 def clean(s,l):
     for c in l:
         s = s.replace(c,'')
