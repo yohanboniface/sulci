@@ -4,8 +4,6 @@ import re
 import codecs
 import os
 
-from Stemmer import Stemmer#DRY ALERT
-
 from django.db import models, transaction
 from django.db.utils import IntegrityError
 
