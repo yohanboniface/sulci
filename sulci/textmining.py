@@ -79,8 +79,10 @@ class SemanticalTagger(TextManager):
     @property
     @cached(cache)
     def medium_word_count(self):
-#        print "*********************", 1.0 * len(self.words) / len(set(self.distinct_words()))
-        return 1.0 * len(self.words) / len(set(self.distinct_words()))
+        """
+        The medium occurrences count.
+        """
+        return float(len(self.words)) / len(set(self.distinct_words()))
 
     @property
     def words(self):
@@ -203,7 +205,7 @@ class SemanticalTagger(TextManager):
                             sulci_logger.debug(u"%s will be deleted" % unicode(one), "RED")
                             self.keyentities.remove(one)
                         else:
-                            sulci_logger.debug(u"Equal, no deletion")
+                            sulci_logger.debug(u"No deletion")
         sulci_logger.debug(u"... keyentities deduplicated", "BLUE", highlight=True)
     
     def keyentities_for_trainer(self):
@@ -322,7 +324,7 @@ class SemanticalTagger(TextManager):
             sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
         sulci_logger.debug(u"Triggers and relation with descriptors", "BLUE", True)
         for t, score in self.triggers:
-            sulci_logger.debug(u"%s => %f" % (unicode(t), score), "GRAY", highlight=True)
+            sulci_logger.debug(u"%s (Local score : %f)" % (unicode(t), score), "GRAY", highlight=True)
             for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
                 sulci_logger.debug(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
 
@@ -345,6 +347,7 @@ class KeyEntity(RetrievableObject):
                             "pos": None
                            }
         self.compute_confidence()
+        self._istitle = None
     
     def __unicode__(self):
         return u" ".join([unicode(t.main_occurrence) for t in self.stemms])
@@ -393,19 +396,33 @@ class KeyEntity(RetrievableObject):
         if not self in other and not other in self:
             raise ValueError("keyentities must be parent for this comparison.")
         sulci_logger.debug(u"Comparing '%s' and '%s'" % (unicode(self), unicode(other)), "GRAY")
-        sulci_logger.debug(self._confidences, "GRAY")
-        sulci_logger.debug(other._confidences, "GRAY")
-        if not self.statistical_mutual_information_confidence() == other.statistical_mutual_information_confidence():
+        sulci_logger.debug(self._confidences, "WHITE")
+        sulci_logger.debug(other._confidences, "WHITE")
+        # If there is a title in the comparison, make a special case
+        if self.istitle() and other.istitle():
+            # If both are title, use PMI
             return self.statistical_mutual_information_confidence() > other.statistical_mutual_information_confidence()
-        elif not self.heuristical_mutual_information_confidence() == other.heuristical_mutual_information_confidence():
-            return self.heuristical_mutual_information_confidence() > other.heuristical_mutual_information_confidence()
-        elif not self.title_confidence() == other.title_confidence():
-            return self.title_confidence() > other.title_confidence()
-        elif not self.confidence == other.confidence:
-            return self.confidence > other.confidence
-        elif not len(self) == len(other):
-            return len(self) > len(other)
-        else: return False
+        elif self.istitle() or other.istitle():
+            # If just one is title: do nothing
+            # Idea : prevent from deleting "Laurent Gbagbo" because of "président
+            # sortant Laurent Gbagbo" many times in a text (as an example)
+            # And in the same time prevent from deleting "Forces républicaines"
+            # because "Forces" is title, and not "Forces républicaines"
+            # This make more false positive cases, but make also more true positive
+            # More false positive means also more noise, and so
+            # maybe there the scenario for training should be different
+            # to create the less noise relations possible
+            return False
+        else: # No title in the comparison
+            if not self.statistical_mutual_information_confidence() == other.statistical_mutual_information_confidence():
+                return self.statistical_mutual_information_confidence() > other.statistical_mutual_information_confidence()
+            elif not self.heuristical_mutual_information_confidence() == other.heuristical_mutual_information_confidence():
+                return self.heuristical_mutual_information_confidence() > other.heuristical_mutual_information_confidence()
+            elif not self.confidence == other.confidence:
+                return self.confidence > other.confidence
+            elif not len(self) == len(other):
+                return len(self) > len(other)
+            else: return False
 
     def __lt__(self, other):
         return other > self
@@ -425,10 +442,18 @@ class KeyEntity(RetrievableObject):
         Do not use.
         """
         raise NotImplementedError("This have no sens.")
-
+    
+    def istitle(self):
+        """
+        A keyEntity is a title when all its stemms are title.
+        """
+        if self._istitle is None:
+            self._istitle = all(s.istitle() for s in self)
+        return self._istitle
+    
     def index(self, key):
         return self.stemms.index(key)
-
+    
     def __contains__(self, item):
         """
         Special behaviour if item is KeyEntity :
