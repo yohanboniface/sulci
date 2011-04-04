@@ -20,7 +20,7 @@ setup(
     url='https://github.com/yohanboniface/sulci',
     packages=find_packages(),
     include_package_data=True,
-    package_data={'sulci': ['corpus/*','templates/*']},
+    package_data={'sulci': ['corpus/*','templates/sulci/*']},
     install_requires=reqs,
     classifiers=[
         'Development Status :: 3 - Alpha',
