@@ -344,7 +344,7 @@ class Token(RetrievableObject):
         """
         Try to define if this word is a "mot outil".
         """
-        return self.tag in ["DTN:sg", "DTN:pl", "DTC:sg", "DTC:pl", "PLU", "COO", "PREP"]
+        return self.tag in ["DTN:sg", "DTN:pl", "DTC:sg", "DTC:pl", "PLU", "COO", "PREP", "REL", "SUB"]
     
     def is_verb(self):
         """
