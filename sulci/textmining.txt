@@ -619,6 +619,14 @@ Elles/PRV:pl/elle ou il ?
 
 Voir pour ne pas rester une règle déjà appliqué dans brill
 
+Ajouter une règle pour les noms communs en début de phrase avec une cape ?
+
+A la fin de l'apprentissage du lemmatiseur, ajouter une règle par erreur restante mot + tag => mot ?
+Plutôt => ajouter les lemmatisation dans le lexique
+
+A chaque règle positive, ajouter des règles "négatives" :
+appliquer la première règle sauf si une des règles négatives s'applique ?
+Pour les règles négatives, ne retenir que 100 % de good ?
 
 
 ========================

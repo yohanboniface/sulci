@@ -24,9 +24,12 @@ class Corpus(TextManager):
     NEW_EXT = ".new"
     LEXICON_EXT = ".lxc"
 
-    def __init__(self, tagger=None):
+    def __init__(self, tagger=None, raw_content=None):
+        """
+        You can force a tagger or a raw_content.
+        """
         self.tagger = tagger
-        self._raw_content = None
+        self._raw_content = raw_content
         self._tokens = None
         self._samples = None
     
@@ -107,4 +110,17 @@ class Corpus(TextManager):
         sulci_logger.info(u"Tag usage :", "WHITE")
         for k, v in sorted(d.iteritems(), key=itemgetter(1), reverse=True):
             sulci_logger.info(u"%s => %d" % (k, v), "CYAN")
-
+    
+    def check_text(self, lexicon):
+        """
+        Check the text of the corpus, and try to determine if there are some errors.
+        Compare with lexicon.
+        """
+        for t in self:
+            if t in lexicon:
+                # Check that current tag is in lexicon
+                # If not, it *could* be an error, we display it
+                if not t.verified_tag in lexicon[t]:
+                    sulci_logger.info(u"Word in lexicon, but not this tag for %s (%s)" \
+                                      % (unicode(t), t.verified_tag), "RED")
+                    sulci_logger.info(u"In Lexicon : %s" % lexicon[t])

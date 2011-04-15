@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+"""
+Define the Lexicon class.
+"""
 # -*- coding:Utf-8 -*-
 
 from collections import defaultdict
@@ -10,7 +12,7 @@ from sulci.log import sulci_logger
 
 class Lexicon(TextManager):
     """
-    The lexicon is a list of unique words and theirs possible  POS tags.
+    The lexicon is a list of unique words and theirs possible POS tags.
     """
     
     def __init__(self):

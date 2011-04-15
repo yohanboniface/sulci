@@ -16,6 +16,7 @@ from sulci.log import sulci_logger
 from sulci.trainers import SemanticalTrainer, LemmatizerTrainer, LexicalTrainer,\
                                                    ContextualTrainer, POSTrainer
 from sulci.lemmatizer import Lemmatizer
+from sulci.utils import load_file
 from sulci import content_model
 
 class Command(BaseCommand):
@@ -87,6 +88,13 @@ class Command(BaseCommand):
                     dest="pk",
                     default = None, 
                     help = "Pk of article to process with sementictagger"),
+        make_option("-j", 
+                    "--check_corpus_text", 
+                    action="store", 
+                    type="string", 
+                    dest="check_corpus_text",
+                    default = None, 
+                    help = "Try to find errors in text corpus. Path with /corpus/."),
         make_option("-w", 
                     "--checkword", 
                     action="store", 
@@ -165,6 +173,7 @@ class Command(BaseCommand):
         SEMANTICAL_TRAINER = options.get("semantical_trainer")
         SEMANTICAL_TAGGER = options.get("semantical_tagger")
         LEMMATIZER_TRAINING = options.get("lemmatizer_training")
+        CHECK_CORPUS_TEXT = options.get("check_corpus_text")
         ADD_LEMMES = options.get("addlemmes")
         C = Corpus()
         L = Lexicon()
@@ -209,6 +218,11 @@ class Command(BaseCommand):
             L = Lemmatizer()
             T = LemmatizerTrainer(L,TRAINER_MODE)
             T.do()
+        if CHECK_CORPUS_TEXT:
+            corpus_content = load_file(CHECK_CORPUS_TEXT)
+            C = Corpus(raw_content=corpus_content)
+            C.attach_tagger(P)
+            C.check_text(L)
         if DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()
