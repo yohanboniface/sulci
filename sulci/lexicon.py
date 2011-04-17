@@ -69,10 +69,16 @@ class Lexicon(TextManager):
             prefix = prefix[:-1]
     
     def make(self):
+        """
+        Build the lexicon.
+        """
         final = {}
         self.load_valid_files()
         _, tokens = self.instantiate_text(self._raw_content.split())
         for tk in tokens:
+            # Don't take Proper nouns (SBP) in lexicon
+            if tk.verified_tag[:3] == "SBP":
+                continue
             if not tk.original in final:
                 final[tk.original] = defaultdict(int)
             final[tk.original][tk.verified_tag] += 1
