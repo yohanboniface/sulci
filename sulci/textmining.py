@@ -323,9 +323,10 @@ class SemanticalTagger(TextManager):
             sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
         sulci_logger.debug(u"Triggers and relation with descriptors", "BLUE", True)
         for t, score in self.triggers:
-            sulci_logger.debug(u"%s (Local score : %f)" % (unicode(t), score), "GRAY", highlight=True)
-            for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
-                sulci_logger.debug(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
+            if len(t._synapses) > 0:
+                sulci_logger.debug(u"%s (Local score : %f)" % (unicode(t), score), "GRAY", highlight=True)
+                for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
+                    sulci_logger.debug(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
 
 
 class KeyEntity(RetrievableObject):
