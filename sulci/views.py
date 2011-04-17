@@ -20,6 +20,7 @@ def demo(request, *args, **kwargs):
     class SulciForm(forms.Form):
         content = forms.CharField(widget=forms.Textarea)
         debug = forms.BooleanField(required=False)
+        min_score = forms.IntegerField(initial=10)
     if request.method == "POST":
         form = SulciForm(request.POST)
         c = {}
@@ -32,7 +33,8 @@ def demo(request, *args, **kwargs):
                 handler.setFormatter(formatter)
                 sulci_logger.addHandler(handler)
             S = SemanticalTagger(content)
-            c = {"content": content, "descriptors": S.descriptors, "form": form}
+            descriptors = S.get_descriptors(form.cleaned_data["min_score"])
+            c = {"content": content, "descriptors": descriptors, "form": form}
             if form.cleaned_data["debug"]:
                 S.debug()
                 handler.flush()

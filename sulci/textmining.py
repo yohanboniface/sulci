@@ -227,8 +227,13 @@ class SemanticalTagger(TextManager):
     
     @property
     def descriptors(self):
+        return self.get_descriptors()
+    
+    def get_descriptors(self, min_score=10):
         """
         Final descriptors for the text.
+        
+        Only descriptors triggered up to min_score will be returned.
         """
         self._scored_descriptors = {}
         total_score = 0
@@ -250,14 +255,12 @@ class SemanticalTagger(TextManager):
                     d.descriptor = self._scored_descriptors[key]["descriptor"]
                     # Update descriptor final score
                     self._scored_descriptors[key]["weight"] += d.pondered_weight * score
+#                    self._scored_descriptors[key]["weight"] += d.pondered_weight * score * (math.log(d.weight)/ math.log(t.count))
             total_score += score
             max_score = max(max_score,score)
         # We make a percentage of the max score possible
         for key, d in self._scored_descriptors.items():
             self._scored_descriptors[key]["weight"] = d["weight"] / max_score * 100.0
-        #This also means that only the descriptors triggered up to this min 
-        #will be considered by trainer.
-        min_score = 10
         return [
             (d["descriptor"], d["weight"]) for key,d in 
             sorted(self._scored_descriptors.items(), key=lambda t: t[1]["weight"], reverse=True) 
@@ -325,6 +328,7 @@ class SemanticalTagger(TextManager):
         for t, score in self.triggers:
             if len(t._synapses) > 0:
                 sulci_logger.debug(u"%s (Local score : %f)" % (unicode(t), score), "GRAY", highlight=True)
+                sulci_logger.debug(u"Trigger total count : %d" % t.count, "GRAY")
                 for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
                     sulci_logger.debug(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
 

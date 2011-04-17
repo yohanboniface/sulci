@@ -167,36 +167,44 @@
     <div class="col12">
         <h1>Sulci : open text mining</h1>
     </div>
-    <div class="col8" id="content">
-        {% if content %}
-            <h2>Texte analysé</h2>
-            {{ content|safe|linebreaks }}
-        {% endif %}
+    {% if content %}
+        <div class="col8" id="content">
+                <h2>Texte analysé</h2>
+                {{ content|safe|linebreaks }}
+        </div>
+        <div class="col4">
+            <h3>Descripteurs</h3>
+            {% if descriptors %}
+                {% for descriptor, score in descriptors %}
+                    <div class="descriptor"><em>{{ descriptor }}</em> ({{ score }})</div>
+                {% endfor %}
+            {% else %}
+                <p><i>Aucun descripteur n'a pu être trouvé avec un score suffisant.</i></p>
+            {% endif %}
+        </div>
+        <div class="clear"></div>
+    {% endif %}
+    <div class="col8">
         <div id="main_form">
             <p>Entrez du texte dans le champ ci-dessous, avec ou sans balises.</p>
             <form action="{% url sulci_demo %}" method="post" />
             {{ form.content }}
-            <div><label>Afficher le debug ?</label> {{ form.debug }}</div>
+            <div><label>Score minimum</label> {{ form.min_score }}</div>
+            <div><label>Afficher le debug</label> {{ form.debug }}</div>
             {% csrf_token %} 
             <br /><input type="submit" />
             </form>
         </div>
     </div>
     <div class="col4">
-        {% if descriptors %}
-            <h3>Descripteurs</h3>
-            {% for descriptor, score in descriptors %}
-                <div class="descriptor"><em>{{ descriptor }}</em> ({{ score }})</div>
-            {% endfor %}
-        {% else %}
-            <h3>À propos</h3>
-            <p>Sulci est un projet de textmining open source, développé dans le labs de <a href="http://www.liberation.fr">Libération</a>.</p>
-            <p>Ceci est la version <em>bêta</em>. Elle est donc imparfaite, et on travaille d'arrache-pied pour l'améliorer.</p>
-            <p>Ce textmining a été entraîné sur le corpus des articles papier de Libération pour l'année 2010. En conséquence, il vaut mieux le tester sur des sujets que Libération traite et qui ne soient pas trop récents : politique française, international, par exemple. Les résultats seront décevants sur le sport ou des événements spécifiques récents (il ne connaît pas Fukushima par exemple). Le mieux étant même de le tester avec des articles de Libé! Dans une optique de mise en production, l'apprentissage devrait être fait au fil de l'eau, bien entendu.</p>
-            <p>Autre remarque : le thésaurus n'a pas été nettoyé, et il contient donc parfois des fautes ou des doublons. Là aussi c'est un chantier qui sera fait j'espère prochainement.</p>
-            <p>Le code source est disponible ici : <br /><a href="https://github.com/yohanboniface/sulci">https://github.com/yohanboniface/sulci</a></p>
-            <p>Toute aide est la bienvenue ! Et n'hésitez pas à me contacter à :<br /> y.boniface@monjournalquejaimeetquejehais.fr.</p>
-        {% endif %}
+        <h3>À propos</h3>
+        <p>Sulci est un projet de textmining open source, développé dans le labs de <a href="http://www.liberation.fr">Libération</a>.</p>
+        <p>Ceci est la version de <em>développement</em>. Elle est donc imparfaite, et on travaille d'arrache-pied pour l'améliorer.</p>
+        <p>Vous pouvez aussi tester la version <a href="http://alpha.sulci.dotcloud.com">alpha</a>, moins avancée, mais a priori plus stable que la version en développement.</p>
+        <p>Ce textmining a été entraîné sur le corpus des articles papier de Libération pour l'année 2010. En conséquence, il vaut mieux le tester sur des sujets que Libération traite et qui ne soient pas trop récents : politique française, international, par exemple. Les résultats seront décevants sur le sport ou des événements spécifiques récents (il ne connaît pas Fukushima par exemple). Le mieux étant même de le tester avec des articles de Libé! Dans une optique de mise en production, l'apprentissage devrait être fait au fil de l'eau, bien entendu.</p>
+        <p>Autre remarque : le thésaurus n'a pas été nettoyé, et il contient donc parfois des fautes ou des doublons. Là aussi c'est un chantier qui sera fait j'espère prochainement.</p>
+        <p>Le code source est disponible ici : <br /><a href="https://github.com/yohanboniface/sulci">https://github.com/yohanboniface/sulci</a></p>
+        <p>Toute aide est la bienvenue ! Et n'hésitez pas à me contacter à :<br /> y.boniface@monjournalquejaimeetquejehais.fr.</p>
     </div>
     {% if sulci_debug %}
     <style type="text/css">
