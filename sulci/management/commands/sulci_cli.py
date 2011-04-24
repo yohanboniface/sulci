@@ -9,7 +9,7 @@ from django.conf import settings
 
 from sulci.pos_tagger import PosTagger
 from sulci.lexicon import Lexicon
-from sulci.corpus import Corpus
+from sulci.corpus import Corpus, TextCorpus
 from sulci.textmining import SemanticalTagger
 from sulci.thesaurus import Thesaurus
 from sulci.log import sulci_logger
@@ -219,10 +219,8 @@ class Command(BaseCommand):
             T = LemmatizerTrainer(L,TRAINER_MODE)
             T.do()
         if CHECK_CORPUS_TEXT:
-            corpus_content = load_file(CHECK_CORPUS_TEXT)
-            C = Corpus(raw_content=corpus_content)
-            C.attach_tagger(P)
-            C.check_text(L)
+            T = TextCorpus(CHECK_CORPUS_TEXT)
+            T.check_text(L)
         if DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()

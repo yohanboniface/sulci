@@ -9,14 +9,24 @@ from operator import itemgetter
 from django.utils.text import unescape_entities
 
 from sulci.textutils import normalize_text
-from sulci.utils import load_file, save_to_file
+from sulci.utils import load_file, save_to_file, get_dir
 from sulci.base import TextManager
 from sulci.lemmatizer import Lemmatizer
 from sulci.log import sulci_logger
 
-class Corpus(TextManager):
+class Corpus(object):
     """
     The corpus is a collection of manualy categorised texts.
+    
+    We have different kind of categorised texts :
+    
+    - .crp => just POS tag
+    
+    - .lem... => also manualy lemmatized
+    
+    - .lcx... => will be used to make the Lexicon
+    
+    When loading a Corpus, you'll need to specify the kind of texts to load.
     """
     PATH = "corpus"
     VALID_EXT = ".crp"
@@ -24,42 +34,60 @@ class Corpus(TextManager):
     NEW_EXT = ".new"
     LEXICON_EXT = ".lxc"
 
-    def __init__(self, tagger=None, raw_content=None):
+    def __init__(self, tagger=None, extension=VALID_EXT):
         """
-        You can force a tagger or a raw_content.
+        You can force a tagger.
+        Extension will be used to load the category of manually tagged files.
         """
         self.tagger = tagger
-        self._raw_content = raw_content
+        self._raw_content = ""
+        self.extension = extension
         self._tokens = None
         self._samples = None
-    
-    @property
-    def content(self):
-        if self._raw_content is None:
-            self._raw_content = ""
-            self.load_valid_files()
-            self._raw_content = self._raw_content.replace("\n", " ").replace("  ", " ")
-        return self._raw_content
+        self._texts = None
     
     def attach_tagger(self, tagger):
+        """
+        Attach a tagger. Used for preparing texts.
+        """
         self.tagger = tagger
+    
+    @property
+    def files(self):
+        """
+        Return a list of files for the corpus extension.
+        """
+        return [x for x in os.listdir(get_dir(__file__) + self.PATH) \
+                                                  if x.endswith(self.extension)]
+    
+    @property
+    def texts(self):
+        if self._texts is None:
+            self._texts = []
+            for f in self.files:
+                t = TextCorpus(os.path.join(self.PATH, f))
+                self._texts.append(t)
+        return self._texts
     
     @property
     def tokens(self):
         if self._tokens is None:
-            sulci_logger.debug("Loading corpus...", "RED", True)
-            self._samples, self._tokens = self.instantiate_text(self.content.split())
+            self._tokens = []
+            for corpus_text in self.texts:
+                self._tokens += corpus_text.tokens
         return self._tokens
     
     @property
     def samples(self):
         if self._samples is None:
-            self.tokens # Load tokens and samples
+            self._samples = []
+            for corpus_text in self.texts:
+                self._samples += corpus_text.samples
         return self._samples
     
     def __iter__(self):
         return self.tokens.__iter__()
-
+    
     def __len__(self):
         return self.tokens.__len__()
     
@@ -111,6 +139,42 @@ class Corpus(TextManager):
         for k, v in sorted(d.iteritems(), key=itemgetter(1), reverse=True):
             sulci_logger.info(u"%s => %d" % (k, v), "CYAN")
     
+class TextCorpus(TextManager):
+    """
+    One single text of the corpus.
+    
+    This is not a raw text, but a manualy categorized text.
+    
+    The normalisation is : word/TAG/lemme word2/TAG2/lemme2, etc.
+    """
+    
+    def __init__(self, path=None):
+        """
+        Load a text, given a path.
+        """
+        self.path = path
+        self.content = load_file(path)
+        self._tokens = None
+        self._samples = None
+    
+    @property
+    def tokens(self):
+        if self._tokens is None:
+            self._samples, self._tokens = self.instantiate_text(self.content.split())
+        return self._tokens
+    
+    @property
+    def samples(self):
+        if self._samples is None:
+            self.tokens # Load tokens and samples
+        return self._samples
+    
+    def __iter__(self):
+        return self.tokens.__iter__()
+    
+    def __len__(self):
+        return self.tokens.__len__()
+    
     def check_text(self, lexicon):
         """
         Check the text of the corpus, and try to determine if there are some errors.
@@ -124,3 +188,5 @@ class Corpus(TextManager):
                     sulci_logger.info(u"Word in lexicon, but not this tag for %s (%s)" \
                                       % (unicode(t), t.verified_tag), "RED")
                     sulci_logger.info(u"In Lexicon : %s" % lexicon[t])
+
+
