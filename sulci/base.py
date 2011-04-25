@@ -15,9 +15,9 @@ class TextManager(object):
     This is an abstract class for all the "text", i.e. collection of samples and
     tokens.
     """
-#    PATH = None#To be overwrited
-    VALID_EXT = None#To be overwrited
-    PENDING_EXT = None#To be overwrited
+#    PATH = None # To be overwrited
+    VALID_EXT = None # To be overwrited
+    PENDING_EXT = None # To be overwrited
     
     def get_files(self, kind):
         return [x for x in os.listdir(get_dir(__file__) + self.PATH) if x.endswith(kind)]
@@ -37,7 +37,7 @@ class TextManager(object):
         for idx, tk in enumerate(text):
             t, created = Token.get_or_create(idx, self, original=tk, parent=None, position=pos)
             if current_sample is None or t.begin_of_sample(previous_token):
-                current_sample, created = Sample.get_or_create(id_s, self)
+                current_sample, created = Sample.get_or_create(id_s, self, parent=self)
                 id_s += 1
                 csamples.append(current_sample)
                 pos = 0
@@ -123,6 +123,7 @@ class Sample(RetrievableObject):
         self.tokens = []#Otherwise all the objects have the same reference
         self._len = None#caching
         self.tag = None
+        self.parent = kwargs["parent"]
         # This field is used  just in training mode.
         # The idea is : every time a token with wrong tag is processed but
         # not corrected, we store his index, to prevent from reprocessing it until 
@@ -215,7 +216,7 @@ class Token(RetrievableObject):
     This is an interface for the tokens to be tagged by the tagger.
     """
     
-    position = 0#Not sure to put this here or in an init...
+    position = 0 # Not sure to put this here or in an init...
     parent = None
     
     def __init__(self, pk, **kwargs):
@@ -223,7 +224,8 @@ class Token(RetrievableObject):
         self.verified_tag = None
         orig = kwargs["original"].split("/")
         self.original = orig[0]
-        self.lemme = orig[0]#default value
+        self.lemme = orig[0] # Default value
+        # This will be done in training mode
         if len(orig) > 1:
             self.verified_tag = orig[1]
             self.verified_lemme = len(orig) > 2 and orig[2] or self.original

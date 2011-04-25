@@ -118,13 +118,17 @@ class Corpus(object):
         save_to_file(os.path.join(self.PATH, "%s%s" % (name, self.PENDING_EXT)), final)
     
     def check_word(self, word):
+        """
+        Find occurrences of a word in the corpus loaded.
+        """
         found = False
         for t in self.tokens:
             if word == t:
+                sulci_logger.info("%s :" % unicode(t.sample.parent), "YELLOW")
                 sulci_logger.info(t.show_context(), "WHITE")
                 found = True
         if not found:
-            sulci_logger.info(u'No occurrence found for "%s"' % word, "WHITE")
+            sulci_logger.info(u'No occurrence found for "%s"' % word, "RED")
     
     def tags_stats(self):
         """
@@ -174,6 +178,9 @@ class TextCorpus(TextManager):
     
     def __len__(self):
         return self.tokens.__len__()
+    
+    def __unicode__(self):
+        return self.path
     
     def check_text(self, lexicon):
         """
