@@ -9,6 +9,7 @@ from operator import itemgetter
 from base import TextManager
 from utils import load_file, save_to_file
 from sulci.log import sulci_logger
+from corpus import Corpus
 
 class Lexicon(TextManager):
     """
@@ -73,9 +74,8 @@ class Lexicon(TextManager):
         Build the lexicon.
         """
         final = {}
-        self.load_valid_files()
-        _, tokens = self.instantiate_text(self._raw_content.split())
-        for tk in tokens:
+        C = Corpus(self.VALID_EXT)
+        for tk in C.tokens:
             # Don't take Proper nouns (SBP) in lexicon
             if tk.verified_tag[:3] == "SBP":
                 continue

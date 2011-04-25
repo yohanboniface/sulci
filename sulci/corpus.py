@@ -34,7 +34,7 @@ class Corpus(object):
     NEW_EXT = ".new"
     LEXICON_EXT = ".lxc"
 
-    def __init__(self, tagger=None, extension=VALID_EXT):
+    def __init__(self, extension=VALID_EXT, tagger=None):
         """
         You can force a tagger.
         Extension will be used to load the category of manually tagged files.
