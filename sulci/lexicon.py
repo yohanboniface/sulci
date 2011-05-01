@@ -74,18 +74,62 @@ class Lexicon(TextManager):
         Build the lexicon.
         """
         final = {}
+        lemme_to_original = {}
         C = Corpus(self.VALID_EXT)
         for tk in C.tokens:
             # Don't take Proper nouns (SBP) in lexicon
             if tk.verified_tag[:3] == "SBP":
                 continue
+            # Manage tags frequences
             if not tk.original in final:
                 final[tk.original] = defaultdict(int)
             final[tk.original][tk.verified_tag] += 1
-        d = ""
-        for k, v in sorted(final.items()):
-            d +=  u"%s\t%s\n" % (k, " ".join([tp[0] for tp in sorted([(k2, v2) for k2, v2 in v.iteritems()], key=itemgetter(1), reverse=True)]))
-        save_to_file("corpus/lexicon.pdg", unicode(d))
+            # Manage lemmes frequences
+            if not tk.original in lemme_to_original:
+                lemme_to_original[tk.original] = {}
+            if not tk.verified_tag in lemme_to_original[tk.original]:
+                lemme_to_original[tk.original][tk.verified_tag] = defaultdict(int)
+            # Frequence of this lemme for this tag for this word...
+            lemme_to_original[tk.original][tk.verified_tag][tk.verified_lemme] += 1
+        
+        def get_one_line(key):
+            """
+            Return one line of the lexicon.
+            Take the token.original string in parameter.
+            """
+            return u"%s\t%s" % (key, get_tags(key))
+        
+        def get_tags(key):
+            """
+            Return sorted tags for a original word compiled in a string :
+            tag/lemme tag/lemme
+            """
+            # Retrieve tags
+            tags = sorted([(k, v) for k, v in final[key].iteritems()], 
+                                             key=itemgetter(1), reverse=True)
+            # Build final datas
+            final_data = []
+            for tag, score in tags:
+                computed_lemmes = get_lemmes(key, tag)
+                lemme, score = computed_lemmes[0]
+                final_data.append(u"%s/%s" % (tag, lemme))
+            
+            # Return it as a string
+            return u" ".join(final_data)
+        
+        def get_lemmes(key, tag):
+            """
+            Return sorted lemmes for one word with one POS tag.
+            """
+            return sorted(((k, v) for k, v in lemme_to_original[key][tag].iteritems()), 
+                                                key=itemgetter(1), reverse=True)
+        
+        d = []
+        for k, v in sorted(final.iteritems()):
+            d.append(get_one_line(k))
+        final_d = u"\n".join(d)
+#            d +=  u"%s\t%s\n" % (k, " ".join([u"%s/%s" % (tp[0], sorted(lemme_to_original[k][tp[0]], key=itemgetter(1), reverse=True)[0]) for tp in sorted([(k2, v2) for k2, v2 in v.iteritems()], key=itemgetter(1), reverse=True)]))
+        save_to_file("corpus/lexicon.pdg", unicode(final_d))
     
     def create_afixes(self):
         """
