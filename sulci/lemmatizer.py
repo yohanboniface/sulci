@@ -10,7 +10,7 @@ class Lemmatizer(TextManager):
     This class give a lemma for a token, using his tag.
     """
     PATH = "corpus"
-    VALID_EXT = ".lem.lxc.crp"
+    VALID_EXT = ".lem.crp"
     
     def __init__(self):
         self._tokens = None
@@ -51,7 +51,6 @@ class Lemmatizer(TextManager):
         tks = hasattr(token, "__iter__") and token or [token]
         rules = LemmatizerTemplateGenerator.load() # Cache me
         for rule in rules:
-#            print rule
             template, _ = LemmatizerTemplateGenerator.get_instance(rule)
             template.apply_rule(tks, rule)
         return hasattr(token, "__iter__") and tks or tks[0]

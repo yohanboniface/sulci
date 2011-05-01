@@ -17,7 +17,7 @@ class Lexicon(TextManager):
     """
     
     def __init__(self):
-        self.VALID_EXT = ".lxc.crp"
+        self.VALID_EXT = ".lxc.lem.crp"
         self.PATH = "corpus"
         self._loaded = None
         self._raw_content = ""
