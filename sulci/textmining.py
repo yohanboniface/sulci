@@ -15,7 +15,7 @@ from GenericCache.decorators import cached
 from sulci.utils import uniqify, sort, product
 from sulci.stopwords import stop_words, usual_words
 from sulci.textutils import lev, normalize_text, words_occurrences
-from sulci.base import RetrievableObject, Sample, Token, TextManager
+from sulci.base import RetrievableObject, Token, TextManager
 from sulci.pos_tagger import PosTagger
 from sulci.lexicon import Lexicon
 from sulci.thesaurus import Trigger, Thesaurus
@@ -29,7 +29,7 @@ class SemanticalTagger(TextManager):
     """
     Main class.
     """
-    def __init__(self, text, thesaurus=None, pos_tagger=None, lemmatizer=None):
+    def __init__(self, text, thesaurus=None, pos_tagger=None, lemmatizer=None, lexicon=None):
         self.thesaurus = thesaurus or Thesaurus()
         self._raw_text = text
         self.normalized_text = normalize_text(text)
@@ -40,8 +40,9 @@ class SemanticalTagger(TextManager):
             raise ValueError("Can't process an empty text.")
         self.samples = []
         self.keyentities = []
-        self.postagger = pos_tagger or PosTagger(lexicon=Lexicon())
-        self.lemmatizer = lemmatizer or Lemmatizer()
+        self.lexicon = lexicon or Lexicon()
+        self.postagger = pos_tagger or PosTagger(lexicon=self.lexicon)
+        self.lemmatizer = lemmatizer or Lemmatizer(self.lexicon)
         self.make()
         self._triggers = None
         self._stemms = None
@@ -255,7 +256,6 @@ class SemanticalTagger(TextManager):
                     d.descriptor = self._scored_descriptors[key]["descriptor"]
                     # Update descriptor final score
                     self._scored_descriptors[key]["weight"] += d.pondered_weight * score
-#                    self._scored_descriptors[key]["weight"] += d.pondered_weight * score * (math.log(d.weight)/ math.log(t.count))
             total_score += score
             max_score = max(max_score,score)
         # We make a percentage of the max score possible
@@ -330,7 +330,7 @@ class SemanticalTagger(TextManager):
                 sulci_logger.debug(u"%s (Local score : %f)" % (unicode(t), score), "GRAY", highlight=True)
                 sulci_logger.debug(u"Trigger total count : %d" % t.count, "GRAY")
                 for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
-                    sulci_logger.debug(u"%s %f" % (unicode(d), t[d.descriptor].weight / t.max_weight * 100), "CYAN")
+                    sulci_logger.debug(u"%s %f" % (unicode(d), d.pondered_weight), "CYAN")
 
 
 class KeyEntity(RetrievableObject):

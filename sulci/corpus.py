@@ -98,7 +98,12 @@ class Corpus(object):
         t = normalize_text(t)
         save_to_file(os.path.join(self.PATH, "%s%s" % (name, self.NEW_EXT)), unicode(t))
 
-    def prepare_candidate(self, name, add_lemmes=False):
+    def prepare_candidate(self, name, add_lemmes=False, lexicon=None):
+        """
+        Create a corpus file, with tags and optionnaly lemmes.
+        
+        lexicon is required if add_lemmes is True.
+        """
         c = load_file(os.path.join(self.PATH, "%s%s" % (name, self.NEW_EXT)))
         tks = self.tokenize(c)
         samples, tokens = self.instantiate_text(tks)
@@ -108,7 +113,7 @@ class Corpus(object):
             for tgdtk in sample:
                 lemme = ""
                 if add_lemmes:
-                    L = Lemmatizer()
+                    L = Lemmatizer(lexicon)
                     L.do(tgdtk)
                     # Add lemme only if different from original
                     if tgdtk.lemme != tgdtk.original:

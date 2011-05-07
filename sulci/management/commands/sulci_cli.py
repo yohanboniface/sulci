@@ -192,7 +192,7 @@ class Command(BaseCommand):
                 a = content_model.objects.get(pk=PK)
                 t = getattr(a, settings.SULCI_CONTENT_PROPERTY)
                 C.add_candidate(t, PK)
-                C.prepare_candidate(PK, ADD_LEMMES)
+                C.prepare_candidate(PK, ADD_LEMMES, lexicon=L)
         if SUBPROCESSES:
             import subprocess
             training_kind = LEXICAL_TRAIN_TAGGER and "-i"\
@@ -215,8 +215,8 @@ class Command(BaseCommand):
             T = ContextualTrainer(P,C,TRAINER_MODE)
             T.do()
         if LEMMATIZER_TRAINING:
-            L = Lemmatizer()
-            T = LemmatizerTrainer(L,TRAINER_MODE)
+            lem = Lemmatizer(L)
+            T = LemmatizerTrainer(lem,TRAINER_MODE)
             T.do()
         if CHECK_CORPUS_TEXT:
             T = TextCorpus(CHECK_CORPUS_TEXT)
@@ -250,7 +250,7 @@ class Command(BaseCommand):
 #            t = a.title + ". " + a.subtitle + ". " + a.content#Make some method
             t = getattr(a, settings.SULCI_CONTENT_PROPERTY)
             T = Thesaurus()
-            S = SemanticalTagger(t, T, P)
+            S = SemanticalTagger(t, T, P, lexicon=L)
             if __debug__:
                 S.debug()
             sulci_logger.info(u"Scored descriptors", "YELLOW", True)

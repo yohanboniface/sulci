@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:Utf-8 -*-
 
-from base import TextManager
-from utils import log
-from rules_templates import LemmatizerTemplateGenerator
+from sulci.base import TextManager
+from sulci.log import sulci_logger
+from sulci.rules_templates import LemmatizerTemplateGenerator
 
 class Lemmatizer(TextManager):
     """
@@ -12,10 +12,11 @@ class Lemmatizer(TextManager):
     PATH = "corpus"
     VALID_EXT = ".lem.crp"
     
-    def __init__(self):
+    def __init__(self, lexicon):
         self._tokens = None
         self._raw_content = None
         self._len = None
+        self.lexicon = lexicon
     
     def __len__(self):
         if self._len is None:
@@ -33,7 +34,7 @@ class Lemmatizer(TextManager):
     @property
     def tokens(self):
         if self._tokens is None:
-            log("Loading Lemmatizer corpus...", "GREEN", True)
+            sulci_logger.info("Loading Lemmatizer corpus...", "GREEN", True)
             self._samples, self._tokens = self.instantiate_text(self.content.split())
         return self._tokens
     
@@ -53,5 +54,9 @@ class Lemmatizer(TextManager):
         for rule in rules:
             template, _ = LemmatizerTemplateGenerator.get_instance(rule)
             template.apply_rule(tks, rule)
+        # We force lemme if word is in lexicon with the current POS tag
+        for tk in tks:
+            if tk in self.lexicon and tk.tag in self.lexicon[tk]:
+                tk.lemme = self.lexicon[tk][tk.tag]
         return hasattr(token, "__iter__") and tks or tks[0]
 

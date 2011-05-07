@@ -210,3 +210,6 @@ class LexiconEntity(object):
     
     def __contains__(self, key):
         return self.tags.__contains__(key)
+    
+    def __getitem__(self, key):
+        return self.tags[key]
