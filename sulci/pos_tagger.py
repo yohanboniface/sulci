@@ -24,7 +24,7 @@ class PosTagger(object):
         if isinstance(token, Token):
             token = token.original
         if token in self.lexicon:
-            return self.lexicon[token][0]
+            return self.lexicon[token].default_tag
         elif modern_istitle(token):
             return "SBP:sg"
 #        elif token.endswith("s") or token.endswith("x"):

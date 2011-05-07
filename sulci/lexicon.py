@@ -1,12 +1,17 @@
 """
 Define the Lexicon class.
+
+For now, the lexicon is stored in a flat file, with special syntax :
+
+* word[TAB]POStag1/lemme1[TAB]POStag2/lemme2
+
 """
 # -*- coding:Utf-8 -*-
 
 from collections import defaultdict
 from operator import itemgetter
 
-from base import TextManager
+from base import TextManager, RetrievableObject
 from utils import load_file, save_to_file
 from sulci.log import sulci_logger
 from corpus import Corpus
@@ -46,20 +51,27 @@ class Lexicon(TextManager):
     def loaded(self):
         """
         Load lexicon in RAM, from file.
+        
+        The representation will be a dict {"word1": [{tag1 : lemme1}]}
         """
-        if self._loaded is None:#Caching and lazy loading
+        if self._loaded is None: # Caching and lazy loading
             sulci_logger.debug("Loading lexicon...", "RED", True)
-            lx = load_file("corpus/lexicon.lxc")
+            lx = load_file("%s/lexicon.lxc" % self.PATH)
             self._loaded = {}
             for line in lx.split("\n"):
-                els = line.split("\t")
-                if len(els) == 2:
-                    cat = els[1].split()
-                    self._loaded[els[0]] = cat
-                    self.add_factors(els[0])
+                if line:
+                    lexicon_entity = LexiconEntity(line)
+                    self.add_factors(lexicon_entity.word)
+                    self._loaded[lexicon_entity.word] = lexicon_entity
         return self._loaded
     
     def add_factors(self, token):
+        """
+        Build the list of factors (pieces of word).
+        
+        These factors are used by the POStagger, to determine if an
+        unnown word could be a derivate of another.
+        """
         prefix = token
         while prefix:
             suffix = prefix
@@ -169,7 +181,32 @@ class Lexicon(TextManager):
     
     def get_entry(self, entry):
         if entry in self:
-            sulci_logger.info(u"%s => %s" % (entry, self[entry]), "WHITE")
+            sulci_logger.info(unicode(self[entry]), "WHITE")
         else:
             sulci_logger.info(u'No entry for "%s"' % entry, "WHITE")
 
+class LexiconEntity(object):
+    """
+    One word of a lexicon.
+    """
+    
+    def __init__(self, raw_data, **kwargs):
+        self.default_tag = None
+        self.default_lemme = None
+        # Initalize data from original line
+        self.word, tags = raw_data.split("\t")
+        self.tags = dict()
+        tags = tags.split()
+        for one_tag in tags:
+            tag, lemme = one_tag.split("/")
+            if self.default_tag is None:
+                self.default_tag = tag
+            if self.default_lemme is None:
+                self.default_lemme = lemme
+            self.tags[tag] = lemme
+    
+    def __unicode__(self):
+        return u"%s => %s" % (self.word, self.tags)
+    
+    def __contains__(self, key):
+        return self.tags.__contains__(key)

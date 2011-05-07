@@ -195,5 +195,3 @@ class TextCorpus(TextManager):
                     sulci_logger.info(u"Word in lexicon, but not this tag for %s (%s)" \
                                       % (unicode(t), t.verified_tag), "RED")
                     sulci_logger.info(u"In Lexicon : %s" % lexicon[t])
-
-
