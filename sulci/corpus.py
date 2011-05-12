@@ -163,7 +163,7 @@ class TextCorpus(TextManager):
     def __unicode__(self):
         return self.path
     
-    def check_text(self, lexicon):
+    def check_text(self, lexicon, check_lemmes=False):
         """
         Check the text of the corpus, and try to determine if there are some errors.
         Compare with lexicon.
@@ -176,6 +176,12 @@ class TextCorpus(TextManager):
                     sulci_logger.info(u"Word in lexicon, but not this tag for %s (%s)" \
                                       % (unicode(t), t.verified_tag), "RED")
                     sulci_logger.info(u"In Lexicon : %s" % lexicon[t])
+                if check_lemmes:
+                    if t.verified_tag in lexicon[t] \
+                             and t.verified_lemme != lexicon[t][t.verified_tag]:
+                        sulci_logger.info(u"Word in lexicon, but not this lemme for %s (%s)" \
+                                          % (unicode(t), t.verified_lemme), "BLUE")
+                        sulci_logger.info(u"In Lexicon : %s" % lexicon[t][t.verified_tag], "GRAY")
     
     def prepare(self, text, tagger, lemmatizer):
         """

@@ -212,7 +212,7 @@ class Command(BaseCommand):
             T.do()
         if CHECK_CORPUS_TEXT:
             T = TextCorpus(CHECK_CORPUS_TEXT)
-            T.check_text(L)
+            T.check_text(L, ADD_LEMMES)
         if DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()

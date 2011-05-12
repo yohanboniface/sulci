@@ -246,7 +246,7 @@ Save	FGW/Save
 Scandale	SBC:sg/Scandale
 Selon	PREP/selon
 Serai	ECJ:sg/être
-Ses	DTN:pl/ses
+Ses	DTN:pl/son
 Si	ADV/si
 Simplement	ADV/Simplement
 Sinon	ADV/sinon
@@ -952,7 +952,7 @@ dessinée	PAR:sg/dessiner
 dessus	ADV/dessus
 destin	SBC:sg/destin
 destination	SBC:sg/destination
-destinées	SBC:pl/destiner
+destinées	PAR:pl/destiner
 deux	CAR/deux
 deuxième	ADJ:sg/deuxième
 devaient	VCJ:sg/devoir
