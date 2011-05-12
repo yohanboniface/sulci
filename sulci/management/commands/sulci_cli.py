@@ -57,13 +57,6 @@ class Command(BaseCommand):
                     action="store_true", 
                     dest="ipdb", 
                     help="Launch ipdb at the end of the process"),
-        make_option("-p", 
-                    "--preparetext", 
-                    action="store", 
-                    type="string", 
-                    dest="preparetext",
-                    default = None, 
-                    help="Name of the text to prepare, without extension"),
         make_option("-t", 
                     "--trainer_mode", 
                     action="store", 
@@ -156,8 +149,6 @@ class Command(BaseCommand):
         MAKE_DICT = options.get("makedict")
         LEXICAL_TRAIN_TAGGER = options.get("lexical_traintagger")
         CONTEXTUAL_TRAIN_TAGGER = options.get("contextual_traintagger")
-        PREPARE_TEXT = options.get("preparetext")
-        ADD_CANDIDATE = options.get("addcandidate")
         CHECK_WORD = options.get("checkword")
         CHECK_ENTRY = options.get("checkentry")
         DISPLAY_ERRORS = options.get("display_errors")
@@ -175,14 +166,14 @@ class Command(BaseCommand):
         LEMMATIZER_TRAINING = options.get("lemmatizer_training")
         CHECK_CORPUS_TEXT = options.get("check_corpus_text")
         ADD_LEMMES = options.get("addlemmes")
+        ADD_CANDIDATE = options.get("addcandidate")
         C = Corpus()
         L = Lexicon()
         P = PosTagger(lexicon=L)
-        C.attach_tagger(P)
+        M = Lemmatizer(L)
+#        C.attach_tagger(P)
         if MAKE_DICT:
             L.make()
-        if PREPARE_TEXT is not None:
-            C.prepare_candidate(PREPARE_TEXT)
         if CHECK_WORD is not None:
             C.check_word(CHECK_WORD.decode("utf-8"))
         if ADD_CANDIDATE:
@@ -191,8 +182,9 @@ class Command(BaseCommand):
             else:
                 a = content_model.objects.get(pk=PK)
                 t = getattr(a, settings.SULCI_CONTENT_PROPERTY)
-                C.add_candidate(t, PK)
-                C.prepare_candidate(PK, ADD_LEMMES, lexicon=L)
+                T = TextCorpus()
+                T.prepare(t, P, M)
+                T.export(PK, FORCE, ADD_LEMMES)
         if SUBPROCESSES:
             import subprocess
             training_kind = LEXICAL_TRAIN_TAGGER and "-i"\

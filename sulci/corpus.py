@@ -33,7 +33,7 @@ class Corpus(object):
     PENDING_EXT = ".pdg"
     NEW_EXT = ".new"
     LEXICON_EXT = ".lxc"
-
+    
     def __init__(self, extension=VALID_EXT, tagger=None):
         """
         You can force a tagger.
@@ -45,12 +45,6 @@ class Corpus(object):
         self._tokens = None
         self._samples = None
         self._texts = None
-    
-    def attach_tagger(self, tagger):
-        """
-        Attach a tagger. Used for preparing texts.
-        """
-        self.tagger = tagger
     
     @property
     def files(self):
@@ -91,37 +85,6 @@ class Corpus(object):
     def __len__(self):
         return self.tokens.__len__()
     
-    def add_candidate(self, t, name):
-        """
-        Retrieve an article in db, clean it, and add it to corpus.
-        """
-        t = normalize_text(t)
-        save_to_file(os.path.join(self.PATH, "%s%s" % (name, self.NEW_EXT)), unicode(t))
-
-    def prepare_candidate(self, name, add_lemmes=False, lexicon=None):
-        """
-        Create a corpus file, with tags and optionnaly lemmes.
-        
-        lexicon is required if add_lemmes is True.
-        """
-        c = load_file(os.path.join(self.PATH, "%s%s" % (name, self.NEW_EXT)))
-        tks = self.tokenize(c)
-        samples, tokens = self.instantiate_text(tks)
-        self.tagger.tag_all(tokens)
-        final = ""
-        for sample in samples:
-            for tgdtk in sample:
-                lemme = ""
-                if add_lemmes:
-                    L = Lemmatizer(lexicon)
-                    L.do(tgdtk)
-                    # Add lemme only if different from original
-                    if tgdtk.lemme != tgdtk.original:
-                        lemme = u"/%s" % tgdtk.lemme
-                final += u"%s/%s%s " % (unicode(tgdtk.original), tgdtk.tag, lemme)
-            final += u"\n"
-        save_to_file(os.path.join(self.PATH, "%s%s" % (name, self.PENDING_EXT)), final)
-    
     def check_word(self, word):
         """
         Find occurrences of a word in the corpus loaded.
@@ -157,14 +120,27 @@ class TextCorpus(TextManager):
     The normalisation is : word/TAG/lemme word2/TAG2/lemme2, etc.
     """
     
+    PATH = "corpus"
+    VALID_EXT = ".crp"
+    PENDING_EXT = ".pdg"
+    LEXICON_EXT = ".lxc.lem.crp"
+    
     def __init__(self, path=None):
         """
         Load a text, given a path.
+        
+        The path is optionnal, because content can be loaded from the prepare
+        method.
         """
         self.path = path
-        self.content = load_file(path)
+        self.content = ""
+        if path:
+            self.load()
         self._tokens = None
         self._samples = None
+    
+    def load(self):
+        self.content = load_file(self.path)
     
     @property
     def tokens(self):
@@ -200,3 +176,41 @@ class TextCorpus(TextManager):
                     sulci_logger.info(u"Word in lexicon, but not this tag for %s (%s)" \
                                       % (unicode(t), t.verified_tag), "RED")
                     sulci_logger.info(u"In Lexicon : %s" % lexicon[t])
+    
+    def prepare(self, text, tagger, lemmatizer):
+        """
+        Given a raw text, clean it, and make tokens and samples.
+        
+        (Maybe this method should be in the TextManager class.)
+        """
+        text = normalize_text(text)
+        tokenized_text = self.tokenize(text)
+        self._samples, self._tokens = self.instantiate_text(tokenized_text)
+        tagger.tag_all(self.tokens)
+        lemmatizer.do(self.tokens)
+    
+    def export(self, name, force=False, add_lemmes=False):
+        """
+        Export tokens in a file.
+        
+        force for export in the valid extension, otherwise it use the pending.
+        """
+        self.content = ""
+        for sample in self.samples:
+            for token in sample:
+                lemme = ""
+                if add_lemmes:
+                    # Add lemme only if different from original
+                    if token.lemme != token.original:
+                        lemme = u"/%s" % token.lemme
+                self.content += u"%s/%s%s " % (unicode(token.original), token.tag, lemme)
+            self.content += u"\n" # Carriage return on each sample, for human reading
+        # Define extention
+        ext = self.PENDING_EXT
+        if force:
+            if add_lemmes:
+                ext = self.LEXICON_EXT
+            else:
+                ext = self.VALID_EXT
+        save_to_file(os.path.join(self.PATH, "%s%s" % (name, ext)), self.content)
+
