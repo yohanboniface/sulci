@@ -6,7 +6,7 @@ Sulci is a French text mining tool, initially designed for the analysis of
 the corpus and thesaurus of `Libération <http://www.liberation.fr/>`_, a 
 french newspaper.
 
-This code is "work in progress"; it's not used (nor usable) in production yet.
+This code is "work in progress", but it's yet used in production at Libération.
 
 Therefore, here is a demo page with the freezed 0.1 alpha version:
  
