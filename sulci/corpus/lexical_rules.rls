@@ -1,103 +1,108 @@
-SBC:sg des fgoodright SBC:pl	0.556643
-SBC:sg ter fhassuf 3 VNCFF	0.524725
-SBC:sg ait fhassuf 3 VCJ:sg	0.515896
-SBC:sg 0 fhassuf 1 CAR	0.496202
-SBC:sg Les fgoodright SBC:pl	0.492538
-SBC:sg rer fhassuf 3 VNCFF	0.492538
-SBC:sg 2 fhaspref 1 CAR	0.488611
-SBC:sg ra fhassuf 2 VCJ:sg	0.488611
-SBC:sg ner fhassuf 3 VNCFF	0.479784
-SBC:sg les fgoodright SBC:pl	0.472847
-SBC:sg teurs fhassuf 5 SBC:pl	0.469196
-SBC:sg iques fhassuf 5 ADJ:pl	0.469196
-SBC:sg uer fhassuf 3 VNCFF	0.469196
-SBC:sg ré fhassuf 2 PAR:sg	0.469196
-SBC:sg % fgoodleft CAR	0.469196
-SBC:sg ces fgoodright SBC:pl	0.463121
-SBC:sg né fhassuf 2 PAR:sg	0.462972
-SBC:sg rès fhassuf 3 PREP	0.462972
-SBC:sg ob fdeletepref 2 ADJ:sg	0.462972
-SBC:sg ts fhassuf 2 SBC:pl	0.462972
-SBC:sg tent fhassuf 4 VCJ:pl	0.455890
-SBC:sg ces fhassuf 3 SBC:pl	0.455890
-SBC:sg nos fgoodright SBC:pl	0.455890
-SBC:sg cer fhassuf 3 VNCFF	0.455890
-SBC:sg ous faddsuf 3 PUL	0.455890
-SBC:sg bles fhassuf 4 ADJ:pl	0.455890
-SBC:sg 2 faddpref 1 CAR	0.455890
-SBC:sg ser fhassuf 3 VNCFF	0.451026
-SBC:sg Je fgoodright VCJ:sg	0.447654
-SBC:sg je fgoodright VCJ:sg	0.447654
-SBC:sg me fgoodright VCJ:sg	0.447654
-SBC:sg ler fhassuf 3 VNCFF	0.447654
-nes deletesuf 3 ADJ:pl	0.447654
-SBC:sg deux fgoodright SBC:pl	0.447654
-SBC:sg ndre fhassuf 4 VNCFF	0.447654
-SBC:sg ez fhassuf 2 VCJ:pl	0.447654
-SBC:sg fund fgoodleft FWG	0.447654
-hedge goodright FWG	0.447654
-SBC:sg és fhassuf 2 PAR:pl	0.437966
-SBC:sg abeilles fgoodright ADJ:pl	0.437775
-SBC:sg elles fgoodright VCJ:pl	0.437775
-SBC:sg ante fhassuf 4 ADJ:sg	0.437775
-SBC:sg ' fhassuf 1 PRV:sg	0.437775
-SBC:sg sent fdeletesuf 4 VCJ:pl	0.437775
-SBC:sg on fgoodright VCJ:sg	0.437775
-SBP:sg ts fhassuf 2 SBP:pl	0.437775
-SBC:sg ans fgoodleft CAR	0.437775
-SBC:sg fund fgoodright FWG	0.437775
-SBC:sg relations fgoodright ADJ:pl	0.437775
-SBC:sg aux fgoodright SBC:pl	0.436167
-SBC:sg ses fgoodright SBC:pl	0.427280
-nouveaux goodright SBC:pl	0.425361
-SBC:sg nt faddsuf 2 VCJ:sg	0.425361
-SBC:sg pen faddpref 3 ADJ:sg	0.425361
-SBC:sg mment fhassuf 5 ADV	0.425361
-SBC:sg ndue faddsuf 4 PRV:sg	0.425361
-SBC:sg sa fgoodleft VNCFF	0.425361
-SBC:sg ver fhassuf 3 VNCFF	0.425361
-SBC:sg per fhassuf 3 VNCFF	0.425361
-SBC:sg tel fdeletepref 3 ADJ:pl	0.425361
-SBC:sg accumulation fgoodleft ADJ:sg	0.425361
-SBC:sg re faddsuf 2 VCJ:sg	0.425361
-SBC:sg mouvement fgoodright ADJ:sg	0.425361
-SBC:sg au fdeletepref 2 PREP	0.425361
-SBP:sg aut fhassuf 3 VCJ:sg	0.425361
-SBP:sg Quel fdeletepref 4 ADV	0.425361
-SBC:sg aient fhassuf 5 VCJ:pl	0.417063
-SBC:sg 1 fhaspref 1 CAR	0.416364
-SBC:sg tes fhassuf 3 SBC:pl	0.394450
-SBC:sg leurs fgoodright SBC:pl	0.390763
-SBC:sg ué fhassuf 2 PAR:sg	0.390763
-SBC:sg qui fgoodright VCJ:sg	0.380583
-SBC:sg sé fhassuf 2 PAR:sg	0.375357
-SBC:sg res fhassuf 3 SBC:pl	0.373045
-SBC:sg nant fhassuf 4 VNCNT	0.373045
-SBC:sg nts fhassuf 3 SBC:pl	0.373045
-SBC:sg cé fhassuf 2 PAR:sg	0.373045
-SBC:sg ne fgoodright VCJ:sg	0.369064
-SBC:sg able fhassuf 4 ADJ:sg	0.366458
-SBC:sg sant fhassuf 4 VNCNT	0.356066
-SBC:sg ains fhassuf 4 ADJ:pl	0.350220
-SBC:sg sque fhassuf 4 VCJ:sg	0.350220
-SBC:sg dant fhassuf 4 VNCNT	0.350220
-SBC:sg s' fgoodright VCJ:sg	0.350220
-SBC:sg ions fhassuf 4 SBC:pl	0.341918
-SBC:sg ins fhassuf 3 SBC:pl	0.341918
-SBC:sg rent fhassuf 4 VCJ:pl	0.319021
-SBC:sg es fdeletesuf 2 ADJ:pl	0.319021
-b deletepref 1 ADJ:sg	0.319021
-SBP:sg ous fhassuf 3 DTN:pl	0.319021
-SBC:sg ères fhassuf 4 SBC:pl	0.319021
-SBC:sg aires fhassuf 5 ADJ:pl	0.319021
-SBC:sg ies fhassuf 3 SBC:pl	0.319021
-SBP:sg ons fhassuf 3 VCJ:pl	0.319021
-SBC:sg ités fhassuf 4 SBC:pl	0.319021
-SBC:sg ents fhassuf 4 ADJ:pl	0.319021
-SBC:sg ont fgoodleft SBC:pl	0.319021
-SBC:sg ges fhassuf 3 ADJ:pl	0.319021
-SBC:sg ont fgoodright PAR:sg	0.319021
-SBC:sg ger fhassuf 3 VNCFF	0.319021
-SBC:sg tou faddpref 3 SBC:pl	0.319021
-SBC:sg its fhassuf 3 PAR:pl	0.319021
-SBC:sg qu' fgoodright PRV:pl	0.319021
+SBC:sg des fgoodright SBC:pl	0.546738
+SBC:sg ter fhassuf 3 VNCFF	0.489057
+SBC:sg ra fhassuf 2 VCJ:sg	0.487259
+SBC:sg ait fhassuf 3 VCJ:sg	0.486661
+SBC:sg rer fhassuf 3 VNCFF	0.472603
+SBC:sg ces fgoodright SBC:pl	0.469114
+SBC:sg les fgoodright SBC:pl	0.468181
+SBC:sg 19 fhaspref 2 CAR	0.465374
+SBC:sg ré fhassuf 2 PAR:sg	0.461342
+SBC:sg ses fgoodright SBC:pl	0.461342
+SBC:sg teurs fhassuf 5 SBC:pl	0.452177
+SBC:sg Les fgoodright SBC:pl	0.452177
+SBC:sg ner fhassuf 3 VNCFF	0.446882
+SBC:sg ces fhassuf 3 SBC:pl	0.440955
+SBC:sg illes fhassuf 5 SBC:pl	0.440955
+SBC:sg cer fhassuf 3 VNCFF	0.440955
+SBC:sg on fgoodright VCJ:sg	0.440955
+SBC:sg ob fdeletepref 2 ADJ:sg	0.440955
+SBC:sg Je fgoodright VCJ:sg	0.434209
+SBC:sg lles fhassuf 4 ADJ:pl	0.434209
+SBC:sg bles fhassuf 4 ADJ:pl	0.434209
+SBC:sg iques fhassuf 5 ADJ:pl	0.429576
+SBC:sg ser fhassuf 3 VNCFF	0.429576
+SBC:sg ante fhassuf 4 ADJ:sg	0.426365
+SBC:sg nés fhassuf 3 PAR:pl	0.426365
+SBC:sg cher fhassuf 4 VNCFF	0.426365
+SBC:sg uer fhassuf 3 VNCFF	0.426365
+SBC:sg re faddsuf 2 VCJ:sg	0.426365
+SBC:sg me fgoodright VCJ:sg	0.426365
+SBC:sg deux fgoodright SBC:pl	0.426365
+SBC:sg gé fhassuf 2 PAR:sg	0.426365
+SBP:sg iens fhassuf 4 SBP:pl	0.426365
+SBP:sg aux fgoodright SBP:pl	0.426365
+fund goodleft FWG	0.426365
+SBC:sg hedge fgoodright FWG	0.426365
+SBC:sg abeilles fgoodright ADJ:pl	0.416956
+SBC:sg elles fgoodright VCJ:pl	0.416956
+SBC:sg ver fhassuf 3 VNCFF	0.416956
+SBC:sg ' fhassuf 1 PRV:sg	0.416956
+SBC:sg je fgoodright VCJ:sg	0.416956
+SBC:sg nos fgoodright SBC:pl	0.416956
+SBC:sg jeunes fgoodright SBC:pl	0.416956
+SBC:sg isant fhassuf 5 VNCNT	0.416956
+SBC:sg ans fgoodleft CAR	0.416956
+SBC:sg ants fhassuf 4 SBC:pl	0.416956
+SBC:sg fund fgoodright FWG	0.416956
+SBC:sg 0 fhassuf 1 CAR	0.416956
+SBC:sg aient fhassuf 5 VCJ:pl	0.415424
+SBC:sg % fgoodleft CAR	0.406959
+SBC:sg Nous fgoodright VCJ:pl	0.405132
+SBC:sg é faddpref 1 VCJ:sg	0.405132
+SBP:sg S fdeletepref 1 PREP	0.405132
+SBC:sg ressources fgoodright ADJ:pl	0.405132
+SBC:sg her fhassuf 3 ADJ:sg	0.405132
+SBC:sg mment fhassuf 5 ADV	0.405132
+SBC:sg rem fdeletepref 3 PAR:sg	0.405132
+SBC:sg per fhassuf 3 VNCFF	0.405132
+SBC:sg rés fhassuf 3 PAR:pl	0.405132
+SBC:sg imm fhaspref 3 ADJ:sg	0.405132
+SBC:sg ant fdeletesuf 3 VNCNT	0.405132
+SBP:sg Fau fdeletepref 3 VCJ:sg	0.405132
+SBC:sg ités fhassuf 4 SBC:pl	0.405132
+PAR:pl t fhassuf 1 ADV	0.405132
+SBC:sg enant fhassuf 5 VNCNT	0.405132
+SBC:sg tent fhassuf 4 VCJ:pl	0.397229
+SBC:sg rès fhassuf 3 PREP	0.397229
+SBC:sg 2 fhaspref 1 CAR	0.397229
+SBC:sg né fhassuf 2 PAR:sg	0.385835
+SBC:sg leurs fgoodright SBC:pl	0.385835
+SBC:sg aux fgoodright SBC:pl	0.385835
+SBC:sg res fhassuf 3 SBC:pl	0.380805
+SBC:sg ez fhassuf 2 VCJ:pl	0.372179
+SBC:sg ies fhassuf 3 SBC:pl	0.372179
+SBC:sg sent fhassuf 4 VCJ:pl	0.367580
+SBC:sg qui fgoodright VCJ:sg	0.362483
+SBC:sg ains fhassuf 4 ADJ:pl	0.355304
+SBC:sg aires fhassuf 5 ADJ:pl	0.355304
+SBC:sg tive fhassuf 4 ADJ:sg	0.355304
+SBC:sg ler fhassuf 3 VNCFF	0.355304
+SBC:sg ué fhassuf 2 PAR:sg	0.355304
+SBP:sg ts fhassuf 2 SBP:pl	0.355304
+SBC:sg sé fhassuf 2 PAR:sg	0.342965
+SBC:sg 1 fhaspref 1 CAR	0.342965
+SBC:sg s' fgoodright VCJ:sg	0.342965
+SBC:sg sont fgoodright PAR:pl	0.339133
+SBC:sg uant fhassuf 4 VNCNT	0.333565
+SBC:sg ible fhassuf 4 ADJ:sg	0.333565
+SBC:sg rir fhassuf 3 VNCFF	0.333565
+SBC:sg ap fdeletepref 2 PAR:sg	0.333565
+SBC:sg es fdeletesuf 2 ADJ:pl	0.333565
+SBP:sg ens fhassuf 3 SBP:pl	0.333565
+SBC:sg ié fhassuf 2 PAR:sg	0.325657
+SBC:sg ins fhassuf 3 SBC:pl	0.325657
+SBC:sg rent fhassuf 4 VCJ:pl	0.303849
+SBC:sg orte fhassuf 4 VCJ:sg	0.303849
+SBC:sg nelle fhassuf 5 ADJ:sg	0.303849
+SBC:sg eaux fhassuf 4 SBC:pl	0.303849
+SBC:sg tale fhassuf 4 ADJ:sg	0.303849
+SBC:sg suf fhaspref 3 VCJ:sg	0.303849
+SBC:sg euse fhassuf 4 ADJ:sg	0.303849
+SBC:sg au fdeletepref 2 PREP	0.303849
+SBC:sg cé fhassuf 2 PAR:sg	0.303849
+SBC:sg ges fhassuf 3 ADJ:pl	0.303849
+SBC:sg nnes fhassuf 4 ADJ:pl	0.303849
+SBC:sg iens fhassuf 4 ADJ:pl	0.303849
+SBP:sg M fdeletepref 1 ABR	0.303849
+SBC:sg sés fhassuf 3 PAR:pl	0.303849
+SBC:sg fu fhaspref 2 ADJ:sg	0.303849

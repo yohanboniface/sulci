@@ -175,10 +175,11 @@ Example of full training
 First, we need to create some text corpus, in two groups:
 
 * one group with texts where only the POS tag for each word is set. Example::
- 
+
  Tout/PRV:sg était/ECJ:sg tellement/ADV absurde/ADJ:sg et/COO compliqué/ADJ:sg
 
 These texts need to have the `.crp` extension ; this group must be bigger.
+
 * one other with texts where both the POS tag and the lemme are set. Example::
 
  Dans/PREP/dans les/DTN:pl/le faits/SBC:pl/fait ,/, la/DTN:sg/le répression/SBC:sg
