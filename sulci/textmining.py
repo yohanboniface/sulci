@@ -182,7 +182,7 @@ class SemanticalTagger(TextManager):
                                                   text=self)
             keyentities.append(kp)
         self.keyentities = keyentities
-        self.deduplicate_keyentities()
+#        self.deduplicate_keyentities()
     
     def deduplicate_keyentities(self):
         """

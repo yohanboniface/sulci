@@ -185,7 +185,8 @@ These texts need to have the `.crp` extension ; this group must be bigger.
  Dans/PREP/dans les/DTN:pl/le faits/SBC:pl/fait ,/, la/DTN:sg/le répression/SBC:sg
  est/ECJ:sg/être contrebalancée/PAR:sg/contrebalancer
 
-These texts will be used to build the lexicon ; this group must be smaller.
+These texts will be used to build the lexicon ; the valid extension is 
+'.lxc.lem.crp' ; this group must be smaller.
 
 Then, we can build the lexicon::
 

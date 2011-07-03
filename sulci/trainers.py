@@ -160,8 +160,9 @@ class SemanticalTrainer(object):
         # Retrieve keytentities :
         try:
             S = SemanticalTagger(text, self.thesaurus, self.pos_tagger)
-        # SemanticalTagger raise ValueError if text is empty
+            S.deduplicate_keyentities() # During lairning, try to filter
         except ValueError:
+            # SemanticalTagger raise ValueError if text is empty
             return
         current_triggers = set()
         for ke in S.keyentities:
