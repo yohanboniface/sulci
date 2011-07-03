@@ -91,7 +91,6 @@ is the POS tag.
 
 Check "corpus/*.crp" to see more examples of "valid output".
 
-
 Lemmatization
 -------------
 
@@ -163,6 +162,67 @@ to pre-tag those texts, indeed).
 
 Steps 1 to 4 are run in sequence, and trigger to descriptors relations are used
 to extract the must pertinent descriptors.
+
+Example of full training
+------------------------
+
+**Warning**
+
+ the training of Sulci is a hard North face, be sure to have the 
+ minimum of French knowledge, some time, some pre-categorized texts, some fast
+ computer...
+
+First, we need to create some text corpus, in two groups:
+
+* one group with texts where only the POS tag for each word is set. Example::
+ 
+ Tout/PRV:sg était/ECJ:sg tellement/ADV absurde/ADJ:sg et/COO compliqué/ADJ:sg
+
+These texts need to have the `.crp` extension ; this group must be bigger.
+* one other with texts where both the POS tag and the lemme are set. Example::
+
+ Dans/PREP/dans les/DTN:pl/le faits/SBC:pl/fait ,/, la/DTN:sg/le répression/SBC:sg
+ est/ECJ:sg/être contrebalancée/PAR:sg/contrebalancer
+
+These texts will be used to build the lexicon ; this group must be smaller.
+
+Then, we can build the lexicon::
+
+ ./manage.py sulci_cli -m
+ 
+This will write the new lexicon in temporary `.pdg` (pending) file. For now, we
+have to manually rename it in `lexicon.lxc`.
+
+Now, we can launch the lexical training::
+
+ ./manage.py sulci_cli -i
+
+or, to loadbalance the work in more than one process (using zmq), here one 
+master and 4 slaves subprocesses::
+
+ ./manage.py sulci_cli -i -s 4
+
+Another time, we have to manually rename the file generated in `/corpus/` from 
+`lexical_rules.pdg` to `lexical_rules.rls`.
+
+Then, we can launch the contextual training (remember to rename the file after)::
+
+ ./manage.py sulci_cli -c -s 4
+
+Now, the lemmatizer trainer::
+
+ ./manage.py sulci_cli -r -s 4
+
+Now, the last step, but the bigger : the semantical training. Here a big corpus 
+of categorized texts is needed. For example, in Libération we are using now a 
+corpus of 35000 texts.
+
+Make sure you have configured the needed settings (see Installation below).
+
+Then launch the command line::
+
+ ./manage.py sulci_cli -n -s 4
+
 
 
 Installation
