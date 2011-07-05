@@ -1,10 +1,10 @@
-=====
+﻿=====
 Sulci
 =====
 
 Sulci is a French text mining tool, initially designed for the analysis of
 the corpus and thesaurus of `Libération <http://www.liberation.fr/>`_, a 
-french newspaper.
+French newspaper.
 
 This code is "work in progress", but it's yet used in production at Libération.
 
@@ -24,7 +24,7 @@ Each algorithm must be *trained* to be operational. Therefore, a trained set of
 data is provided (see fixtures/). This is the result of a training with the
 Libération corpus.
 
-Therefore, if you want a textmining most accurate to your own texts, you must
+Therefore, if you want a text mining most accurate to your own texts, you must
 should train it.
 
 What does "training" mean?
@@ -35,10 +35,10 @@ What does "training" mean?
 #. You then have to launch the training with the command line.
 #. Each algorithm has it's own trainer. This trainer will take the input texts, 
    remove the verified output, and begin to find the best rules to determine the
-   right ouput. The trainer will analyze its mistakes, and change its processing
+   right output. The trainer will analyze its mistakes, and change its processing
    rules/weights/triggers/... in order to avoid making those mistakes again in 
-   the future. The trainer will loop over the corpus untill it concider that no 
-   more rules could be infered.
+   the future. The trainer will loop over the corpus until it considers that no 
+   more rules could be inferred.
 
 .. note::
    You can also use the algorithm to help you create the corpus : give a text to
@@ -48,7 +48,7 @@ What does "training" mean?
    to train the algorithms in the order they are called.
 
 .. note::
-   The trained datas provided with the Sulci alpha version has been made with a
+   The trained data provided with the Sulci alpha version has been made with a
    corpus of :
    #. 15500 POS tagged words
    #. 2000 words in lexicon (lexicon must be smaller than POS corpus)
@@ -60,7 +60,7 @@ Before running the first algorithm, the text is split into tokens
 (words, symbols, punctuation marks, etc.), using simple regular expressions.
 
 
-Part-of-speech tagging
+Part-Of-Speech tagging
 ----------------------
 
 The PosTagger finds out the "POS tag", or "lexical class", or "lexical 
@@ -117,7 +117,7 @@ Check "corpus/*.lem.lxc.crp" to see more examples of "valid output".
 Semantical tagging
 ------------------
 
-The SemanticalTagger tries to find "collocations" -- i.e., sequence of tokens
+The Semantical Tagger tries to find "collocations" -- i.e., sequence of tokens
 that have a higher chance of appearing together -- and key entities -- i.e. words
 the may help to find the significance of the text : proper nouns, for example, or
 ones with many occurrences in the text, etc.
@@ -127,18 +127,18 @@ A few examples:
 * voiture électrique
 * Barack Obama
 
-The SemanticalTagger will actually use two different algorithms:
+The Semantical Tagger will actually use two different algorithms:
 
 * a purely statistical algorithm, scoring n-grams according to their
-  relatives frequences in the corpus.
+  relatives frequencies in the corpus.
 * an heuristics-based algorithm, scoring n-grams (sequences of words) with
   hand-crafted rules;
 
-The statistical algorithm uses `Pointwise mutual information 
+The statistical algorithm uses `Point-wise mutual information 
 <http://en.wikipedia.org/wiki/Pointwise_mutual_information>`_.
 
-The first one is mainly used do determine weither or not a séquence of words is 
-a collocation ; the second one, to determine weither or not a word or a collocation
+The first one is mainly used do determine whether or not a sequence of words is 
+a collocation ; the second one, to determine whether or not a word or a collocation
 is representative of the text.
 
 
@@ -199,7 +199,7 @@ Now, we can launch the lexical training::
 
  ./manage.py sulci_cli -i
 
-or, to loadbalance the work in more than one process (using zmq), here one 
+or, to load-balance the work in more than one process (using zmq), here one 
 master and 4 slaves subprocesses::
 
  ./manage.py sulci_cli -i -s 4
@@ -256,13 +256,13 @@ Sample usage::
   ((Charlie Chaplin, 87.8984),
   (Europe, 78.4387))
 
-Generic roadmap for the beta version
+Generic road-map for the beta version
 ------------------------------------
 
 * More categorized texts for the POS tagger corpus (15000 words now, I'd like to
 have almost 30000)
 
-* Find a way to build unittests for every algorithm
+* Find a way to build unit tests for every algorithm
 
 * Refine the key entities extraction
 
@@ -274,21 +274,21 @@ have almost 30000)
 
 * Be able to train the algorithm for one new descriptor
 
-* Generic python optimisation
+* Generic python optimization
 
-* Generic algorithm optimisation
+* Generic algorithm optimization
 
 Feel free to contribute any help!
 
 How can I help?
 ---------------
 
-* You're a python killer: there is many optimisations to do in the actual code
+* You're a python killer: there is many optimizations to do in the actual code
 
 * You're a language expert: all the algorithm can be optimized
 
-* You know well french language: you can add texts in the POS corpus, or make a 
+* You know well French language: you can add texts in the POS corpus, or make a 
 proof read of the actual texts (in corpus/*.crp)
 
-* You're an enthousiast: you can play with the demo, with the debug, and make
+* You're an enthusiast: you can play with the demo, with the debug, and make
 tickets for the bug seen ; you can help for making the doc, etc.
