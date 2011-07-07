@@ -41,6 +41,7 @@
 2008	CAR/2008
 2009	CAR/2009
 2010	CAR/2010
+2011	CAR/2011
 2012	CAR/2012
 21	CAR/21
 266	CAR/266
@@ -56,8 +57,10 @@
 40	CAR/40
 41	CAR/41
 43,5	CAR/43,5
+5	CAR/5
 50	CAR/50
 500	CAR/500
+6.000	CAR/6.000
 60	CAR/60
 67	CAR/67
 7	CAR/7
@@ -130,6 +133,7 @@ Depuis	PREP/depuis ADV/depuis
 Des	DTC:pl/des
 Deux	CAR/deux
 Dictature	SBC:sg/dictature
+Dimanche	SBC:sg/dimanche
 Disons	VCJ:pl/dire
 Donc	ADV/Donc
 Du	DTC:sg/du
@@ -227,6 +231,7 @@ QHS	SBC:pl/QHS
 QUI	SBC:sg/qui
 Qu'	REL/que
 Quand	SUB/quand
+Quant	PREP/quant
 Que	SUB/que
 Quelque	DTN:sg/quelque
 Quelques	DTN:pl/quelque
@@ -302,7 +307,7 @@ accrochant	VNCNT/accrocher
 accusait	VCJ:sg/accuser
 accusant	VNCNT/accuser
 accuse	VCJ:sg/accuser
-accès	SBC:sg/accès
+accès	SBC:sg/accès SBC:pl/accès
 accéder	VNCFF/accéder
 accélérant	VNCNT/accélérer
 achat	SBC:sg/achat
@@ -338,6 +343,7 @@ affrontements	SBC:pl/affrontement
 afin	PUL/afin
 agacés	PAR:pl/agacer
 agence	SBC:sg/agence
+agents	SBC:pl/agent
 agir	VNCFF/agir
 agirai	VCJ:sg/agir
 agit	VCJ:sg/agir
@@ -403,6 +409,7 @@ anthologie	SBC:sg/anthologie
 anti-Kadhafi	SBC:sg/anti-Kadhafi
 anti-immigration	ADJ:pl/anti-immigration
 anticipée	PAR:sg/anticiper
+anticipés	PAR:pl/anticiper
 apartheid	SBC:sg/apartheid
 aperçut	VCJ:sg/apercevoir
 aplatie	PAR:sg/aplatir
@@ -434,6 +441,7 @@ arrangé	PAR:sg/arranger
 arrivant	VNCNT/arrivant
 arrive	VCJ:sg/arriver
 arrivée	SBC:sg/arrivée PAR:sg/arriver
+arrivées	SBC:pl/arrivée
 arrière	PREP/arrière
 arrêter	VNCFF/arrêter
 arrêté	PAR:sg/arrêter
@@ -464,6 +472,7 @@ assujetties	ADJ:pl/assujetti
 assure	VCJ:sg/assurer
 assurer	VNCFF/assurer
 assureurs	SBC:pl/assureur
+assuré	PAR:sg/assurer
 asséné	PAR:sg/asséner
 atmosphère	SBC:sg/atmosphère
 attaché(e)s	SBC:pl/attaché
@@ -540,6 +549,7 @@ avoir	ANCFF/avoir
 avons	ACJ:pl/avoir
 avènement	SBC:sg/avènement
 axiome	SBC:sg/axiome
+ayant	VNCNT/ayant
 aérienne	ADJ:sg/aérien
 aéronautique	SBC:sg/aéronautique
 aéroport	SBC:sg/aéroport
@@ -557,6 +567,7 @@ baraka	SBC:sg/baraka
 barbe	SBC:sg/barbe
 barre	SBC:sg/barre
 bases	SBC:pl/base
+bassins	SBC:pl/bassin
 bat	VCJ:sg/battre
 batterie	SBC:sg/batterie
 battrai	VCJ:sg/battre
@@ -575,7 +586,10 @@ blanc	SBC:sg/blanc
 blanchi	PAR:sg/blanchir
 blesse	VCJ:sg/blesser
 bleu	ADJ:sg/bleu
+blocage	SBC:sg/blocage
 blogs	SBC:pl/blog
+bloqué	PAR:sg/bloquer
+bloquées	PAR:pl/bloquées
 bombardements	SBC:pl/bombardement
 bombe	SBC:sg/bombe
 bon	ADV/bon ADJ:sg/bon
@@ -671,6 +685,7 @@ certaines	DTN:pl/certain
 certains	DTN:pl/certain PRO:pl/certain
 ces	DTN:pl/ce
 cesse	VCJ:sg/cesser
+cesseront	VCJ:pl/cesser
 cessé	PAR:sg/cesser
 cet	DTN:sg/cet
 cette	DTN:sg/ce
@@ -740,6 +755,7 @@ cogito	SBC:sg/cogito
 cogne	VCJ:sg/cogner
 cognent	VCJ:pl/cogner
 collectifs	ADJ:pl/collectif
+collective	ADJ:sg/coolectif
 collectiviste	ADJ:sg/collectiviste
 coller	VNCFF/coller
 collègues	SBC:pl/collègue
@@ -808,6 +824,7 @@ conceptuel	ADJ:sg/conceptuel
 concert	SBC:sg/concert
 conclusions	SBC:pl/conclusion
 conclut	VCJ:sg/conclure
+concordantes	ADJ:pl/concordante
 concède	VCJ:sg/concéder
 condamne	VCJ:sg/condamner
 condamnent	VCJ:sg/condamnent
@@ -915,6 +932,7 @@ critiqué	PAR:sg/critiquer
 critères	SBC:pl/critère
 croire	VNCFF/croire
 crois	VCJ:sg/croire
+croisière	SBC:sg/croisière
 croisée	ADJ:sg/croisé
 croisés	PAR:pl/croiser
 croit	VCJ:sg/croire
@@ -997,6 +1015,7 @@ diffusion	SBC:sg/diffusion
 différent	ADJ:sg/différent
 différentes	ADJ:pl/différente
 digérer	VNCFF/digérer
+dimanche	SBC:sg/dimanche
 dimension	SBC:sg/dimension
 dinar	SBC:sg/dinar
 dire	VNCFF/dire
@@ -1028,6 +1047,8 @@ dit	VCJ:sg/dire PAR:sg/dire
 dix	CAR/dix
 dix-huit	CAR/dix-huit
 dizaine	SBC:sg/dizaine
+dockers	SBC:pl/docker
+docks	SBC:pl/dock
 documentaire	SBC:sg/documentaire
 documents	SBC:pl/document
 doigt	SBC:sg/doigt
@@ -1085,6 +1106,7 @@ décembre	SBC:sg/décembre
 décennie	SBC:sg/décennie
 décennies	SBC:pl/décennie
 décent	ADJ:sg/décent
+déchargement	SBC:sg/déchargement
 décide	VCJ:sg/décider
 décidé	PAR:sg/décider
 décision	SBC:sg/décision
@@ -1129,6 +1151,7 @@ dénoncer	VNCFF/dénoncer
 dénonciation	SBC:sg/dénonciation
 départ	SBC:sg/départ
 département	SBC:sg/département
+départs	SBC:pl/départ
 dépasse	VCJ:sg/dépasser
 dépasser	VNCFF/dépasser
 dépend	VCJ:sg/dépendre
@@ -1160,6 +1183,7 @@ déterminer	VNCFF/déterminer
 déterminé	PAR:sg/déterminer
 détient	VCJ/détenir
 détournements	SBC:pl/détournement
+détourné	PAR:sg/détourner
 détruit	PAR:sg/détruire VCJ:sg/détruire
 dévale	VCJ:sg/dévaler
 développer	VNCFF/développer
@@ -1243,12 +1267,14 @@ entrepôts	SBC:pl/entrepôt
 entrer	VNCFF/entrer
 entré	PAR:sg/entrer
 entrée	SBC:sg/entrée
+entériner	VNCFF/entériner
 envers	PREP/envers
 envie	SBC:sg/envie
 envoyé	PAR:sg/envoyer
 erreur	SBC:sg/erreur
 erreurs	SBC:pl/erreur
 escalade	SBC:sg/escalade
+escale	SBC:sg/escale
 esclaffe	VCJ:sg/esclaffer
 escroc	SBC:sg/escroc
 espace	SBC:sg/espace
@@ -1412,7 +1438,7 @@ fracture	SBC:sg/fracture
 fragilisé	PAR:sg/fragiliser
 frais	SBC:pl/frais
 francophone	ADJ:sg/francophone
-français	SBC:sg/français ADJ:sg/français
+français	SBC:sg/français ADJ:sg/français ADG:pl/français
 française	ADJ:sg/français
 front	SBC:sg/front
 frontière	SBC:sg/frontière
@@ -1458,6 +1484,7 @@ global	ADJ:sg/global
 globalement	ADV/globalement
 globales	ADJ:pl/global
 gloire	SBC:sg/gloire
+golfe	SBC:sg/golfe
 gonds	SBC:pl/gond
 gonflant	VNCNT/gonfler
 goulag	SBC:sg/goulag
@@ -1480,7 +1507,9 @@ gros	ADJ:sg/gros SBC:pl/gros
 grossir	VNCFF/grossir
 grossière	ADJ:sg/grossier
 groupe	SBC:sg/groupe
+grutiers	SBC:pl/grutier
 grâce	PREP/grâce
+grève	SBC:sg/grève
 guerre	SBC:sg/guerre
 guide	SBC:sg/guide
 guitare	SBC:sg/guitare
@@ -1605,6 +1634,7 @@ indique	VCJ:sg/indiquer
 indiqué	PAR:sg/indiquer
 individu	SBC:sg/individu
 individus	SBC:pl/individu
+industries	SBC:pl/industrie
 indéfiniment	ADV/indéfiniment
 indépassable	ADJ:sg/indépassable
 indépendant	ADJ:sg/indépendant
@@ -1759,6 +1789,7 @@ leur	DTN:sg/son PRV:pl/leur PRV:sg/son
 leurraient	VCJ:pl/leurrer
 leurs	DTN:pl/son
 lever	VNCFF/lever
+levé	PAR:sg/levé
 liberticide	ADJ:sg/liberticide
 liberté	SBC:sg/liberté
 libertés	SBC:pl/liberté
@@ -1857,10 +1888,12 @@ manquent	VCJ:pl/manquer
 manquer	VNCFF/manquer
 manqué	PAR:sg/manquer
 manuscrit	SBC:sg/manuscrit
+manutention	SBC:sg/manutention
 mappemonde	SBC:sg/mappemonde
 maquillaient	VCJ:pl/maquiller
 marchande	ADJ:sg/marchand
 marchandise	SBC:sg/marchandise
+marchandises	SBC:pl/marchandise
 marche	VCJ:sg/marcher SBC:sg/marche
 marché	SBC:sg/marché
 marchés	SBC:pl/marché
@@ -1985,6 +2018,7 @@ méritais	VCJ:sg/mériter
 mérites	SBC:pl/mérite
 métaphore	SBC:sg/métaphore
 méthodes	SBC:pl/méthode
+métiers	SBC:pl/métier
 même	ADV/même ADJ:sg/même PRO:sg/même
 mêmes	ADJ:pl/même
 n'	ADV/ne
@@ -2002,6 +2036,7 @@ naturalisme	SBC:sg/naturalisme
 nature	SBC:sg/nature
 naunaute	SBC:sg/naunaute
 navigateurs	SBC:sg/navigateur
+navire	SBC:sg/navire
 ndlr	PUL/ndlr
 ne	ADV/ne
 net	ADJ:sg/net
@@ -2052,6 +2087,7 @@ nécessaire	ADJ:sg/nécessaire
 nécessite	VCJ:sg/nécessiter
 nécessitera	VCJ:sg/nécessiter
 née	PAR:sg/naître
+négocié	PAR:sg/négocier
 néologisme	SBC:sg/néologisme
 néomarxisme	SBC:sg/néomarxisme
 objectif	SBC:sg/objectif
@@ -2089,6 +2125,7 @@ opposition	SBC:sg/opposition
 opposé	PAR:sg/opposer
 oppression	SBC:sg/oppression
 oppressives	ADJ:pl/oppressif
+opérant	VNCNT/opérant
 opération	SBC:sg/opération
 opérationnelle	ADJ:sg/opérationnel
 opérations	SBC:pl/opération
@@ -2172,6 +2209,7 @@ parus	PAR:sg/paraître
 parvenues	PAR:pl/parvenir
 pas	ADV/pas SBC:sg/pas
 passage	SBC:sg/passage
+passagers	SBC:pl/passager
 passages	SBC:pl/passage
 passait	VCJ:sg/passer
 passe	VCJ:sg/passer
@@ -2181,6 +2219,7 @@ passé	PAR:sg/passer SBC:sg/passé
 passées	PAR:pl/passer
 patriarcal	ADJ:sg/patriarcal
 patron	SBC:sg/patron
+patronat	SBC:sg/patronat
 pauvres	SBC:pl/pauvre
 payer	VNCFF/payer
 pays	SBC:sg/pays SBC:pl/pays
@@ -2216,9 +2255,11 @@ personnalités	SBC:pl/personnalité
 personne	SBC:sg/personne
 personnel	ADJ:sg/personnel
 personnelle	ADJ:sg/personnel
+personnels	SBC:pl/personnel
 personnes	SBC:pl/personne
 perspective	SBC:sg/perspective
 persuadés	PAR:pl/persuader
+perturbait	VCJ:sg/perturber
 perçue	PAR:sg/percevoir
 petit	ADJ:sg/petit
 petit-fils	SBC:sg/petit-fils
@@ -2274,8 +2315,15 @@ pontife	ADJ:sg/pontife
 populaire	ADJ:sg/populaire
 populaires	ADJ:pl/populaire
 populiste	ADJ:sg/populiste
+port	SBC:sg/port
 porte	SBC:sg/porte
+porte-parole	SBC:sg/porte-parole
 porter	VNCFF/porter
+portes	SBC:pl/porte
+portiqueurs	SBC:pl/portiqueur
+ports	SBC:pl/port
+portuaire	ADJ:sg/portuaire
+portuaires	ADJ:pl/portuaire
 porté	PAR:sg/porter
 position	SBC:sg/position
 possibilité	SBC:sg/possibilité
@@ -2311,6 +2359,7 @@ premiers	ADJ:pl/premier
 première	ADJ:sg/premier
 premières	ADJ:pl/premier
 prendre	VNCFF/prendre
+prendront	VNCFF/prendre
 prenne	VCJ:sg/prendre
 prescription	SBC:sg/prescription
 presse	SBC:sg/presse
@@ -2381,6 +2430,7 @@ protéger	VNCFF/protéger
 provenance	SBC:sg/provenance
 provoquant	VNCNT/provoquer
 précis	ADJ:sg/précis
+précisant	VNCNT/préciser
 précise	VCJ:sg/préciser ADJ:sg/précis
 précédait	VCJ:sg/précéder
 précédée	PAR:sg/précéder
@@ -2405,6 +2455,7 @@ prévenir	VNCFF/prévenir
 prévention	SBC:sg/prévention
 prévenu	PAR:sg/prévenir
 prévenus	SBC:pl/prévenu
+prévoyant	VNCNT/prévoyant
 prévu	PAR:sg/prévoir
 préétablie	PAR:sg/préétablir
 prêtait	VCJ:sg/prêtait
@@ -2432,6 +2483,7 @@ putatif	ADJ:sg/putatif
 père	SBC:sg/père
 pénale	ADJ:sg/pénal
 pénalisait	VCJ:sg/pénaliser
+pénibilité	SBC:sg/pénibilité
 pénétrer	VNCFF/pénétrer
 périodes	SBC:pl/période
 pétrie	PAR:sg/pétrir
@@ -2518,7 +2570,7 @@ religion	SBC:sg/religion
 religions	SBC:pl/religion
 relire	VNCFF/relire
 relâche	VCJ:sg/relâcher
-relève	VCJ:sg/relever
+relève	VCJ:sg/relever SBC:sg/relève
 relégation	SBC:sg/relégation
 remarque	VCJ:sg/remarquer
 remboursement	SBC:sg/remboursement
@@ -2550,6 +2602,7 @@ renversé	PAR:sg/renverser
 reporter	SBC:sg/reporter
 repose	VCJ:sg/reposer
 repris	PAR:sg/reprendre
+reprise	SBC:sg/reprise
 reprises	SBC:pl/reprise
 représentation	SBC:sg/représentation
 représenter	VNCFF/représenter
@@ -2574,6 +2627,7 @@ restés	PAR:pl/rester
 retenue	PAR:sg/retenir
 retour	SBC:sg/retour
 retourné	PAR:sg/retourner
+retraite	SBC:sg/retraite
 retrouvant	VNCNT/retrouver
 retrouvé	PAR:sg/retrouver
 revanche	SBC:sg/revanche
@@ -2637,6 +2691,7 @@ régnait	VCJ:sg/régner
 régnant	VNCNT/régner
 régné	PAR:sg/régner
 régulièrement	ADV/régulièrement
+régulières	ADJ:pl/régulière
 réintégration	SBC:sg/réintégration
 répondre	VNCFF/répondre
 répondu	PAR:sg/répondre
@@ -2908,6 +2963,7 @@ suspendue	PAR:sg/suspendre
 suspicion	SBC:sg/suspicion
 symbole	SBC:sg/symbole
 synchronisent	VCJ:pl/synchroniser
+syndicat	SBC:sg/syndicat
 système	SBC:sg/système
 systèmes	SBC:pl/système
 systématique	ADJ:sg/systématique
@@ -2948,6 +3004,7 @@ tenté	PAR:sg/tenter
 tenu	PAR:sg/tenir
 tenus	PAR:sg/tenir
 termes	SBC:pl/termes
+terminaux	SBC:pl/terminal
 termineront	VCJ:pl/terminer
 terrains	SBC:pl/terrain
 terre	SBC:sg/terre
@@ -3005,6 +3062,7 @@ traditionnelle	ADJ:sg/traditionnel
 traditions	SBC:pl/tradition
 traduction	SBC:sg/traduction
 traduirait	VCJ:sg/traduire
+trafic	SBC:sg/trafic
 trafiquent	VCJ:pl/trafiquer
 trahir	VNCFF/trahir
 train	SBC:sg/train
@@ -3071,6 +3129,7 @@ vais	VCJ:sg/aller
 valent	VCJ:pl/valoir
 valeur	SBC:sg/valeur
 valeurs	SBC:pl/valeur
+valider	VNCFF/valider
 validée	PAR:sg/valider
 valorisation	SBC:sg/valorisation
 valorisent	VCJ:pl/valoriser
@@ -3151,6 +3210,7 @@ vous	PRV:pl/vous
 vous-même	PRO:sg/vous-même
 voyage	SBC:sg/voyage
 voûte	SBC:sg/voûte
+vrac	SBC:sg/vrac
 vraie	ADJ:sg/vrai
 vraiment	ADV/vraiment
 vu	PAR:sg/voir
@@ -3172,6 +3232,7 @@ zéro	CAR/zéro
 à	PREP/à
 âge	SBC:sg/âge
 âgée	ADJ:sg/âgé
+âprement	ADV/âprement
 ça	PRV:sg/ça PRO:sg/ça
 échange	SBC:sg/échange
 échangent	VCJ:pl/échanger
