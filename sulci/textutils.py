@@ -44,16 +44,7 @@ def normalize_text(text, language="french"):
 
 def tokenize_text(text):
     """
-    Split text into list.
-    Tests needed.
-    #TODO:
-    il est 19h30.
-    années 60, et
-    Qu'est-ce
-    Port-la-Forêt
-    en 5e position
-    le 1er
-    c'est-à-dire
+    Split text into a list of tokens.
     """
     pattern = re.compile(ur"""
               \d{4}(?#Year)
