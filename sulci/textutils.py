@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 """
-Sulci text utils.
+Sulci raw text utils.
 """
 import string
 import re
@@ -8,8 +8,6 @@ import unicodedata
 
 from operator import itemgetter
 from collections import defaultdict
-
-from Stemmer import Stemmer
 
 from django.utils.html import strip_tags
 from django.utils.text import unescape_entities
@@ -44,12 +42,6 @@ def normalize_token(w):
     w = ''.join((c for c in unicodedata.normalize('NFD', w) if unicodedata.category(c) != 'Mn'))
     w = w.lower()
     return w
-
-def token_is_valid(token):
-    return token not in stop_words and len(token) > 2
-
-def filter_tokens(tokens):
-    return [token for token in tokens if token_is_valid(token)]
 
 def normalize_text(text, language="french"):
     """
@@ -103,151 +95,11 @@ def split_in_sentences(text):
     sentences = enders.split(text)
     return sentences
 
-def ngrams(text, min_length = 2, max_length = 10, min_count = 2):
-    """
-    Take a text as a list of sentences. Return ngrams and frequency.
-    """
-    final = {}
-#    sentence = tuple(sentences[0])
-    for sentence in [tokenize_text(sentence) for sentence in split_in_sentences(text)]:
-        sentence = tuple(sentence)
-        for begin in range(0,len(sentence)):
-            for end in range(begin + min_length, len(sentence) + 1):
-                g = sentence[begin:end]
-#                if "projet" in g: log(g, RED)
-                if normalize_token(g[0]) in stop_words or normalize_token(g[len(g)-1]) in stop_words:
-                    continue
-                if not g in final: final[g] = 1
-                else: final[g] += 1
-    return sorted([(k, v) for k, v in final.iteritems() if v >= min_count], key=itemgetter(1), reverse=True)
-
-def guess_collocation(ngram, ngram_count, text):
-    """
-    Text may be tokenized.
-    Return a confidence number, from 0 to 1.
-    """
-    confidence = 100.0
-    # Lets define that a ngram of 10 for a text of 100 words
-    # means 1 of confidence, so 0.1
-    log("Ngram count : %f" % ngram_count, "GRAY")
-    confidence *= 1.0 * ngram_count / len(text) / 0.1
-    log("Confidence after counting ngram : %f" % confidence, "GRAY")
-    confidence *= statistical_mutual_information(ngram, text)
-    log("Confidence after SMI : %f" % confidence, "GRAY")
-    confidence *= is_title(ngram)
-    log("Confidence after is_title : %f" % confidence, "GRAY")
-    return confidence
-
-def statistical_mutual_information(ngram, text):
-    """
-    Return the probability of all the terms of the ngram to appear together.
-    Do we may consider the stop_words ?
-    """
-    candidates = [(k, v) for k, v in enumerate(ngram) if normalize_token(v) not in stop_words \
-                  and not v.isdigit() and len(v) > 1]
-    alone_count = {}
-    if len(candidates) == 0: return 0.1
-    for candidate in candidates:
-        next = candidates.index(candidate) < len(candidates) - 1 \
-               and candidates[candidates.index(candidate) + 1] \
-               or None
-        previous = candidates.index(candidate) > 0 \
-               and candidates[candidates.index(candidate) - 1] \
-               or None
-        alone_count[candidate] = 0
-        indexes = [ idx for idx, value in enumerate(text) if value == candidate[1] ]
-        for idx in indexes:
-            if next is not None:
-                positions_diff = next[0] - candidate[0]
-                if idx >= len(text) - (positions_diff + 1) \
-                   or not text[idx+positions_diff] == next[1]:
-                    #we are close end of text, next can't be found
-                    alone_count[candidate] += 1
-            if previous is not None:
-                positions_diff = candidate[0] - previous[0]
-                if idx < positions_diff \
-                   or not text[idx-positions_diff] == previous[1]:
-                    #we are close beggin of text, preivous can't be found
-                    alone_count[candidate] += 1
-    res = [v for k,v in alone_count.items()]
-#    print [v for v in alone_count.items()]
-    if 0 in res:
-        return 1
-    else:
-        return product([1.0 * len(ngram) / (len(ngram) + v) for v in res])
-
-def is_title(ngram, factor = 2.0):
-    """
-    Define the probability of a ngram to be a title.
-    Factor is for the confidence coex max.
-    """
-    confidence = 1
-    to_test = [n for n in ngram if n not in stop_words]
-    for item in to_test:
-        if item.istitle(): confidence += factor / len(to_test)
-#        print item, confidence
-    return confidence
-
-def make_index(expression):
-    """
-    Make a standardization in the expression to return a tuple who maximise
-    maching possibilities.
-    expression must be a list or tuple
-    """
-    stemmer = Stemmer("french")
-    expression = [stemmer.stemWord(normalize_token(w)) for w in expression]
-    expression.sort()
-    return tuple(expression)
-
 def words_occurrences(text):
     occurrences = defaultdict(int)
     for k in text:
         occurrences[k] += 1
     return occurrences
-
-def more_frequents_token(text, min_count=2):
-    occurrences = words_occurrences(text)
-    candidates = [(k, v) for k, v in occurrences.iteritems() if v >= min_count \
-                  and normalize_token(k) not in stop_words and not k.isdigit()\
-                  and len(k) > 1]
-    return sorted(candidates, key=itemgetter(1), reverse=True)
-
-def add_to_corpus(article_id):
-    """
-    Retrieve an article in db, clean it, and add it to corpus.
-    """
-    t = Article.objects.get(pk=article_id).content
-    t = normalize_text(unescape_entities(t))
-    t = t.encode("utf-8")
-    t = t.decode("string_escape")
-    save_to_file("corpus/%s.txt" % article_id, t)
-    print normalize_text(t)
-
-#_THESAURUS = None
-#def load_thesaurus():
-#    print "loading thesaurus"
-#    _THESAURUS = None#hack
-#    if _THESAURUS is None:
-#        thesaurus = {}
-#        with open("thesaurus.txt") as f:
-#            for line in f:
-#                line = line.decode("utf-8")
-#                line = line.replace("\t", "")
-#                line = line.replace("\n", "")
-#                line = line.replace("  ", "")
-#                line = line.replace("- ", "")
-#                thesaurus[make_index(tokenize_text(line))] = line
-#        _THESAURUS = thesaurus
-#    print "thesaurus loaded"
-#    return _THESAURUS
-
-def is_in_thesaurus(t, s):
-    i = make_index(s)
-    if i in t:
-        print t[i]
-        return True
-    else:
-        return False
 
 def lev(s1, s2, mode=3):
     if mode == 1: 

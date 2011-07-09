@@ -4,8 +4,6 @@
 import os
 import re
 
-from Stemmer import Stemmer
-
 from sulci.utils import save_to_file, load_file, get_dir
 from sulci.textutils import normalize_token, tokenize_text
 from sulci.stopwords import stop_words, usual_words
@@ -98,11 +96,8 @@ class RetrievableObject(object):
         maching possibilities.
         expression must be a list or tuple, or string or unicode
         """
-#        stemmer = Stemmer("french")
         if not isinstance(expression, (list, tuple)):
             expression = unicode(expression).split()
-#        expression = [stemmer.stemWord(normalize_token(w)) for w in expression]
-#        expression.sort()
         expression = tuple(expression)
         return "%s__%s" % (cls.__name__, expression), expression
 
