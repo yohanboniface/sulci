@@ -72,6 +72,3 @@ class TextUtilsTests(TestCase):
 #        do(u"1er du mois", [u"1er", u"du", u"mois"])
         do(u"c'est-à-dire", [u"c'est-à-dire",])
 #        do(u"http://libe.fr", [u"http://libe.fr",])
-
-    def test_split_in_sentences(self):
-        pass

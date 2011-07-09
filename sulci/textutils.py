@@ -65,15 +65,6 @@ def tokenize_text(text, language="fr"):
         raise NotImplementedError
     return pattern.findall(text)
 
-def split_in_sentences(text):
-    """
-    break a paragraph into sentences
-    and return a list
-    """
-    enders = re.compile(ur"[.!?\:\u2026]", re.U)
-    sentences = enders.split(text)
-    return sentences
-
 def words_occurrences(text):
     occurrences = defaultdict(int)
     for k in text:
