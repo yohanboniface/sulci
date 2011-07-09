@@ -36,6 +36,7 @@ class TextUtilsTests(TestCase):
         self.failIf(normalize_text(u'dis-le!') != u'dis - le!')
         self.failIf(normalize_text(u'ce camion-ci.') != u'ce camion - ci.')
         self.failIf(normalize_text(u'camion-citerne') != u'camion-citerne')
+        self.failIf(normalize_text(u"est-ce\n") != u"est - ce\n")
     
     def test_tokenize_text(self):
         
@@ -66,9 +67,9 @@ class TextUtilsTests(TestCase):
         do(tokenize_text(u"l'aviron"), [u"l'", u"aviron"])
         do(tokenize_text(u"qu'il"), [u"qu'", u"il"])
 #        do(tokenize_text(u"il est 19h30"), [u"il", u"est", u"19h30"])
-#        do(tokenize_text(u"est-ce"), [u"est", u"-", u"ce"])
 #        do(tokenize_text(u"5e position"), [u"5e", u"position"])
 #        do(tokenize_text(u"1er du mois"), [u"1er", u"du", u"mois"])
-#        do(tokenize_text(u"c'est-à-dire"), [u"c'est-à-dire",])
+        do(tokenize_text(u"c'est-à-dire"), [u"c'est-à-dire",])
+#        do(tokenize_text(u"http://libe.fr"), [u"http://libe.fr",])
 
 

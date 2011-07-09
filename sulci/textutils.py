@@ -27,38 +27,47 @@ def clean(s,l):
         s = s.replace(c,'')
     return s
 
-def normalize_text(text, language="french"):
+def normalize_text(text, language="fr"):
     """
     Normalize text : clean, strip tags...
     Tests needed.
     """
-    text = strip_tags(unescape_entities(text))
-    text = text.replace(u"’", u"'")
-    text = text.replace(u"qu'", u"qu' ")#qu' lorsqu', etc.
-    text = re.sub(ur'(")([^ \n\.,!?]){1}', u"\xab\g<2>", text, re.U)#replacing opening quotes
-    text = re.sub(ur'([^ \n]){1}(")', u"\g<1>\xbb", text, re.U)#replacing closing quotes
-    #Replacing inverted pronouns.
-    text = re.sub(ur"\-t\-", u" - t - ", text, re.U)
-    text = re.sub(ur"\-(je|moi|tu|toi|il|le|elle|la|on|nous|vous|ils|elles|les|ci|là)([\W])", u" - \g<1>\g<2>", text, re.U)
+    if language == "fr":
+        text = strip_tags(unescape_entities(text))
+        text = text.replace(u"’", u"'")
+        # qu' lorsqu', etc.
+        text = text.replace(u"qu'", u"qu' ")
+        # replacing opening quotes
+        text = re.sub(ur'(")([^ \n\.,!?]){1}', u"\xab\g<2>", text, re.U)
+        text = re.sub(ur'([^ \n]){1}(")', u"\g<1>\xbb", text, re.U)#replacing closing quotes
+        # Replacing inverted pronouns.
+        text = re.sub(ur"\-t\-", u" - t - ", text, re.U)
+        text = re.sub(ur"\-(je|moi|tu|toi|il|le|elle|la|on|nous|vous|ils|elles|les|ci|là|ce)([\W])", u" - \g<1>\g<2>", text, re.U)
+    else:
+        raise NotImplementedError
     return text
 
-def tokenize_text(text):
+def tokenize_text(text, language="fr"):
     """
     Split text into a list of tokens.
     """
-    pattern = re.compile(ur"""
-              \d{4}(?#Year)
-              |[A-Z]{1}\.(?#M., R., etc.)
-              |[\d]+[\d,.]*(?#Number)
-              |\$\d+(?:\.\d{2})?(?#Dollars)
-              |%(?#Percentage)
-              |\u2026(?#Ellipsis)
-              |[\xab\xbb"](?#« or »)
-              |[\,\.\:\(\)\!\-\?\[\];]{1}(?#comma)
-              |\w{1}[’\u2019']{1}(?#l' m', etc.)
-              |qu[’\u2019']{1}(?#qu')
-              |[\w’\u2019'\-]+(?#All others "words")
-              """, re.U | re.X)
+    if language == "fr":
+        pattern = re.compile(ur"""
+                  \d{4}(?#Year)
+                  |c'est\-à\-dire(?#special case)
+                  |[A-Z]{1}\.(?#M., R., etc.)
+                  |[\d]+[\d,.]*(?#Number)
+                  |\$\d+(?:\.\d{2})?(?#Dollars)
+                  |%(?#Percentage)
+                  |\u2026(?#Ellipsis)
+                  |[\xab\xbb"](?#« or »)
+                  |[\,\.\:\(\)\!\-\?\[\];]{1}(?#comma)
+                  |\w{1}[’\u2019']{1}(?#l' m', etc.)
+                  |qu[’\u2019']{1}(?#qu')
+                  |[\w’\u2019'\-]+(?#All others "words")
+                  """, re.U | re.X)
+    else:
+        raise NotImplementedError
     return pattern.findall(text)
 
 def split_in_sentences(text):
