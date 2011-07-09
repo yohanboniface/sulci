@@ -48,6 +48,7 @@ class TextUtilsTests(TestCase):
         do(tokenize_text(u"M. Duchmol"), [u"M.", u"Duchmol"])
         do(tokenize_text(u"A. B."), [u"A.", u"B."])
         do(tokenize_text(u"200 personnes"), [u"200", u"personnes"])
+        do(tokenize_text(u"2 chats"), [u"2", u"chats"])
         do(tokenize_text(u"3,5 millions"), [u"3,5", u"millions"])
         do(tokenize_text(u"3.5 millions"), [u"3.5", u"millions"])
         do(tokenize_text(u"2.000.000 millions"), [u"2.000.000", u"millions"])

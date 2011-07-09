@@ -53,10 +53,9 @@ def tokenize_text(text, language="fr"):
     """
     if language == "fr":
         pattern = re.compile(ur"""
-                  \d{4}(?#Year)
-                  |c'est\-à\-dire(?#special case)
+                  c'est\-à\-dire(?#special case)
                   |[A-Z]{1}\.(?#M., R., etc.)
-                  |[\d]+[\d,.]*(?#Number)
+                  |[\d]+(?:[,. ][\d]+)*(?#Number)
                   |\$\d+(?:\.\d{2})?(?#Dollars)
                   |%(?#Percentage)
                   |\u2026(?#Ellipsis)
