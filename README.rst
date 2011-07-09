@@ -8,7 +8,7 @@ French newspaper.
 
 This code is "work in progress", but it's yet used in production at Libération.
 
-Therefore, here is a demo page with the freezed 0.1 alpha version:
+Therefore, here is a demo page with the frozen 0.1 alpha version:
  
  http://alpha.sulci.dotcloud.com
 
@@ -29,7 +29,7 @@ should train it.
 
 What does "training" mean?
 
-#. You first need to prepare a corpus, for each of the algorithm. A corpus is a 
+#. You first need to prepare a corpus, for each of the algorithms. A corpus is a 
    set of texts with the final output you want : for example, the corpus for the 
    PosTagger is some texts where each word is pos tagged, with a verified value.
 #. You then have to launch the training with the command line.
@@ -58,6 +58,11 @@ What does "training" mean?
 
 Before running the first algorithm, the text is split into tokens
 (words, symbols, punctuation marks, etc.), using simple regular expressions.
+
+Sulci compared to other tools
+----------------------------
+We were looking for a Python tool. We looked at NLTK but ...
+There are good Java tools: Apache UIMA, Gate, Apache SOLR.
 
 
 Part-Of-Speech tagging
@@ -114,12 +119,12 @@ excerpt).
 
 Check "corpus/*.lem.lxc.crp" to see more examples of "valid output".
 
-Semantical tagging
-------------------
+Semantical tagging (Collocation and key entities extraction)
+------------------------------------------------------------
 
 The Semantical Tagger tries to find "collocations" -- i.e., sequence of tokens
 that have a higher chance of appearing together -- and key entities -- i.e. words
-the may help to find the significance of the text : proper nouns, for example, or
+that may help to find the significance of the text : proper nouns, for example, or
 ones with many occurrences in the text, etc.
 A few examples:
 
@@ -292,3 +297,6 @@ proof read of the actual texts (in corpus/*.crp)
 
 * You're an enthusiast: you can play with the demo, with the debug, and make
 tickets for the bug seen ; you can help for making the doc, etc.
+
+* in any case,
+  Meet us for IRC chats: #sulci on irc.freenode.net
