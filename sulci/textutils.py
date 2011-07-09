@@ -3,7 +3,6 @@
 Sulci raw text utils.
 """
 import re
-import unicodedata
 
 from collections import defaultdict
 
@@ -27,15 +26,6 @@ def clean(s,l):
     for c in l:
         s = s.replace(c,'')
     return s
-
-def normalize_token(w):
-    w = w.replace(u"l'", u"")
-    w = w.replace(u"m'", u"")
-    #w = w.replace(u"d'", u"")
-    w = w.replace(u"-", u"")
-    w = ''.join((c for c in unicodedata.normalize('NFD', w) if unicodedata.category(c) != 'Mn'))
-    w = w.lower()
-    return w
 
 def normalize_text(text, language="french"):
     """

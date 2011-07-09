@@ -7,7 +7,7 @@ import os
 from django.db import models, transaction
 from django.db.utils import IntegrityError
 
-from sulci.textutils import tokenize_text, normalize_token, lev
+from sulci.textutils import tokenize_text, lev
 from sulci.base import RetrievableObject
 from sulci.utils import save_to_file, get_dir
 
@@ -115,8 +115,18 @@ class TriggerToDescriptor(models.Model):
         Give the weight of the relation, relative to the max weight of the
         trigger and the max weight of the descriptor.
         """
-        return self.weight / self.trigger.max_weight \
-               * self.weight / self.descriptor.max_weight
+        # current weigth relative to trigger max weight
+        weight = self.weight / self.trigger.max_weight
+        # current weight relative to descriptor max weight
+        weight *= self.weight / self.descriptor.max_weight
+#        # current weight relative to trigger count
+#        # we use logarithm to limit negative impact for very common triggers
+#        weight *= math.log(self.weight) / math.log(self.trigger.count)
+#        # current weight relative to descriptor occurrences in training
+#        # Using log to limit impact
+#        weight *= \
+#           math.log(self.weight) / math.log(self.descriptor.trained_occurrences)
+        return weight
     
     class Meta:
         unique_together = ("descriptor", "trigger")
