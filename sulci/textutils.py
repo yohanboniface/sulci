@@ -2,19 +2,13 @@
 """
 Sulci raw text utils.
 """
-import string
 import re
 import unicodedata
 
-from operator import itemgetter
 from collections import defaultdict
 
 from django.utils.html import strip_tags
 from django.utils.text import unescape_entities
-from django.conf import settings
-
-from utils import save_to_file, product, log
-from stopwords import stop_words
 
 def modern_istitle(word):
     """
