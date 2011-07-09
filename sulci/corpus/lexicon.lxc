@@ -94,6 +94,7 @@ Attendez	VCJ:pl/attendre
 Au	DTC:sg/au
 Au-delà	ADV/au-delà
 Aujourd'hui	ADV/aujourd'hui
+Auparavant	ADV/auparavant
 Aussitôt	ADV/aussitôt
 Autocensure	SBC:sg/Autocensure
 Avant	PREP/avant
@@ -125,11 +126,13 @@ Combien	ADV/combien
 Comités	SBC:pl/comité
 Comme	SUB/comme
 Comment	ADV/comment
+Commentaire	SBC:sg/commentaire
 Complète	ADJ:sg/complet
 Comprenez	VCJ:pl/comprendre
 Confronté	PAR:sg/confronter
 Critiquant	VNCNT/critiquer
 Critiques	SBC:pl/critique
+Croissance	SBC:sg/croissance
 Côte	SBC:sg/côte
 D'	PREP/de
 Dans	PREP/dans
@@ -154,6 +157,7 @@ ETRE	ENCFF/être
 EVITE	PAR:sg/éviter
 Ecoute	VCJ:sg/écouter
 Ecrit	PAR:sg/écrit
+Egalement	ADV/également
 Elle	PRV:sg/il
 Elles	PRV:pl/elles
 En	PREP/en
@@ -264,6 +268,7 @@ Ses	DTN:pl/son
 Si	ADV/si
 Simplement	ADV/Simplement
 Sinon	ADV/sinon
+Sommes	ECJ:pl/être
 Son	DTN:sg/son
 Source	SBC:sg/Source
 Sous	PREP/sous
@@ -398,6 +403,7 @@ analyses	SBC:pl/analyses
 analystes	SBC:pl/analyste
 ancien	ADJ:sg/ancien
 ancienne	SBC:sg/ancien ADJ:sg/ancien
+anciens	ADJ:pl/ancien
 and	FGW/and
 anglais	SBC:sg/anglais
 anglo-saxons	ADJ:sg/anglo-saxon
@@ -485,6 +491,7 @@ assureurs	SBC:pl/assureur
 assuré	PAR:sg/assurer
 asséné	PAR:sg/asséner
 atmosphère	SBC:sg/atmosphère
+attablés	PAR:pl/attabler
 attaché(e)s	SBC:pl/attaché
 attaques	SBC:pl/attaque
 attarder	VNCFF/attarder
@@ -499,6 +506,7 @@ attention	SBC:sg/attention
 atterrissage	SBC:sg/atterrissage
 attestent	VCJ:pl/attester
 attirent	VCJ:pl/attirer
+attirer	VNCFF/attirer
 attitude	SBC:sg/attitude
 au	DTC:sg/au
 au-delà	PREP/au-delà
@@ -638,6 +646,7 @@ business	SBC:sg/business
 byzantin	ADJ:sg/byzantin
 bât	SBC:sg/bât
 béante	ADJ:sg/béant
+bébés	SBC:pl/bébé
 bénéfice	SBC:sg/bénéfice
 bénéficié	PAR:sg/bénéficier
 bête	SBC:sg/bête
@@ -649,7 +658,9 @@ caché	PAR:sg/cacher
 cacophonie	SBC:sg/cacophonie
 cadet	ADJ:sg/cadet
 cadre	SBC:sg/cadre
+café	SBC:sg/café
 calmer	VNCFF/calmer
+camarade	SBC:sg/camarade
 campus	SBC:sg/campus
 canadienne	ADJ:sg/canadien
 capable	ADJ:sg/capable
@@ -1060,11 +1071,13 @@ disparition	SBC:sg/disparition
 disparu	PAR:sg/disparaître
 disparus	SBC:pl/disparu
 dispositif	SBC:sg/dispositif
+dissertera	VCJ:sg/disserter
 dissidence	SBC:sg/dissidence
 dissolution	SBC:sg/dissolution
 distinguer	VNCFF/distinguer
 distingué	ADJ:sg/distingué
 dit	VCJ:sg/dire PAR:sg/dire
+divers	ADJ:pl/divers
 dix	CAR/dix
 dix-huit	CAR/dix-huit
 dizaine	SBC:sg/dizaine
@@ -1158,6 +1171,7 @@ définit	VCJ:sg/définir
 définitivement	ADV/définitivement
 défoncé	PAR:sg/défoncer
 dégénèrent	VCJ:pl/dégénérer
+déjeuner	VNCFF/déjeuner
 déjà	ADV/déjà
 délai	SBC:sg/délai
 délits	SBC:pl/délit
@@ -1253,6 +1267,7 @@ enflammé	PAR:sg/enflammer
 engage	VCJ:sg/engager
 engagement	SBC:sg/engagement
 engagée	PAR:sg/engager
+engagés	PAR:sg/engager
 engendré	PAR:sg/engendrer
 enjeu	SBC:sg/enjeu
 enjoindre	VNCFF/enjoindre
@@ -1272,7 +1287,7 @@ enseigne	VCJ:sg/enseigner SBC:sg/enseigne
 enseignement	SBC:sg/enseignement
 enseignements	SBC:pl/enseignement
 enseigner	VNCFF/enseigner
-ensemble	SBC:sg/ensemble ADJ:sg/ensemble
+ensemble	SBC:sg/ensemble ADV/ensemble
 ensuite	ADV/ensuite
 entendre	VNCFF/entendre
 entends	VCJ:sg/entendre
@@ -1290,6 +1305,7 @@ entreprise	SBC:sg/entreprise
 entreprises	SBC:pl/entreprise PAR:pl/entreprendre
 entrepôts	SBC:pl/entrepôt
 entrer	VNCFF/entrer
+entretenir	VNCFF/entretenir
 entré	PAR:sg/entrer
 entrée	SBC:sg/entrée
 entériner	VNCFF/entériner
@@ -1410,6 +1426,7 @@ ficelles	SBC:pl/ficelle
 fidèle	ADJ:sg/fidèle
 figer	VNCFF/figer
 figure	SBC:sg/figure
+figureront	VCJ:pl/figurer
 figures	SBC:pl/figure
 filiales	SBC:pl/filiale
 fille	SBC:sg/fille
@@ -1579,6 +1596,7 @@ homophobe	ADJ:sg/homophobe
 homophobie	SBC:sg/homophobie
 hongrois	ADJ:sg/hongrois
 hongroise	ADJ:sg/hongrois
+honneur	SBC:sg/honneur
 hop	INJ/hop
 horizon	SBC:sg/horizon
 horrible	ADJ:sg/horrible
@@ -1757,7 +1775,7 @@ jetée	PAR:sg/jeter
 jeu	SBC:sg/jeu
 jeudi	SBC:sg/jeudi
 jeune	ADJ:sg/jeune
-jeunes	SBC:pl/jeune
+jeunes	SBC:pl/jeune ADJ:pl/jeune
 jeunesse	SBC:sg/jeunesse
 joindre	VNCFF/joindre
 jouait	VCJ:sg/joueur
@@ -1907,6 +1925,7 @@ maison	SBC:sg/maison
 majorité	SBC:sg/majorité
 mal	ADV/mal
 malgré	PREP/malgré
+malintentionné	ADJ:sg/malintentionné
 manche	SBC:sg/manche
 mandarin	SBC:sg/mandarin
 manier	SBC:sg/manier
@@ -1971,6 +1990,7 @@ mi	PUL/mi
 microcrédit	SBC:sg/microcrédit
 microfinance	SBC:sg/microfinance
 mieux	ADV/mieux
+migration	SBC:sg/migration
 milieu	SBC:sg/milieu
 militaire	ADJ:sg/militaire
 militaires	ADJ:pl/militaire
@@ -2150,10 +2170,12 @@ offerte	PAR:sg/offrir
 office	SBC:sg/office
 officielle	ADJ:sg/officiel
 officiels	ADJ:pl/officiel
+officieuse	ADJ:sg/officieux
 offrait	VCJ:sg/offrir
 offres	SBC:pl/offre
 ombre	SBC:sg/ombre
 on	PRV:sg/on
+one	FWG/one
 ont	ACJ:pl/avoir
 opacité	SBC:sg/opacité
 opinion	SBC:sg/opinion
@@ -2252,6 +2274,7 @@ passait	VCJ:sg/passer
 passe	VCJ:sg/passer
 passe-passe	SBC:sg/passe-passe
 passer	VNCFF/passer
+passera	VCJ:sg/passer
 passé	PAR:sg/passer SBC:sg/passé
 passées	PAR:pl/passer
 patriarcal	ADJ:sg/patriarcal
@@ -2327,6 +2350,7 @@ plaidoiries	SBC:pl/plaidoirie
 plaidé	PAR:sg/plaider
 plainte	SBC:sg/plainte
 plan	SBC:sg/plan
+planché	PAR:sg/plancher
 plein	ADV/plein
 plein-temps	SBC:sg/plein-temps
 pleine	ADJ:sg/plein
@@ -2487,7 +2511,7 @@ préfère	VCJ:sg/préfère
 prélassant	VNCNT/prélasser
 préparé	PAR:sg/préparer
 présence	SBC:sg/présence
-présent	SBC:sg/présent
+présent	SBC:sg/présent ADJ:sg/présent
 présentateur	SBC:sg/présentateur
 présente	VCJ:sg/présenter
 présenter	VNCFF/présenter
@@ -2635,6 +2659,7 @@ remplacée	PAR:sg/remplacer
 remplacés	PAR:pl/remplacer
 remémorer	VNCFF/remémorer
 renchérit	VCJ:sg/renchérir
+rencontre	SBC:sg/rencontre
 rend	VCJ:sg/rendre
 rendez-vous	SBC:sg/rendez-vous
 rendre	VNCFF/rendre
@@ -2674,6 +2699,7 @@ restent	VCJ:pl/rester
 rester	VNCFF/rester
 restée	PAR:sg/rester
 restés	PAR:pl/rester
+retenir	VNCFF/retenir
 retenue	PAR:sg/retenir
 retour	SBC:sg/retour
 retourné	PAR:sg/retourner
@@ -2879,6 +2905,7 @@ siècle	SBC:sg/siècle
 siéger	VNCFF/siéger
 social	ADJ:sg/social
 socialiste	SBC:sg/socialiste
+socialistes	SBC:pl/socialiste
 sociaux	ADJ:pl/social
 sociologue	SBC:sg/sociologue
 sociologues	SBC:pl/sociologue
@@ -3031,7 +3058,9 @@ sûr	ADJ:sg/sûr
 sûre	ADJ:sg/sûr
 sœur	SBC:sg/sœur
 t	PUL/t
+table	SBC:sg/table
 tailles	SBC:pl/taille
+talents	SBC:pl/talent
 tampon	SBC:sg/tampon
 tandis	PREP/tandis
 tant	ADV/tant
@@ -3093,6 +3122,7 @@ tiré	PAR:sg/tirer
 titre	SBC:sg/titre
 titulaire	SBC:sg/titulaire
 tiédeur	SBC:sg/tiédeur
+to	FWG/to
 toi	PRO:sg/toi
 tombeau	SBC:sg/tombeau
 tomber	VNCFF/tomber
@@ -3206,6 +3236,7 @@ venue	PAR:sg/venir
 venues	PAR:pl/venir
 venus	PAR:pl/venir
 verbal	ADJ:sg/verbal
+verra	VCJ:sg/voir
 vers	PREP/vers
 version	SBC:sg/version
 versés	PAR:pl/verser
@@ -3286,7 +3317,7 @@ yeux	SBC:pl/œil
 zéro	CAR/zéro
 «	«/«
 »	»/»
-Ça	PRO:sg/cela
+Ça	PRO:sg/cela PRV:sg/cela
 à	PREP/à
 âge	SBC:sg/âge
 âgée	ADJ:sg/âgé
