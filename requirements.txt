@@ -1,0 +1,4 @@
+Django
+GenericCache==1.0.2
+psycopg2==2.3.2
+pyzmq-static
