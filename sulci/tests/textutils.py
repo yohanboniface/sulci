@@ -6,7 +6,7 @@ from sulci.textutils import modern_istitle
 
 class TextUtilsTests(TestCase):
 
-    def text_modern_istitle(self):
+    def test_modern_istitle(self):
         self.failIf(modern_istitle("al-Assad") != True)
         self.failIf(modern_istitle("el-Assad") != True)
         self.failIf(modern_istitle("iPhone") != True)
