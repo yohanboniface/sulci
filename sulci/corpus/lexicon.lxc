@@ -15,6 +15,7 @@
 113	CAR/113
 14	CAR/14
 15	CAR/15
+155	CAR/155
 17	CAR/17
 175	CAR/175
 19	CAR/19
@@ -53,6 +54,7 @@
 28	CAR/28
 29	CAR/29
 3	CAR/3
+3,7	CAR/3,7
 30	CAR/30
 31	CAR/31
 35	CAR/35
@@ -64,8 +66,11 @@
 5	CAR/5
 50	CAR/50
 500	CAR/500
+504	CAR/504 SBC:sg/504
+525.000	CAR/525.000
 6.000	CAR/6.000
 60	CAR/60
+60.000	CAR/60.000
 67	CAR/67
 7	CAR/7
 70	CAR/70
@@ -89,7 +94,7 @@ Alors	ADV/alors
 Ambiance	SBC:sg/ambiance
 Après	PREP/après
 Arrête	VCJ:sg/arrêter
-Atteinte	SBC:s/atteinte
+Atteinte	SBC:sg/atteinte
 Attendez	VCJ:pl/attendre
 Au	DTC:sg/au
 Au-delà	ADV/au-delà
@@ -146,6 +151,7 @@ Disons	VCJ:pl/dire
 Donc	ADV/Donc
 Du	DTC:sg/du
 Dès	PREP/dès
+Début	SBC:sg/début
 Décadence	SBC:sg/décadence
 Décrivant	VNCNT/décrire
 Dénonçant	VNCNT/dénoncer
@@ -194,6 +200,7 @@ Les	DTN:pl/le
 Leur	DTN:sg/leur
 Lorsque	SUB/lorsque
 Là	ADV/là
+M.	ABR/M.
 Maintenant	ADV/maintenant
 Mais	COO/mais
 Malgré	PREP/Malgré
@@ -242,7 +249,7 @@ Qu'	REL/que
 Quand	SUB/quand
 Quant	PREP/quant
 Que	SUB/que
-Quelque	DTN:sg/quelque
+Quelque	DTN:sg/quelque DTN:pl/quelque
 Quelques	DTN:pl/quelque
 Quoi	PRO:sg/quoi
 RENFORCEE	PAR:sg/renforcer
@@ -309,6 +316,7 @@ absurde	SBC:sg/absurde ADJ:sg/absurde
 acceptable	SBC:sg/acceptable
 acceptait	VCJ:sg/accepter
 accepter	VNCFF/accepter
+accession	SBC:sg/accession
 accident	SBC:sg/accident
 accidents	SBC:pl/accident
 accommodements	SBC:pl/accommodement
@@ -322,6 +330,7 @@ accéder	VNCFF/accéder
 accélérant	VNCNT/accélérer
 achat	SBC:sg/achat
 acheter	VNCFF/acheter
+acheteur	SBC:sg/acheteur
 achève	VCJ:sg/achever
 acte	SBC:sg/acte
 acteurs	SBC:pl/acteur
@@ -344,6 +353,7 @@ affaibli	PAR:sg/affaiblir
 affaire	SBC:sg/affaire
 affaires	SBC:pl/affaire
 affectation	SBC:sg/affectation
+affection	SBC:sg/affection
 affecté	PAR:sg/affecter
 affiché	PAR:sg/afficher
 affirmant	VNCNT/affirmant
@@ -358,6 +368,7 @@ agir	VNCFF/agir
 agirai	VCJ:sg/agir
 agit	VCJ:sg/agir
 agression	SBC:sg/agression
+ahmadinejad-car.com	PUL/ahmadinejad-car.com
 ai	ACJ:sg/avoir
 aider	VNCFF/aider
 aiguiller	VNCFF/aiguiller
@@ -586,6 +597,7 @@ banquier	SBC:sg/banquier
 baraka	SBC:sg/baraka
 barbe	SBC:sg/barbe
 barre	SBC:sg/barre
+bas	ADJ:sg/bas
 bases	SBC:pl/base
 bassins	SBC:pl/bassin
 bat	VCJ:sg/battre
@@ -597,12 +609,14 @@ beaux-arts	SBC:pl/beaux-arts
 ben	FGW/ben
 besoin	SBC:sg/besoin
 bien	ADV/bien
+bien-être	SBC/sg
 bientôt	ADV/bientôt
 bilans	SBC:pl/bilan
 bio	SBC:sg/bio
 biopolitique	ADJ:sg/biopolitique
 biscuits	SBC:pl/biscuit
 blanc	SBC:sg/blanc
+blanche	ADJ:sg/blanc
 blanchi	PAR:sg/blanchir
 blesse	VCJ:sg/blesser
 bleu	ADJ:sg/bleu
@@ -613,6 +627,7 @@ bloquées	PAR:pl/bloquées
 bombardements	SBC:pl/bombardement
 bombe	SBC:sg/bombe
 bon	ADV/bon ADJ:sg/bon
+bonifiés	ADJ:pl/bonifiés
 bonjour	SBC:sg/bonjour
 bonne	ADJ:sg/bon
 bonnes	ADJ:pl/bon
@@ -648,6 +663,8 @@ bât	SBC:sg/bât
 béante	ADJ:sg/béant
 bébés	SBC:pl/bébé
 bénéfice	SBC:sg/bénéfice
+bénéficiant	VNCNT/bénéficier
+bénéficier	VNCFF/bénéficier
 bénéficié	PAR:sg/bénéficier
 bête	SBC:sg/bête
 bœufs	SBC:pl/bœuf
@@ -663,6 +680,7 @@ calmer	VNCFF/calmer
 camarade	SBC:sg/camarade
 campus	SBC:sg/campus
 canadienne	ADJ:sg/canadien
+candidats	SBC:pl/candidat
 capable	ADJ:sg/capable
 capitaine	SBC:sg/capitaine
 capitale	SBC:sg/capitale
@@ -783,6 +801,7 @@ cogito	SBC:sg/cogito
 cogne	VCJ:sg/cogner
 cognent	VCJ:pl/cogner
 collectifs	ADJ:pl/collectif
+collection	SBC:sg/collection
 collective	ADJ:sg/coolectif
 collectiviste	ADJ:sg/collectiviste
 coller	VNCFF/coller
@@ -830,6 +849,7 @@ compliqué	ADJ:sg/compliqué
 complot	SBC:sg/complot
 complète	ADJ:sg/complet
 complètement	ADV/complètement
+compléter	VNCFF/compléter
 composition	SBC:sg/composition
 composé	PAR:sg/composer
 comprenaient	VCJ:pl/comprendre
@@ -889,6 +909,7 @@ constatés	PAR:pl/constater
 constitution	SBC:sg/constitution
 constitutionnel	ADJ:sg/constitutionnel
 constructeur	SBC:pl/constructeur
+construction	SBC:sg/construction
 constructions	SBC:pl/construction
 construire	VNCFF/construire
 construit	PAR:sg/construire
@@ -899,6 +920,7 @@ contemporaine	ADJ:sg/contemporain
 contenu	SBC:sg/contenu
 contenus	SBC:sg/contenu
 contestation	SBC:sg/contestation
+contestée	PAR:sg/contester
 contient	VCJ:sg/contenir
 continue	ADJ:sg/continu
 continuent	VCJ:pl/continuer
@@ -936,6 +958,7 @@ correctement	ADV/correctement
 correctionnelle	SBC:sg/correctionnel
 corruption	SBC:sg/corruption
 cotées	PAR:pl/coter ADJ:pl/coté
+couches	SBC:pl/couche
 couilles	SBC:pl/couille
 couler	VNCFF/couler
 couleurs	SBC:pl/couleur
@@ -953,6 +976,7 @@ cours	SBC:sg/cours SBC:pl/cours
 court	ADJ:sg/court
 coutume	SBC:sg/coutume
 couture	SBC:sg/couture
+coût	SBC:sg/coût
 coûter	VNCFF/coûter
 craquait	VCJ:sg/craquer
 crash	SBC:sg/crash
@@ -980,6 +1004,7 @@ créole	ADJ:sg/créole
 crétin	SBC:sg/crétin
 créé	PAR:sg/créer
 créée	PAR:sg/créer
+cultive	VCJ:sg/cultiver
 culture	SBC:sg/culture
 culturelle	ADJ:sg/culturel
 culturelles	ADJ:pl/culturel
@@ -1003,7 +1028,7 @@ debout	ADV/debout
 dedans	ADV/dedans
 dehors	SBC:sg/dehors
 demain	SBC:sg/demain
-demande	VCJ:sg/demander SBC:sg/demande
+demande	SBC:sg/demande VCJ:sg/demander
 demandent	VCJ:pl/demander
 demander	VNCFF/demander
 demandez	VCJ:pl/demander
@@ -1023,6 +1048,7 @@ dessus	ADV/dessus
 destin	SBC:sg/destin
 destination	SBC:sg/destination
 destinées	PAR:pl/destiner
+destinés	PAR:pl/destiner
 deux	CAR/deux
 deuxième	ADJ:sg/deuxième
 devaient	VCJ:sg/devoir
@@ -1147,6 +1173,7 @@ décide	VCJ:sg/décider
 décidé	PAR:sg/décider
 décision	SBC:sg/décision
 déclarait	VCJ:sg/déclarer
+déclaration	SBC:sg/déclaration
 déclaré	PAR:sg/déclarer
 déclin	SBC:sg/déclin
 décollage	SBC:sg/décollage
@@ -1198,6 +1225,7 @@ dépliants	SBC:pl/dépliant
 déplore	VCJ:sg/déplorer
 déploré	PAR:sg/déplorer
 déposer	VNCFF/déposer
+déposé	PAR:sg/déposer
 déposée	PAR:sg/déposer
 députée	SBC:sg/député
 députés	SBC:pl/député
@@ -1205,6 +1233,7 @@ dépêché	PAR:sg/dépêcher
 dérives	SBC:pl/dérive
 dérobe	VCJ:sg/dérober
 désertes	ADJ:pl/désert
+déshérités	SBC:pl/déshérité
 désidentification	SBC:sg/désidentification
 désidentifier	VNCFF/désidentifier
 désignant	VNCNT/désigner
@@ -1256,6 +1285,7 @@ encadrant	VNCNT/encadrer
 encadre	VCJ:sg/encadrer
 encerclé	PAR:sg/encercler
 enchevêtrent	VCJ:pl/enchevêtrer
+enchères	SBC:pl/enchère
 encore	ADV/encore
 enfant	SBC:sg/enfant
 enfants	SBC:pl/enfant
@@ -1321,6 +1351,7 @@ escroc	SBC:sg/escroc
 espace	SBC:sg/espace
 esplanade	SBC:sg/esplanade
 essence	SBC:sg/essence
+essentiellement	ADV/essentiellement
 essor	SBC:sg/essor
 est	ECJ:sg/être SBC:sg/est
 est-à-dire	PUL/est-à-dire
@@ -1392,6 +1423,7 @@ fais	VCJ:sg/faire
 faisait	VCJ:sg/faire
 faisant	VNCNT/faire
 fait	PAR:sg/faire SBC:sg/fait VCJ:sg/faire
+faite	PAR:sg/faire
 faits	SBC:pl/fait
 fallait	VCJ:sg/falloir
 fallu	PAR:sg/falloir
@@ -1414,7 +1446,7 @@ faveur	SBC:sg/faveur
 façon	SBC:sg/façon
 feinter	VNCFF/feinter
 femme	SBC:sg/femme
-femmes	SBC:pl/femmes
+femmes	SBC:pl/femme
 fer	SBC:sg/fer
 fera	VCJ:sg/faire
 ferait	VCJ:sg/faire
@@ -1473,9 +1505,11 @@ formes	SBC:pl/forme
 formule	SBC:sg/formule
 formé	PAR:sg/former
 fort	ADV/fort
+forte	ADJ:sg/fort
 fortes	ADJ:pl/fort
 fosse	SBC:sg/fosse
 fougueux	ADJ:sg/fougueux
+fournis	PAR:pl/fournir
 fous	VCJ:sg/foutre ADJ:pl/fou
 foutaise	SBC:sg/foutaise
 foutre	VNCFF/foutre
@@ -1545,6 +1579,7 @@ grande	ADJ:sg/grand
 grandes	ADJ:pl/grande
 grands	ADJ:pl/grand
 gratte	VCJ:sg/gratter
+gratuitement	ADV/gratuitement
 grave	ADJ:sg/grave
 gravité	SBC:sg/gravité
 grimper	VNCFF/grimper
@@ -1571,6 +1606,7 @@ habituel	ADJ:sg/habituel
 haine	SBC:sg/haine
 haleine	SBC:sg/haleine
 hall	SBC:sg/hall
+handicapés	SBC:pl/handicapé
 harceler	VNCFF/harceler
 harcèlement	SBC:sg/harcèlement
 hasard	SBC:sg/hasard
@@ -1636,6 +1672,7 @@ imaginaires	SBC:pl/imaginaire
 imaginer	VNCFF/imaginer
 imaginé	PAR:sg/imaginer
 immigrés	SBC:pl/immigré
+immobilier	ADJ:sg/immobilier
 immolée	PAR:sg/immoler
 immédiat	ADJ:sg/immédiat
 immédiatement	ADV/immédiatement
@@ -1703,6 +1740,7 @@ injuste	ADJ:sg/injuste
 innovation	SBC:sg/innovation
 innovations	SBC:pl/innovation
 inquiétude	SBC:sg/inquiétude
+inscrire	VNCFF/inscrire
 insidieusement	ADV/insidieusement
 insiste	VCJ:sg/insister
 inspiration	SBC:sg/inspiration
@@ -1793,6 +1831,7 @@ juge	SBC:sg/juge
 jugement	SBC:sg/jugement
 juger	VNCFF/juger
 jugée	PAR:sg/juger
+jugées	PAR:pl/juger
 jugés	PAR:pl/juger
 juif	ADJ:sg/juif
 juifs	SBC:pl/juif
@@ -1882,6 +1921,7 @@ loisirs	SBC:pl/loisir
 lors	ADV/lors
 lorsqu'	SUB/lorsque
 lorsque	SUB/lorsque
+lot	SBC:sg/lot
 loup	SBC:sg/loup
 loupé	PAR:sg/louper
 lourd	ADJ:sg/lourd
@@ -1905,6 +1945,7 @@ légumes	SBC:pl/légume
 léninisme	SBC:sg/léninisme
 m	ABR/m
 m'	PRV:sg/me
+m2	ABR/m2
 ma	DTN:sg/mon
 machinique	SBC:sg/machinique
 mafieuses	ADJ:pl/mafieux
@@ -1928,6 +1969,7 @@ malgré	PREP/malgré
 malintentionné	ADJ:sg/malintentionné
 manche	SBC:sg/manche
 mandarin	SBC:sg/mandarin
+mandat	SBC:sg/mandat
 manier	SBC:sg/manier
 manifestants	SBC:pl/manifestant
 manifestation	SBC:sg/manifestation
@@ -2018,6 +2060,8 @@ mode	SBC:sg/mode
 model	SBC:sg/model
 modernisateur	ADJ:sg/modernisateur
 modernisateurs	SBC:pl/modernisateur
+modeste	ADJ:sg/modeste
+modèle	SBC:sg/modèle
 modèles	SBC:pl/modèle
 moi	PRO:sg/moi
 moindre	ADJ:sg/moindre
@@ -2086,6 +2130,7 @@ nation	SBC:sg/nation
 national	ADJ:sg/national
 nationale	ADJ:sg/national
 nationales	ADJ:pl/national
+nationalité	SBC:sg/nationalité
 nations	SBC:pl/nation
 naturalisme	SBC:sg/naturalisme
 nature	SBC:sg/nature
@@ -2172,6 +2217,7 @@ officielle	ADJ:sg/officiel
 officiels	ADJ:pl/officiel
 officieuse	ADJ:sg/officieux
 offrait	VCJ:sg/offrir
+offre	SBC:sg/offre
 offres	SBC:pl/offre
 ombre	SBC:sg/ombre
 on	PRV:sg/on
@@ -2259,6 +2305,7 @@ partiales	ADJ:pl/partial
 participation	SBC:sg/participation
 participer	VNCFF/participer
 particules	SBC:pl/particule
+particulier	SBC:sg/particulier
 particulièrement	ADV/particulièrement
 partie	SBC:sg/partie
 parties	SBC:pl/partie
@@ -2278,6 +2325,7 @@ passera	VCJ:sg/passer
 passé	PAR:sg/passer SBC:sg/passé
 passées	PAR:pl/passer
 patriarcal	ADJ:sg/patriarcal
+patrimoine	SBC:sg/patrimoine
 patron	SBC:sg/patron
 patronat	SBC:sg/patronat
 pauvres	SBC:pl/pauvre
@@ -2309,6 +2357,7 @@ permet	VCJ:sg/permettre
 permit	VCJ:sg/permettre
 perpétuel	ADJ:sg/perpétuel
 perquisitionner	VNCFF/perquisitionner
+persan	SBC:sg/persan
 personnages	SBC:pl/personnage
 personnalité	SBC:sg/personnalité
 personnalités	SBC:pl/personnalité
@@ -2395,6 +2444,7 @@ porté	PAR:sg/porter
 position	SBC:sg/position
 possibilité	SBC:sg/possibilité
 possible	ADJ:sg/possible SBC:sg/possible
+possède	VCJ:sg/posséder
 postcoloniales	ADJ:pl/postcoloniale
 poste	SBC:sg/poste
 postes	SBC:pl/poste
@@ -2438,6 +2488,7 @@ principale	ADJ:sg/principal
 principalement	ADV/principalement
 principes	SBC:pl/principe
 printemps	SBC:sg/printemps
+priorités	SBC:pl/priorité
 pris	PAR:sg/prendre
 prise	PAR:sg/prendre SBC:sg/prise
 prises	SBC:pl/prise PAR:pl/prendre
@@ -2456,6 +2507,7 @@ problème	SBC:sg/problème
 problèmes	SBC:pl/problème
 processus	SBC:sg/processus
 prochaines	ADJ:pl/prochain
+proche	ADJ:sg/proche
 procureur	SBC:sg/procureur
 procès	SBC:sg/procès PREP/procès
 procès-fleuve	SBC:sg/procès-fleuve
@@ -2489,6 +2541,7 @@ proposaient	VCJ:pl/proposer
 propose	VCJ:sg/proposer
 proposes	VCJ:sg/proposer
 proposition	SBC:sg/proposition
+proposé	PAR:sg/proposer
 propre	ADJ:sg/propre
 propriété	SBC:sg/propriété
 protesté	PAR:sg/protester
@@ -2500,6 +2553,7 @@ près	PREP/près
 précis	ADJ:sg/précis
 précisant	VNCNT/préciser
 précise	VCJ:sg/préciser ADJ:sg/précis
+préciser	VNCFF/préciser
 précédait	VCJ:sg/précéder
 précédée	PAR:sg/précéder
 prédécesseur	SBC:sg/prédécesseur
@@ -2515,7 +2569,9 @@ présent	SBC:sg/présent ADJ:sg/présent
 présentateur	SBC:sg/présentateur
 présente	VCJ:sg/présenter
 présenter	VNCFF/présenter
+présenté	PAR:sg/présenter
 préside	VCJ:sg/présider
+présidence	SBC:sg/présidence
 président	SBC:sg/président
 présidente	SBC:sg/présidente
 présidentiel	SBC:sg/présidentiel
@@ -2525,6 +2581,7 @@ prévenir	VNCFF/prévenir
 prévention	SBC:sg/prévention
 prévenu	PAR:sg/prévenir
 prévenus	SBC:pl/prévenu
+prévoit	VCJ:sg/prévoir
 prévoyant	VNCNT/prévoyant
 prévu	PAR:sg/prévoir
 préétablie	PAR:sg/préétablir
@@ -2607,6 +2664,7 @@ rappelle	VCJ:sg/rappeler
 rapport	SBC:sg/rapport
 rapporte	VCJ:sg/rapporter
 rapports	SBC:pl/rapport
+rapporté	PAR:sg/rapporter
 rapprochements	SBC:pl/rapprochement
 rares	ADJ:pl/rare
 ratez	VCJ:pl/rater
@@ -2689,7 +2747,7 @@ respectait	VCJ:sg/respecter
 respecter	VNCFF/respecter
 responsabilités	SBC:pl/responsabilité
 responsable	SBC:sg/responsable ADJ:sg/responsable
-responsables	SBC:pl/responsable
+responsables	SBC:pl/responsable ADJ:pl/responsable
 ressemblait	VCJ:sg/ressemblait
 ressemble	VCJ:sg/ressembler
 restaient	VCJ:pl/rester
@@ -2746,6 +2804,7 @@ récentes	ADJ:pl/récent
 réciproque	ADJ:sg/réciproque
 réclameraient	VCJ:pl/réclamer
 réclusion	SBC:sg/réclusion
+récolter	VNCFF/récolter
 réconciliation	SBC:sg/réconciliation
 rédacteur	SBC:sg/rédacteur
 rédaction	SBC:sg/rédaction
@@ -2800,6 +2859,7 @@ révélation	SBC:sg/révélation
 révélations	SBC:pl/révélation
 révélé	PAR:sg/révéler
 réécrives	VCJ:pl/réécrire
+réélection	SBC:sg/réélection
 rêve	SBC:sg/rêve
 rôle	SBC:sg/rôle
 s'	PRV:sg/se ADV/si
@@ -2838,6 +2898,7 @@ scolaires	ADJ:pl/scolaire
 score	SBC:sg/score
 scène	SBC:sg/scène
 se	PRV:sg/se PRV:pl/se
+second	ADJ:sg/second
 secondaires	ADJ:pl/secondaire
 seconde	ADJ:sg/seconde
 secret	SBC:sg/secret
@@ -2864,6 +2925,7 @@ septembre	SBC:sg/septembre
 septique	ADJ:sg/septique
 sera	ECJ:sg/être VCJ:sg/être
 serai	ECJ:sg/être
+seraient	ECJ:pl/être
 serait	ECJ:sg/être
 seras	ECJ:sg/être
 seront	ECJ:pl/être
@@ -2884,6 +2946,7 @@ si	ADV/si
 sienne	PRO:sg/sienne
 signal	SBC:sg/signal
 signale	VCJ:sg/signaler
+signature	SBC:sg/signature
 signe	VCJ:sg/signer
 signés	PAR:pl/signer
 silence	SBC:sg/silence
@@ -3068,7 +3131,7 @@ tard	ADV/tard
 tardif	ADJ:sg/tardif
 tari	PAR:sg/tarir
 tas	SBC:sg/tas
-taux	SBC:sg/taux
+taux	SBC:sg/taux SBC:pl/taux
 tchadienne	ADJ:sg/tchadien
 te	PRV:sg/te
 techniquement	ADV/techniquement
@@ -3134,6 +3197,7 @@ tonneau	SBC:sg/tonneau
 totale	ADJ:sg/total
 totalement	ADV/totalement
 toujours	ADV/toujours
+touman	SBC:sg/touman
 tour	SBC:sg/tour
 tourmentés	PAR:pl/tourmenter
 tourne	VCJ:sg/tourner
@@ -3208,6 +3272,7 @@ urnes	SBC:pl/urne
 usage	SBC:sg/usage
 utile	ADJ:sg/utile
 utiliser	VNCFF/utiliser
+utilisé	PAR:sg/utiliser
 va	VCJ:sg/aller
 vache	SBC:sg/vache
 vague	SBC:sg/vague
@@ -3239,6 +3304,7 @@ verbal	ADJ:sg/verbal
 verra	VCJ:sg/voir
 vers	PREP/vers
 version	SBC:sg/version
+versé	PAR:sg/verser
 versés	PAR:pl/verser
 vert	ADJ:sg/vert
 vestige	SBC:sg/vestige
@@ -3282,6 +3348,7 @@ voir	VNCFF/voir
 vois	VCJ:sg/voir
 voisins	SBC:pl/voisin
 voiture	SBC:sg/voiture
+voitures	SBC:pl/voiture
 voix	SBC:sg/voix
 vole	VCJ:sg/voler
 volet	SBC:sg/volet
@@ -3361,6 +3428,7 @@ zéro	CAR/zéro
 élections	SBC:pl/élection
 électorale	ADJ:sg/électoral
 électronique	SBC:sg/électronique
+éligibles	ADJ:pl/éligible
 éliminés	PAR:pl/éliminer
 élite	SBC:sg/élite
 éloigne	VCJ:sg/éloigner
