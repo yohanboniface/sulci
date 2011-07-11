@@ -184,6 +184,17 @@ class Lexicon(TextManager):
             sulci_logger.info(unicode(self[entry]), "WHITE")
         else:
             sulci_logger.info(u'No entry for "%s"' % entry, "WHITE")
+    
+    def check(self):
+        """
+        Util method to try to individuate errors in the Lexicon.
+        For this, we display the entries with several tags, in case 
+        they are wrong duplicate.
+        """
+        for key, entity in self.items():
+            if len(entity.tags) > 1:
+                sulci_logger.info(u"%s tags for %s" % (len(entity.tags), key), "RED")
+                sulci_logger.info(entity.tags, "WHITE")
 
 class LexiconEntity(object):
     """

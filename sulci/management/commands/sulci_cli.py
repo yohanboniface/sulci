@@ -107,6 +107,11 @@ class Command(BaseCommand):
                     action="store_true", 
                     dest="display_errors", 
                     help = "Display errors remaining in corpus after runing the pos tagger."),
+        make_option("-q", 
+                    "--check_lexicon", 
+                    action="store_true", 
+                    dest="check_lexicon", 
+                    help = "Display multivaluate entries of lexicon."),
         make_option("-o", 
                     "--lexicon_count", 
                     action="store_true", 
@@ -152,6 +157,7 @@ class Command(BaseCommand):
         CHECK_WORD = options.get("checkword")
         CHECK_ENTRY = options.get("checkentry")
         DISPLAY_ERRORS = options.get("display_errors")
+        CHECK_LEXICON = options.get("check_lexicon")
         FORCE = options.get("force")
         IPDB = options.get("ipdb")
         LIMIT = options.get("limit")
@@ -174,6 +180,8 @@ class Command(BaseCommand):
 #        C.attach_tagger(P)
         if MAKE_DICT:
             L.make()
+        if CHECK_LEXICON is not None:
+            L.check()
         if CHECK_WORD is not None:
             C.check_word(CHECK_WORD.decode("utf-8"))
         if ADD_CANDIDATE:
