@@ -119,7 +119,7 @@ Celle	PRO:sg/celle
 Celui	PRV:sg/Celui
 Certains	DTN:pl/certain PRV:pl/certain
 Ces	DTN:pl/ce
-Cet	PRO:sg/cet DTN:sg/cet
+Cet	DTN:sg/ce
 Cette	DTN:sg/ce
 Chaque	DTN:sg/chaque
 Chemins	SBC:pl/Chemins
@@ -231,7 +231,7 @@ Paradoxalement	ADV/paradoxalement
 Parce	PUL/parce
 Parfaitement	ADV/Parfaitement
 Parfois	ADV/parfois
-Pendant	ADV/pendant PREP/Pendant
+Pendant	PREP/pendant
 Peu	PRO:sg/Peu
 Peut-être	ADV/peut-être
 Photo	SBC:sg/photo
@@ -524,7 +524,7 @@ au-delà	PREP/au-delà
 au-dessus	ADV/au-dessus
 aube	SBC:sg/aube
 aucun	ADJ:sg/aucun
-aucune	ADJ:sg/aucun SBC:sg/aucune
+aucune	ADJ:sg/aucun PRO:sg/aucune
 audace	SBC:sg/audace
 audience	SBC:sg/audience
 audiovisuel	SBC:sg/audiovisuel
@@ -1058,7 +1058,7 @@ devenait	VCJ:sg/devenir
 devenir	VNCFF/devenir
 devenu	PAR:sg/devenir
 devenue	PAR:sg/devenir
-devenus	PAR:sg/devenir PAR:pl/devenir
+devenus	PAR:pl/devenir
 deviennent	VCJ:pl/devenir
 devient	VCJ:sg/devenir
 devises	SBC:pl/devise
@@ -1599,7 +1599,7 @@ générale	ADJ:sg/général
 géographie	SBC:sg/géographie
 géographique	ADJ:sg/géographique
 gérer	VNCFF/gérer
-h	ABR/h SBC:sg/h
+h	ABR/h
 habitants	SBC:pl/habitant
 habitude	SBC:sg/habitude
 habituel	ADJ:sg/habituel
@@ -1868,7 +1868,7 @@ leaders	SBC:pl/leader
 lendemain	SBC:sg/lendemain
 lentement	ADV/lentement
 lequel	REL/lequel
-les	DTN:pl/le PRV:pl/les PRO:pl/les
+les	DTN:pl/le PRV:pl/les
 lesquelles	PRO:pl/lequel
 lest	SBC:sg/lest
 lettre	SBC:sg/lettre
@@ -2509,7 +2509,7 @@ processus	SBC:sg/processus
 prochaines	ADJ:pl/prochain
 proche	ADJ:sg/proche
 procureur	SBC:sg/procureur
-procès	SBC:sg/procès PREP/procès
+procès	SBC:sg/procès
 procès-fleuve	SBC:sg/procès-fleuve
 procédure	SBC:sg/procédure
 production	SBC:sg/production
@@ -2640,7 +2640,7 @@ quitter	VNCFF/quitter
 quitteront	VCJ:pl/quitter
 quitté	PAR:sg/quitter
 quiétude	SBC:sg/quiétude
-quoi	PRV:sg/quoi PRO:sg/quoi SBC:sg/quoi
+quoi	PRO:sg/quoi PRV:sg/quoi
 quotidien	SBC:sg/quotidien
 racisme	SBC:sg/racisme
 raciste	ADJ:sg/raciste
@@ -2923,7 +2923,7 @@ sentiment	SBC:sg/sentiment
 sept	CAR/sept
 septembre	SBC:sg/septembre
 septique	ADJ:sg/septique
-sera	ECJ:sg/être VCJ:sg/être
+sera	ECJ:sg/être
 serai	ECJ:sg/être
 seraient	ECJ:pl/être
 serait	ECJ:sg/être
