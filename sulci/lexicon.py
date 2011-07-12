@@ -22,7 +22,9 @@ class Lexicon(TextManager):
     """
     
     def __init__(self):
-        self.VALID_EXT = ".lxc.lem.crp"
+        self.CORPUS_EXT = ".lxc.lem.crp"
+        self.VALID_EXT = ".lxc"
+        self.PENDING_EXT = ".pdg"
         self.PATH = "corpus"
         self._loaded = None
         self._raw_content = ""
@@ -81,13 +83,13 @@ class Lexicon(TextManager):
                 suffix = suffix[1:]
             prefix = prefix[:-1]
     
-    def make(self):
+    def make(self, force=False):
         """
         Build the lexicon.
         """
         final = {}
         lemme_to_original = {}
-        C = Corpus(self.VALID_EXT)
+        C = Corpus(self.CORPUS_EXT)
         for tk in C.tokens:
             # Don't take Proper nouns (SBP) in lexicon
             if tk.verified_tag[:3] == "SBP":
@@ -141,7 +143,8 @@ class Lexicon(TextManager):
             d.append(get_one_line(k))
         final_d = u"\n".join(d)
 #            d +=  u"%s\t%s\n" % (k, " ".join([u"%s/%s" % (tp[0], sorted(lemme_to_original[k][tp[0]], key=itemgetter(1), reverse=True)[0]) for tp in sorted([(k2, v2) for k2, v2 in v.iteritems()], key=itemgetter(1), reverse=True)]))
-        save_to_file("corpus/lexicon.pdg", unicode(final_d))
+        ext = force and self.VALID_EXT or self.PENDING_EXT
+        save_to_file("%s/lexicon%s" % (self.PATH, ext), unicode(final_d))
     
     def create_afixes(self):
         """

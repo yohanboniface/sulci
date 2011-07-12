@@ -179,7 +179,7 @@ class Command(BaseCommand):
         M = Lemmatizer(L)
 #        C.attach_tagger(P)
         if MAKE_DICT:
-            L.make()
+            L.make(FORCE)
         if CHECK_LEXICON is not None:
             L.check()
         if CHECK_WORD is not None:
