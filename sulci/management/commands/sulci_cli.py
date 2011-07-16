@@ -13,10 +13,7 @@ from sulci.corpus import Corpus, TextCorpus
 from sulci.textmining import SemanticalTagger
 from sulci.thesaurus import Thesaurus
 from sulci.log import sulci_logger
-from sulci.trainers import SemanticalTrainer, LemmatizerTrainer, LexicalTrainer,\
-                                                   ContextualTrainer, POSTrainer
 from sulci.lemmatizer import Lemmatizer
-from sulci.utils import load_file
 from sulci import content_model
 
 
@@ -62,7 +59,7 @@ class Command(SulciBaseCommand):
                 S.debug()
             sulci_logger.info(u"Scored descriptors", "YELLOW", True)
             for d, value in S.descriptors:
-                print u"%s %f" % (unicode(d), value)
+                sulci_logger.info(u"%s %f" % (unicode(d), value), "BLUE")
             
         if self.IPDB:
             import ipdb; ipdb.set_trace()
