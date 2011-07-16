@@ -83,15 +83,15 @@ class Command(SulciBaseCommand):
         if self.CHECK_LEXICON:
             L.check()
         if self.CHECK_WORD:
-            C.check_word(CHECK_WORD.decode("utf-8"))
+            C.check_word(self.CHECK_WORD.decode("utf-8"))
         if self.CHECK_CORPUS_TEXT:
-            T = TextCorpus(CHECK_CORPUS_TEXT)
+            T = TextCorpus(self.CHECK_CORPUS_TEXT)
             T.check_text(L, ADD_LEMMES)
         if self.DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()
         if self.CHECK_ENTRY:
-            L.get_entry(CHECK_ENTRY.decode("utf-8"))
+            L.get_entry(self.CHECK_ENTRY.decode("utf-8"))
         if self.LEXICON_COUNT:
             sulci_logger.info(u"Words in lexicon : %d" % len(L), "WHITE")
         if self.CORPUS_COUNT:
