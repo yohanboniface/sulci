@@ -26,24 +26,17 @@ class Command(SulciBaseCommand):
     """
     help = __doc__
     option_list = SulciBaseCommand.option_list + (
-        make_option("-c", "--check_corpus", action="store_true", 
+        make_option("-u", "--check_corpus", action="store_true", 
                     dest="check_corpus", default = None, 
                     help = "Check the corpus. Use -w, -t or -p to specify what."),
         make_option("-w", "--word", action="store", type="string", 
                     dest="word", default = None, 
                     help = "Retrieve word usage in corpus."),
-        make_option("-x", "--check_entry", action="store", type="string", 
-                    dest="check_entry", default = None, 
-                    help = "Retrive entry in lexicon."),
+        make_option("-x", "--check_lexicon", action="store_true", dest="check_lexicon",
+                    default = None, help = "Check lexicon. Use -w to check a specific word."),
         make_option("-e", "--display_errors", action="store_true", dest="display_errors", 
                     help = "Display errors remaining in corpus after runing the pos tagger."),
-        make_option("-q", "--check_lexicon", action="store_true", 
-                    dest="check_lexicon", 
-                    help = "Display multivaluate entries of lexicon."),
-        make_option("-o", "--lexicon_count", action="store_true", 
-                    dest="lexicon_count", 
-                    help = "Display number of words in lexicon"),
-        make_option("-u", "--corpus_count", action="store_true", dest="corpus_count", 
+        make_option("-c", "--count", action="store_true", dest="count", 
                     help = "Display number of words in corpus"),
         make_option("-g", "--tags_stats", action="store_true", dest="tags_stats", 
                     help = "Display tags usage statistics"),
@@ -63,8 +56,15 @@ class Command(SulciBaseCommand):
         P = PosTagger(lexicon=L)
         M = Lemmatizer(L)
         if self.CHECK_LEXICON:
-            L.check()
+            if self.COUNT:
+                sulci_logger.info(u"Words in lexicon : %d" % len(L), "WHITE")
+            elif self.WORD:
+                L.get_entry(self.WORD.decode("utf-8"))
+            else:
+                L.check()
         if self.CHECK_CORPUS:
+            if self.COUNT:
+                sulci_logger.info(u"Words in corpus : %d" % len(C), "WHITE")
             if self.PATH:
                 T = TextCorpus(self.PATH)
                 T.check(L, self.USE_LEMMES)
@@ -75,12 +75,6 @@ class Command(SulciBaseCommand):
         if self.DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()
-        if self.CHECK_ENTRY:
-            L.get_entry(self.CHECK_ENTRY.decode("utf-8"))
-        if self.LEXICON_COUNT:
-            sulci_logger.info(u"Words in lexicon : %d" % len(L), "WHITE")
-        if self.CORPUS_COUNT:
-            sulci_logger.info(u"Words in corpus : %d" % len(C), "WHITE")
         if self.TAGS_STATS:
             C.tags_stats()
         if self.IPDB:
