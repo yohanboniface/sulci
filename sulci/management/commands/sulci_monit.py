@@ -26,52 +26,34 @@ class Command(SulciBaseCommand):
     """
     help = __doc__
     option_list = SulciBaseCommand.option_list + (
-        make_option("-j", 
-                    "--check_corpus_text", 
-                    action="store", 
-                    type="string", 
-                    dest="check_corpus_text",
-                    default = None, 
-                    help = "Try to find errors in text corpus. Path with /corpus/."),
-        make_option("-w", 
-                    "--check_word", 
-                    action="store", 
-                    type="string", 
-                    dest="check_word",
-                    default = None, 
+        make_option("-c", "--check_corpus", action="store_true", 
+                    dest="check_corpus", default = None, 
+                    help = "Check the corpus. Use -w, -t or -p to specify what."),
+        make_option("-w", "--word", action="store", type="string", 
+                    dest="word", default = None, 
                     help = "Retrieve word usage in corpus."),
-        make_option("-x", 
-                    "--check_entry", 
-                    action="store", 
-                    type="string", 
-                    dest="check_entry",
-                    default = None, 
+        make_option("-x", "--check_entry", action="store", type="string", 
+                    dest="check_entry", default = None, 
                     help = "Retrive entry in lexicon."),
-        make_option("-e", 
-                    "--display_errors", 
-                    action="store_true", 
-                    dest="display_errors", 
+        make_option("-e", "--display_errors", action="store_true", dest="display_errors", 
                     help = "Display errors remaining in corpus after runing the pos tagger."),
-        make_option("-q", 
-                    "--check_lexicon", 
-                    action="store_true", 
+        make_option("-q", "--check_lexicon", action="store_true", 
                     dest="check_lexicon", 
                     help = "Display multivaluate entries of lexicon."),
-        make_option("-o", 
-                    "--lexicon_count", 
-                    action="store_true", 
+        make_option("-o", "--lexicon_count", action="store_true", 
                     dest="lexicon_count", 
                     help = "Display number of words in lexicon"),
-        make_option("-u", 
-                    "--corpus_count", 
-                    action="store_true", 
-                    dest="corpus_count", 
+        make_option("-u", "--corpus_count", action="store_true", dest="corpus_count", 
                     help = "Display number of words in corpus"),
-        make_option("-g", 
-                    "--tags_stats", 
-                    action="store_true", 
-                    dest="tags_stats", 
+        make_option("-g", "--tags_stats", action="store_true", dest="tags_stats", 
                     help = "Display tags usage statistics"),
+        make_option("-m", "--use_lemmes", action="store_true", dest="use_lemmes", 
+                    help = "Use lemmes"),
+        make_option("-t", "--tag", action="store", type="string", dest="tag", 
+                    default=None, help = "Specify a tag when needed"),
+        make_option("-p", "--path", action="store",type="string", dest="path", 
+                    default=None,
+                    help = "Specify a file path when needed. Relative to /sulci/"),
         )
     
     def handle(self, *args, **options):
@@ -82,11 +64,14 @@ class Command(SulciBaseCommand):
         M = Lemmatizer(L)
         if self.CHECK_LEXICON:
             L.check()
-        if self.CHECK_WORD:
-            C.check_word(self.CHECK_WORD.decode("utf-8"))
-        if self.CHECK_CORPUS_TEXT:
-            T = TextCorpus(self.CHECK_CORPUS_TEXT)
-            T.check_text(L, ADD_LEMMES)
+        if self.CHECK_CORPUS:
+            if self.PATH:
+                T = TextCorpus(self.PATH)
+                T.check(L, self.USE_LEMMES)
+            else:
+                if self.WORD:
+                    self.WORD = self.WORD.decode("utf-8")
+                C.check_usage(word=self.WORD, tag=self.TAG)
         if self.DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()
