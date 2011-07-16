@@ -85,7 +85,7 @@ class Corpus(object):
     def __len__(self):
         return self.tokens.__len__()
     
-    def check_usage(self, word=None, tag=None):
+    def check_usage(self, word=None, tag=None, case_insensitive=False):
         """
         Find occurrences of a word or tag or both in the corpus loaded.
         """
@@ -94,7 +94,12 @@ class Corpus(object):
         found = False
         for t in self:
             # If a specific word is asked
-            if word and not word == t: continue
+            if word:
+                original = t.original
+                if case_insensitive:
+                    word = word.lower()
+                    original = original.lower()
+                if not word == original: continue
             # If a specific tag is asked
             if tag and not tag == t.verified_tag: continue
             sulci_logger.info("%s :" % unicode(t.sample.parent), "YELLOW")

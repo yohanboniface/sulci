@@ -47,6 +47,8 @@ class Command(SulciBaseCommand):
         make_option("-p", "--path", action="store",type="string", dest="path", 
                     default=None,
                     help = "Specify a file path when needed. Relative to /sulci/"),
+        make_option("-i", "--case_insensitive", action="store_true", dest="case_insensitive", 
+                    help = "Case insensitive"),
         )
     
     def handle(self, *args, **options):
@@ -71,7 +73,8 @@ class Command(SulciBaseCommand):
             else:
                 if self.WORD:
                     self.WORD = self.WORD.decode("utf-8")
-                C.check_usage(word=self.WORD, tag=self.TAG)
+                C.check_usage(word=self.WORD, tag=self.TAG,
+                                         case_insensitive=self.CASE_INSENSITIVE)
         if self.DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()
