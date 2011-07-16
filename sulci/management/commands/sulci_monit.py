@@ -28,27 +28,28 @@ class Command(SulciBaseCommand):
     option_list = SulciBaseCommand.option_list + (
         make_option("-u", "--check_corpus", action="store_true", 
                     dest="check_corpus", default = None, 
-                    help = "Check the corpus. Use -w, -t or -p to specify what."),
+                    help="Check the corpus. Use -w, -t or -p to specify what."),
         make_option("-w", "--word", action="store", type="string", 
                     dest="word", default = None, 
-                    help = "Retrieve word usage in corpus."),
+                    help="Retrieve word usage in corpus."),
         make_option("-x", "--check_lexicon", action="store_true", dest="check_lexicon",
-                    default = None, help = "Check lexicon. Use -w to check a specific word."),
+                    default = None, 
+                    help="Check lexicon. Use -w to check a specific word."),
         make_option("-e", "--display_errors", action="store_true", dest="display_errors", 
-                    help = "Display errors remaining in corpus after runing the pos tagger."),
+                    help="Display errors remaining in corpus after runing the pos tagger."),
         make_option("-c", "--count", action="store_true", dest="count", 
-                    help = "Display number of words in corpus"),
+                    help="Display number of words. Use -u or -x to specify corpus of lexicon"),
         make_option("-g", "--tags_stats", action="store_true", dest="tags_stats", 
-                    help = "Display tags usage statistics"),
+                    help="Display tags usage statistics. Use -w to specify a word."),
         make_option("-m", "--use_lemmes", action="store_true", dest="use_lemmes", 
-                    help = "Use lemmes"),
+                    help="Use lemmes"),
         make_option("-t", "--tag", action="store", type="string", dest="tag", 
                     default=None, help = "Specify a tag when needed"),
         make_option("-p", "--path", action="store",type="string", dest="path", 
                     default=None,
-                    help = "Specify a file path when needed. Relative to /sulci/"),
+                    help="Specify a file path when needed. Relative to /sulci/"),
         make_option("-i", "--case_insensitive", action="store_true", dest="case_insensitive", 
-                    help = "Case insensitive"),
+                    help="Case insensitive"),
         )
     
     def handle(self, *args, **options):
@@ -57,11 +58,13 @@ class Command(SulciBaseCommand):
         L = Lexicon()
         P = PosTagger(lexicon=L)
         M = Lemmatizer(L)
+        if self.WORD:
+            self.WORD = self.WORD.decode("utf-8")
         if self.CHECK_LEXICON:
             if self.COUNT:
                 sulci_logger.info(u"Words in lexicon : %d" % len(L), "WHITE")
             elif self.WORD:
-                L.get_entry(self.WORD.decode("utf-8"))
+                L.get_entry(self.WORD)
             else:
                 L.check()
         if self.CHECK_CORPUS:
@@ -71,15 +74,13 @@ class Command(SulciBaseCommand):
                 T = TextCorpus(self.PATH)
                 T.check(L, self.USE_LEMMES)
             else:
-                if self.WORD:
-                    self.WORD = self.WORD.decode("utf-8")
                 C.check_usage(word=self.WORD, tag=self.TAG,
                                          case_insensitive=self.CASE_INSENSITIVE)
         if self.DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()
         if self.TAGS_STATS:
-            C.tags_stats()
+            C.tags_stats(self.WORD, self.CASE_INSENSITIVE)
         if self.IPDB:
             import ipdb; ipdb.set_trace()
 

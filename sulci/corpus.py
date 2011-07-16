@@ -113,16 +113,25 @@ class Corpus(object):
                 not_found += " %s" % tag
             sulci_logger.info(not_found, "RED")
     
-    def tags_stats(self):
+    def tags_stats(self, word=None, case_insensitive=None):
         """
         Display tags usage stats.
         """
         d = defaultdict(int)
         for t in self:
+            if word:
+                original = t.original
+                if case_insensitive:
+                    word = word.lower()
+                    original = original.lower()
+                if not word == original: continue
             if t.verified_tag == None:
                 sulci_logger.info(u"No verified tag for %s" % unicode(t), "RED", True)
             d[t.verified_tag] += 1
-        sulci_logger.info(u"Tag usage :", "WHITE")
+        log = u"Tag usage :"
+        if word:
+            log = u"Tag usage for word '%s'" % word
+        sulci_logger.info(log, "WHITE")
         for k, v in sorted(d.iteritems(), key=itemgetter(1), reverse=True):
             sulci_logger.info(u"%s => %d" % (k, v), "CYAN")
     
