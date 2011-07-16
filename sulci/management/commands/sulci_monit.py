@@ -70,17 +70,17 @@ class Command(SulciBaseCommand):
         if self.CHECK_CORPUS:
             if self.COUNT:
                 sulci_logger.info(u"Words in corpus : %d" % len(C), "WHITE")
-            if self.PATH:
+            elif self.PATH:
                 T = TextCorpus(self.PATH)
                 T.check(L, self.USE_LEMMES)
+            elif self.TAGS_STATS:
+                C.tags_stats(self.WORD, self.CASE_INSENSITIVE)
             else:
                 C.check_usage(word=self.WORD, tag=self.TAG,
                                          case_insensitive=self.CASE_INSENSITIVE)
         if self.DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()
-        if self.TAGS_STATS:
-            C.tags_stats(self.WORD, self.CASE_INSENSITIVE)
         if self.IPDB:
             import ipdb; ipdb.set_trace()
 
