@@ -266,6 +266,14 @@ where wi,j is the weight of term i in document j,tfi,j = number of occurrences
 of term i in document j, N is the total number of documents, and dfi is the
 number of documents containing term i.
 
+ajouter une règle sur la position dans phrase ? Genre : il a été tagué x mais il aurait dû être tagué y parce que sa position est z (faire que avec la première, pour économiser des ressources lors de l'apprentissage ?)
+
+ajouter tool pour checker les doublons dans lexique
+
+Faire un outil qui liste les mots d'un texte par tag (avec un tag optionnel si on en veut qu'un)
+Faire un outil qui permet de lister les tags d'un mot dans le corpus (pas le lexique du coup), plus pouvoir lister les occurrences d'un mot avec un tag donné
+Penser à une option pour le case insensitive
+
 
 =============
 Lemmatisation
@@ -616,6 +624,7 @@ Types de règles :
 
 Ecoute => écouter...
 Elles/PRV:pl/elle ou il ?
+ahmadinejad-car.com/PUL ?
 
 Voir pour ne pas rester une règle déjà appliqué dans brill
 

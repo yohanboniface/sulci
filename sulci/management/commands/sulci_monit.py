@@ -28,13 +28,17 @@ class Command(SulciBaseCommand):
     option_list = SulciBaseCommand.option_list + (
         make_option("-u", "--check_corpus", action="store_true", 
                     dest="check_corpus", default = None, 
-                    help="Check the corpus. Use -w, -t or -p to specify what."),
+                    help="""
+                         Check the corpus.
+                         Use -w, -g or -p to specify what to check.
+                         Use -p to specify a path to check a specific text.
+                         """),
+        make_option("-x", "--check_lexicon", action="store_true", dest="check_lexicon",
+                    default = None, 
+                    help="Check lexicon. Use -w to check a specific word to check."),
         make_option("-w", "--word", action="store", type="string", 
                     dest="word", default = None, 
                     help="Retrieve word usage in corpus."),
-        make_option("-x", "--check_lexicon", action="store_true", dest="check_lexicon",
-                    default = None, 
-                    help="Check lexicon. Use -w to check a specific word."),
         make_option("-e", "--display_errors", action="store_true", dest="display_errors", 
                     help="Display errors remaining in corpus after runing the pos tagger."),
         make_option("-c", "--count", action="store_true", dest="count", 
@@ -67,17 +71,20 @@ class Command(SulciBaseCommand):
                 L.get_entry(self.WORD)
             else:
                 L.check()
-        if self.CHECK_CORPUS:
-            if self.COUNT:
-                sulci_logger.info(u"Words in corpus : %d" % len(C), "WHITE")
-            elif self.PATH:
-                T = TextCorpus(self.PATH)
-                T.check(L, self.USE_LEMMES)
-            elif self.TAGS_STATS:
-                C.tags_stats(self.WORD, self.CASE_INSENSITIVE)
+        elif self.CHECK_CORPUS:
+            if self.PATH:
+                corpus = TextCorpus(self.PATH)
             else:
-                C.check_usage(word=self.WORD, tag=self.TAG,
+                corpus = C
+            if self.COUNT:
+                sulci_logger.info(u"Words in corpus : %d" % len(corpus), "WHITE")
+            elif self.TAGS_STATS:
+                corpus.tags_stats(self.WORD, self.CASE_INSENSITIVE)
+            elif self.WORD or self.TAG:
+                corpus.check_usage(word=self.WORD, tag=self.TAG,
                                          case_insensitive=self.CASE_INSENSITIVE)
+            else:
+                corpus.check(L, self.USE_LEMMES)
         if self.DISPLAY_ERRORS:
             T = POSTrainer(P,C)
             T.display_errors()

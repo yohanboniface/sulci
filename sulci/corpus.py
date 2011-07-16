@@ -14,7 +14,87 @@ from sulci.base import TextManager
 from sulci.lemmatizer import Lemmatizer
 from sulci.log import sulci_logger
 
-class Corpus(object):
+class CorpusMonitor(object):
+    """
+    Convenience class to store common methors between Corpus and TextCorpus.
+    """
+    def check_usage(self, word=None, tag=None, case_insensitive=False):
+        """
+        Find occurrences of a word or tag or both in the corpus loaded.
+        """
+        if not word and not tag:
+            raise ValueError("You must specify at least a word or a tag")
+        found = False
+        for t in self:
+            # If a specific word is asked
+            if word:
+                original = t.original
+                if case_insensitive:
+                    word = word.lower()
+                    original = original.lower()
+                if not word == original: continue
+            # If a specific tag is asked
+            if tag and not tag == t.verified_tag: continue
+            sulci_logger.info("%s :" % unicode(t.sample.parent), "YELLOW")
+            sulci_logger.info(t.show_context(), "WHITE")
+            found = True
+        if not found:
+            not_found = u'No occurrence found for'
+            if word:
+                not_found += " %s" % word
+            if tag:
+                not_found += " %s" % tag
+            sulci_logger.info(not_found, "RED")
+    
+    def tags_stats(self, word=None, case_insensitive=None):
+        """
+        Display tags usage stats.
+        """
+        d = defaultdict(int)
+        for t in self:
+            if word:
+                original = t.original
+                if case_insensitive:
+                    word = word.lower()
+                    original = original.lower()
+                if not word == original: continue
+            if t.verified_tag == None:
+                sulci_logger.info(u"No verified tag for %s" % unicode(t), "RED", True)
+            d[t.verified_tag] += 1
+        log = u"Tag usage :"
+        if word:
+            log = u"Tag usage for word '%s'" % word
+        sulci_logger.info(log, "WHITE")
+        for k, v in sorted(d.iteritems(), key=itemgetter(1), reverse=True):
+            sulci_logger.info(u"%s => %d" % (k, v), "CYAN")
+    
+    def check(self, lexicon, check_lemmes=False):
+        """
+        Check the text of the corpus, and try to determine if there are some errors.
+        Compare with lexicon.
+        """
+        sulci_logger.info(u"Checking text %s" % self.path, "YELLOW")
+        found = False
+        for t in self:
+            if t in lexicon:
+                # Check that current tag is in lexicon
+                # If not, it *could* be an error, we display it
+                if not t.verified_tag in lexicon[t]:
+                    sulci_logger.info(u"Word in lexicon, but not this tag for %s (%s)" \
+                                      % (unicode(t), t.verified_tag), "RED")
+                    sulci_logger.info(u"In Lexicon : %s" % lexicon[t])
+                    found = True
+                if check_lemmes:
+                    if t.verified_tag in lexicon[t] \
+                             and t.verified_lemme != lexicon[t][t.verified_tag]:
+                        sulci_logger.info(u"Word in lexicon, but not this lemme for %s (%s)" \
+                                          % (unicode(t), t.verified_lemme), "BLUE")
+                        sulci_logger.info(u"In Lexicon : %s" % lexicon[t][t.verified_tag], "GRAY")
+                    found = True
+        if not found:
+            sulci_logger.info(u"No error found", "YELLOW")
+
+class Corpus(CorpusMonitor):
     """
     The corpus is a collection of manualy categorised texts.
     
@@ -85,57 +165,7 @@ class Corpus(object):
     def __len__(self):
         return self.tokens.__len__()
     
-    def check_usage(self, word=None, tag=None, case_insensitive=False):
-        """
-        Find occurrences of a word or tag or both in the corpus loaded.
-        """
-        if not word and not tag:
-            raise ValueError("You must specify at least a word or a tag")
-        found = False
-        for t in self:
-            # If a specific word is asked
-            if word:
-                original = t.original
-                if case_insensitive:
-                    word = word.lower()
-                    original = original.lower()
-                if not word == original: continue
-            # If a specific tag is asked
-            if tag and not tag == t.verified_tag: continue
-            sulci_logger.info("%s :" % unicode(t.sample.parent), "YELLOW")
-            sulci_logger.info(t.show_context(), "WHITE")
-            found = True
-        if not found:
-            not_found = u'No occurrence found for'
-            if word:
-                not_found += " %s" % word
-            if tag:
-                not_found += " %s" % tag
-            sulci_logger.info(not_found, "RED")
-    
-    def tags_stats(self, word=None, case_insensitive=None):
-        """
-        Display tags usage stats.
-        """
-        d = defaultdict(int)
-        for t in self:
-            if word:
-                original = t.original
-                if case_insensitive:
-                    word = word.lower()
-                    original = original.lower()
-                if not word == original: continue
-            if t.verified_tag == None:
-                sulci_logger.info(u"No verified tag for %s" % unicode(t), "RED", True)
-            d[t.verified_tag] += 1
-        log = u"Tag usage :"
-        if word:
-            log = u"Tag usage for word '%s'" % word
-        sulci_logger.info(log, "WHITE")
-        for k, v in sorted(d.iteritems(), key=itemgetter(1), reverse=True):
-            sulci_logger.info(u"%s => %d" % (k, v), "CYAN")
-    
-class TextCorpus(TextManager):
+class TextCorpus(TextManager, CorpusMonitor):
     """
     One single text of the corpus.
     
@@ -186,32 +216,6 @@ class TextCorpus(TextManager):
     
     def __unicode__(self):
         return self.path
-    
-    def check(self, lexicon, check_lemmes=False):
-        """
-        Check the text of the corpus, and try to determine if there are some errors.
-        Compare with lexicon.
-        """
-        sulci_logger.info(u"Checking text %s" % self.path, "YELLOW")
-        found = False
-        for t in self:
-            if t in lexicon:
-                # Check that current tag is in lexicon
-                # If not, it *could* be an error, we display it
-                if not t.verified_tag in lexicon[t]:
-                    sulci_logger.info(u"Word in lexicon, but not this tag for %s (%s)" \
-                                      % (unicode(t), t.verified_tag), "RED")
-                    sulci_logger.info(u"In Lexicon : %s" % lexicon[t])
-                    found = True
-                if check_lemmes:
-                    if t.verified_tag in lexicon[t] \
-                             and t.verified_lemme != lexicon[t][t.verified_tag]:
-                        sulci_logger.info(u"Word in lexicon, but not this lemme for %s (%s)" \
-                                          % (unicode(t), t.verified_lemme), "BLUE")
-                        sulci_logger.info(u"In Lexicon : %s" % lexicon[t][t.verified_tag], "GRAY")
-                    found = True
-        if not found:
-            sulci_logger.info(u"No error found", "YELLOW")
     
     def prepare(self, text, tagger, lemmatizer):
         """
