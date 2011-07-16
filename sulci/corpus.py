@@ -83,6 +83,7 @@ class CorpusMonitor(object):
                     sulci_logger.info(u"Word in lexicon, but not this tag for %s (%s)" \
                                       % (unicode(t), t.verified_tag), "RED")
                     sulci_logger.info(u"In Lexicon : %s" % lexicon[t])
+                    sulci_logger.info(u"Context : %s" % t.show_context(), "MAGENTA")
                     found = True
                 if check_lemmes:
                     if t.verified_tag in lexicon[t] \
@@ -90,6 +91,7 @@ class CorpusMonitor(object):
                         sulci_logger.info(u"Word in lexicon, but not this lemme for %s (%s)" \
                                           % (unicode(t), t.verified_lemme), "BLUE")
                         sulci_logger.info(u"In Lexicon : %s" % lexicon[t][t.verified_tag], "GRAY")
+                        sulci_logger.info(u"Context : %s" % t.show_context(), "YELLOW")
                     found = True
         if not found:
             sulci_logger.info(u"No error found", "YELLOW")
