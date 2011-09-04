@@ -21,11 +21,11 @@ class Lexicon(TextManager):
     The lexicon is a list of unique words and theirs possible POS tags.
     """
     
-    def __init__(self):
+    def __init__(self, path="corpus"):
         self.CORPUS_EXT = ".lxc.lem.crp"
         self.VALID_EXT = ".lxc"
         self.PENDING_EXT = ".pdg"
-        self.PATH = "corpus"
+        self.PATH = path
         self._loaded = None
         self._raw_content = ""
         self._prefixes = None
