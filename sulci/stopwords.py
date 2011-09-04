@@ -24,11 +24,12 @@ stop_words = [u'a', u'à', u'après', u'au', u'aux', u'avec', u'ce', u'ces', u'c
               u'ici', u'ils', u'les', u'leurs', u'quel', u'quels', u'quelle', 
               u'quelles', u'sans', u'soi', u"quelque", u"quelques", u"si", 
               u"jusqu'au", u"jusqu'à", u"jusqu’au", u"jusqu’à", u"alors", u"ça", u"fait",
-              u"faite", u"faits", u"faites", u"qu'"]
+              u"faite", u"faits", u"faites", u"qu'", u"ni", u"déjà", u"ceux", u"celui"]
 
 #We define usual_words, words that are very common, and so have less chance to be special keywords
 usual_words = stop_words + [u'pourquoi', u'chez', u"avant", u"après", u"plus", 
                             u"ensuite", u"autant", u"surtout", u"plutôt", u"car",
                             u"toujours", u"encore", u"parmi", u"malgré", u"depuis",
                             u"donc", u"tout", u"tous", u"toute", u"toutes", u"aussi",
-                            u"très", u"avoir", u"faire", u"quant"]
+                            u"très", u"avoir", u"faire", u"dire", u"an", u"autre",
+                            u"quant"]
