@@ -7,7 +7,10 @@ from sulci.log import sulci_logger
 
 def merge_descriptors(origin, destination, force=False):
     """
-    This facility take all relations of a descriptor, add or create the weigth
+    Move all relations from a descriptor `origin` to another descriptor 
+    `destination`, and make `origin` an alias of `destination`.
+    
+    Takes all relations of a descriptor, add or create the weigth
     of these relations to the destination descriptor relations, and delete
     the origin descriptors relations.
     """
@@ -27,3 +30,7 @@ def merge_descriptors(origin, destination, force=False):
         trigger.connect(destination, score)
         # Delete the original relation
         relation.delete()
+    
+    # Make origin an alias of destination
+    origin.is_alias_of = destination
+    origin.save()
