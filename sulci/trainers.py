@@ -154,6 +154,8 @@ class SemanticalTrainer(object):
                 # because descriptors in article and thesaurus are not
                 # always matching. Will be improved.
                 dsc, created = Descriptor.objects.get_or_create(name=d)
+                # Retrieve the primeval value
+                dsc = dsc.primeval
                 validated_descriptors.add(dsc)
                 if created:
                     log(u"Lairning descriptor not in thesaurus : %s" % unicode(dsc), "RED")
