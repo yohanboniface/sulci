@@ -609,7 +609,7 @@ beaux-arts	SBC:pl/beaux-arts
 ben	FGW/ben
 besoin	SBC:sg/besoin
 bien	ADV/bien
-bien-être	SBC/sg
+bien-être	SBC:sg/bien-être
 bientôt	ADV/bientôt
 bilans	SBC:pl/bilan
 bio	SBC:sg/bio
@@ -719,7 +719,7 @@ celui	PRO:sg/celui PRV:sg/celui
 censure	SBC:sg/censure
 censé	ADJ:sg/censé
 centaines	SBC:pl/centaine
-centrale	ADJ:sg/centrale
+centrale	ADJ:sg/central
 centre	SBC:sg/centre
 centre-ville	SBC:sg/centre-ville
 centristes	SBC:pl/centriste
@@ -727,7 +727,7 @@ cependant	ADV/cependant
 cercle	SBC:sg/cercle
 certaine	ADJ:sg/certain
 certaines	DTN:pl/certain
-certains	DTN:pl/certain PRO:pl/certain
+certains	DTN:pl/certain PRV:pl/certain
 ces	DTN:pl/ce
 cesse	VCJ:sg/cesser
 cesseront	VCJ:pl/cesser
@@ -1248,7 +1248,7 @@ détenu	SBC:sg/détenu
 détenus	SBC:pl/détenu
 déterminer	VNCFF/déterminer
 déterminé	PAR:sg/déterminer
-détient	VCJ/détenir
+détient	VCJ:sg/détenir
 détournements	SBC:pl/détournement
 détourné	PAR:sg/détourner
 détruit	PAR:sg/détruire VCJ:sg/détruire
@@ -1368,7 +1368,7 @@ européenne	ADJ:sg/européen
 européens	ADJ:pl/européen
 euros	SBC:pl/euro
 eux	PRO:pl/eux
-ex	PLU/ex
+ex	PUL/ex
 exactement	ADV/exactement
 examens	SBC:pl/examen
 exception	SBC:sg/exception
@@ -1391,7 +1391,7 @@ existe	VCJ:sg/exister
 expert	SBC:sg/expert
 experts	SBC:pl/expert
 expliquait	VCJ:sg/expliquer
-expliquant	VNCNT/expliquant
+expliquant	VNCNT/expliquer
 explique	VCJ:sg/explique
 expliquer	VNCFF/expliquer
 exploration	SBC:sg/exploration
@@ -1518,7 +1518,7 @@ fracture	SBC:sg/fracture
 fragilisé	PAR:sg/fragiliser
 frais	SBC:pl/frais
 francophone	ADJ:sg/francophone
-français	SBC:sg/français ADJ:sg/français ADG:pl/français
+français	SBC:sg/français ADJ:sg/français ADJ:pl/français
 française	ADJ:sg/français
 front	SBC:sg/front
 frontière	SBC:sg/frontière
