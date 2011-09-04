@@ -77,6 +77,12 @@ class Descriptor(models.Model):
         related_name="children")
     name = models.CharField(max_length=200, db_index=True)
     description = models.TextField(blank=True, null=True)
+#    is_alias_of = models.ForeignKey('self', 
+#                      blank=True, 
+#                      null=True, 
+#                      related_name="aliases", 
+#                      help_text="If this descriptor is an alias of another."
+#                  )
 
     def __init__(self, *args, **kwargs):
         self._max_weight = None
