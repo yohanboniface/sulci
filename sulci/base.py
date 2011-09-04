@@ -107,7 +107,6 @@ class RetrievableObject(object):
 #    def __repr__(self):
 #        return self.__unicode__().encode("utf-8")
 
-
 class Sample(RetrievableObject):
     """
     To be factorised.
