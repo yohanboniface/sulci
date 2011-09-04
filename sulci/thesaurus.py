@@ -83,7 +83,7 @@ class Descriptor(models.Model):
                       related_name="aliases", 
                       help_text="If this descriptor is an alias of another."
                   )
-
+    
     def __init__(self, *args, **kwargs):
         self._max_weight = None
         super(Descriptor, self).__init__(*args, **kwargs)
@@ -106,6 +106,15 @@ class Descriptor(models.Model):
                 # Should not occur.
                 self._max_weight = 0
         return self._max_weight
+    
+    @property
+    def primeval(self):
+        """
+        Returns the primeval descriptor when self is alias of another.
+        """
+        if self.is_alias_of is None:
+            return self
+        return self.is_alias_of.primeval
 
 class TriggerToDescriptor(models.Model):
     """
