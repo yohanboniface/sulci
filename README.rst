@@ -195,30 +195,30 @@ These texts will be used to build the lexicon ; the valid extension is
 
 Then, we can build the lexicon::
 
- ./manage.py sulci_cli -m
+ ./manage.py sulci_train -x
  
 This will write the new lexicon in temporary `.pdg` (pending) file. For now, we
-have to manually rename it in `lexicon.lxc`.
+have to manually rename it in `lexicon.lxc` if the result is ok for us.
 
 Now, we can launch the lexical training::
 
- ./manage.py sulci_cli -i
+ ./manage.py sulci_train -e
 
 or, to load-balance the work in more than one process (using zmq), here one 
 master and 4 slaves subprocesses::
 
- ./manage.py sulci_cli -i -s 4
+ ./manage.py sulci_train -e -s 4
 
 Another time, we have to manually rename the file generated in `/corpus/` from 
 `lexical_rules.pdg` to `lexical_rules.rls`.
 
 Then, we can launch the contextual training (remember to rename the file after)::
 
- ./manage.py sulci_cli -c -s 4
+ ./manage.py sulci_train -c -s 4
 
 Now, the lemmatizer trainer::
 
- ./manage.py sulci_cli -r -s 4
+ ./manage.py sulci_train -r -s 4
 
 Now, the last step, but the bigger : the semantical training. Here a big corpus 
 of categorized texts is needed. For example, in Libération we are using now a 
@@ -228,7 +228,7 @@ Make sure you have configured the needed settings (see Installation below).
 
 Then launch the command line::
 
- ./manage.py sulci_cli -n -s 4
+ ./manage.py sulci_train -n -s 4
 
 
 
