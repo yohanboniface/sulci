@@ -9,13 +9,14 @@ import datetime
 
 from django.conf import settings
 
-from sulci.utils import load_file, save_to_file, log
+from sulci.utils import load_file, save_to_file
 from sulci.thesaurus import Trigger, Descriptor
 from sulci.textmining import SemanticalTagger
 from sulci.textutils import tokenize_text
 from sulci.rules_templates import LemmatizerTemplateGenerator, RuleTemplate,\
                            ContextualTemplateGenerator, LexicalTemplateGenerator
 from sulci import content_model, content_manager
+from sulci.log import sulci_logger
 
 class SemanticalTrainer(object):
     """
@@ -158,7 +159,7 @@ class SemanticalTrainer(object):
                 dsc = dsc.primeval
                 validated_descriptors.add(dsc)
                 if created:
-                    log(u"Lairning descriptor not in thesaurus : %s" % unicode(dsc), "RED")
+                    sulci_logger.info(u"Lairning descriptor not in thesaurus : %s" % unicode(dsc), "RED")
         # Retrieve keytentities :
         try:
             S = SemanticalTagger(text, self.thesaurus, self.pos_tagger)
@@ -273,7 +274,7 @@ class RuleTrainer(object):
                 rule = rule.decode("utf-8")
                 template = self.get_template_instance(rule)
                 #Apply the rule to the tokens
-                log(u"Applying rule %s" % rule, "RED")
+                sulci_logger.info(u"Applying rule %s" % rule, "RED")
                 template.apply_rule(self.tokens, rule)
             if self.reppoller.poll(0):
                 idx, action, rule = self.repsocket.recv_multipart()
@@ -291,8 +292,8 @@ class RuleTrainer(object):
                 resp = self.reqsocket.recv_multipart()
                 r, good, bad = resp
                 pondered_rules.append((r.decode("utf-8"), int(good), int(bad)))
-                log(u"Received rule %s" % r.decode("utf-8"), "MAGENTA")
-            log(u"All rules are received from slaves")
+                sulci_logger.info(u"Received rule %s" % r.decode("utf-8"), "MAGENTA")
+            sulci_logger.info(u"All rules are received from slaves")
         else:
             for rule in rules_candidates:
                 pondered_rules.append(self.test_rule(rule))
@@ -318,12 +319,12 @@ class RuleTrainer(object):
         Main factorized train method.
         """
         #We have to apply rules one after one to all objects
-        log("Begin of training session.", "WHITE", True)
+        sulci_logger.info("Begin of training session.", "WHITE", True)
         final_rules = []
         errors = self.get_errors()
         while errors:
             run_applied_rule = False
-            log("%d errors for now..." % len(errors), "RED", True)
+            sulci_logger.info("%d errors for now..." % len(errors), "RED", True)
             for token_with_error in errors[:]:
                 rules_candidates = []
                 self.log_error(token_with_error)
@@ -341,7 +342,7 @@ class RuleTrainer(object):
                     template = self.get_template_instance(rule_candidate)
                     final_rules.append((rule_candidate, score))
                     # Apply the rule to the tokens
-                    log(u"Applying rule %s (%s)" % (rule_candidate, score), "RED")
+                    sulci_logger.info(u"Applying rule %s (%s)" % (rule_candidate, score), "RED")
                     template.apply_rule(self.tokens, rule_candidate)
                     if self.mode == "master":
                         # Send the rule to apply
@@ -369,7 +370,7 @@ class RuleTrainer(object):
                 good += 1
             elif test == -1:
                 bad += 1
-        log(u"%s g: %d b : %d" % (rule, good, bad), "GRAY")
+        sulci_logger.info(u"%s g: %d b : %d" % (rule, good, bad), "GRAY")
         return rule, good, bad
     
     def display_errors(self):
@@ -379,7 +380,7 @@ class RuleTrainer(object):
         remaining_errors = self.get_errors()
         errors_count = len(remaining_errors)
         total_words = len(self.tokens)
-        log(u"Remaining %d errors (%f %% of %d total words)" %
+        sulci_logger.info(u"Remaining %d errors (%f %% of %d total words)" %
            (errors_count, 100.0 * errors_count / total_words, total_words), "RED")
         for r_error in remaining_errors:
             self.log_error(r_error)
@@ -416,7 +417,7 @@ class LemmatizerTrainer(RuleTrainer):
             token.tag = token.verified_tag
     
     def log_error(self, token):
-        log(u"Error : %s, lemmatized %s instead of %s" \
+        sulci_logger.info(u"Error : %s, lemmatized %s instead of %s" \
             % (unicode(token), token.lemme, token.verified_lemme), "WHITE")
     
     def get_template_instance(self, tpl):
@@ -445,7 +446,8 @@ class POSTrainer(RuleTrainer):
         self.mode = mode
     
     def log_error(self, token):
-        log(u"Error : %s, tagged %s instead of %s" % (unicode(token), token.tag, token.verified_tag), "WHITE")
+        sulci_logger.info(u"Error : %s, tagged %s instead of %s" \
+                     % (unicode(token), token.tag, token.verified_tag), "WHITE")
     
     def get_template_instance(self, tpl):
         template, _ = self.template_generator.get_instance(tpl, lexicon=self.tagger.lexicon)
