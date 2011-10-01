@@ -9,7 +9,7 @@ from django.conf import settings
 
 from sulci.pos_tagger import PosTagger
 from sulci.lexicon import Lexicon
-from sulci.corpus import Corpus
+from sulci.corpus import Corpus, TextCorpus
 from sulci.textmining import SemanticalTagger
 from sulci.thesaurus import Thesaurus
 from sulci.log import sulci_logger
@@ -51,6 +51,7 @@ class Command(SulciBaseCommand):
         super(Command, self).handle(self, *args, **options)
         C = Corpus()
         L = Lexicon()
+        M = Lemmatizer(L)
         P = PosTagger(lexicon=L)
         if self.LEXICON:
             L.make(self.FORCE)
@@ -76,7 +77,6 @@ class Command(SulciBaseCommand):
             T = ContextualTrainer(P,C,self.MODE)
             T.do()
         elif self.LEMMATIZER:
-            M = Lemmatizer(L)
             T = LemmatizerTrainer(M,self.MODE)
             T.do()
         elif self.SEMANTICAL:
