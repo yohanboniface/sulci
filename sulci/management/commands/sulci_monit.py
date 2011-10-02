@@ -47,6 +47,8 @@ class Command(SulciBaseCommand):
                     help="Display tags usage statistics. Use -w to specify a word."),
         make_option("-m", "--use_lemmes", action="store_true", dest="use_lemmes", 
                     help="Use lemmes"),
+        make_option("-M", "--lemme", action="store", type="string", dest="lemme", 
+                    default=None, help = "Specify a lemme when needed"),
         make_option("-t", "--tag", action="store", type="string", dest="tag", 
                     default=None, help = "Specify a tag when needed"),
         make_option("-p", "--path", action="store",type="string", dest="path", 
@@ -64,6 +66,8 @@ class Command(SulciBaseCommand):
         M = Lemmatizer(L)
         if self.WORD:
             self.WORD = self.WORD.decode("utf-8")
+        if self.LEMME:
+            self.LEMME = self.LEMME.decode("utf-8")
         if self.CHECK_LEXICON:
             if self.COUNT:
                 sulci_logger.info(u"Words in lexicon : %d" % len(L), "WHITE")
@@ -80,9 +84,13 @@ class Command(SulciBaseCommand):
                 sulci_logger.info(u"Words in corpus : %d" % len(corpus), "WHITE")
             elif self.TAGS_STATS:
                 corpus.tags_stats(self.WORD, self.CASE_INSENSITIVE)
-            elif self.WORD or self.TAG:
-                corpus.check_usage(word=self.WORD, tag=self.TAG,
-                                         case_insensitive=self.CASE_INSENSITIVE)
+            elif self.WORD or self.TAG or self.LEMME:
+                corpus.check_usage(
+                    word=self.WORD, 
+                    tag=self.TAG, 
+                    lemme=self.LEMME,
+                    case_insensitive=self.CASE_INSENSITIVE
+                )
             else:
                 corpus.check(L, self.USE_LEMMES)
         if self.DISPLAY_ERRORS:

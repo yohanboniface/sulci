@@ -18,12 +18,12 @@ class CorpusMonitor(object):
     """
     Convenience class to store common methors between Corpus and TextCorpus.
     """
-    def check_usage(self, word=None, tag=None, case_insensitive=False):
+    def check_usage(self, word=None, tag=None, lemme=None, case_insensitive=False):
         """
         Find occurrences of a word or tag or both in the corpus loaded.
         """
-        if not word and not tag:
-            raise ValueError("You must specify at least a word or a tag")
+        if not any((word, tag, lemme)):
+            raise ValueError("You must specify at least a word, a tag or a lemme")
         found = False
         for t in self:
             # If a specific word is asked
@@ -35,6 +35,10 @@ class CorpusMonitor(object):
                 if not word == original: continue
             # If a specific tag is asked
             if tag and not tag == t.verified_tag: continue
+            # don't care about texts without lemmes, when a lemme is asked
+            if lemme:
+                if not t.sample.parent.has_verified_lemmes: continue
+                if not lemme == t.verified_lemme: continue
             sulci_logger.info("%s :" % unicode(t.sample.parent), "YELLOW")
             sulci_logger.info(t.show_context(), "WHITE")
             found = True
@@ -255,4 +259,11 @@ class TextCorpus(TextManager, CorpusMonitor):
             else:
                 ext = self.VALID_EXT
         save_to_file(os.path.join(self.PATH, "%s%s" % (name, ext)), self.content)
+    
+    @property
+    def has_verified_lemmes(self):
+        """
+        Returns True if the text is supposed to contains verified lemmes.
+        """
+        return self.path.endswith(self.LEXICON_EXT)
 

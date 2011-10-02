@@ -313,6 +313,7 @@ il/PRV:sg faut/VCJ:sg quand/SUB même/
 quelque/ADV chose/SBC:sg
 Je/PRV:sg/je ne/ADV l'/PRV:++ ai/ACJ:sg/avoir pas/ADV fait/PAR:sg ./.
 la/DTN:sg réalité/SBC:sg même/ADJ:sg => même ?
+a/ACJ:sg/avoir été/EPAR:sg/être international/SBC:sg géorgien/ADJ:sg
 
 attaché/PAR:sg (/( e/SBC:sg )/) s/SBC:sg
 pousse/SBC:sg -/- toi-de/SBC:sg -/- là-que/SBC:sg -/- je-m'y-mette/SBC:sg
