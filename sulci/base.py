@@ -161,9 +161,12 @@ class Sample(RetrievableObject):
         return True
     
     def show_context(self, position):
+        """
+        Returns a string of tokens around some positin of the sample.
+        """
         begin = max(0, position - 5)
         end = min(len(self), position + 5)
-        return [repr(t) for t in self[begin:end]]
+        return u" ".join([t.__urepr__() for t in self[begin:end]])
     
     def get_errors(self, attr="tag"):
         """
@@ -231,11 +234,20 @@ class Token(RetrievableObject):
     def __unicode__(self):
         return unicode(self.lemme)
     
-    def __repr__(self):
+    def __urepr__(self):
+        """
+        Unicode version of repr.
+        """
         tag = self.tag and u"/%s" % unicode(self.tag) or ""
         verified_tag = self.verified_tag and u"[%s]" % unicode(self.verified_tag) or ""
         final = u"<Token %s%s %s>"  % (unicode(self.original), tag, verified_tag)
-        return final.encode("utf-8")
+        return final
+    
+    def __repr__(self):
+        """
+        __repr__ *must* return a str, not a unicode.
+        """
+        return self.__urepr__().encode("utf-8")
     
     def lower(self):
         return self.original.lower()
