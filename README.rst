@@ -230,6 +230,11 @@ Then launch the command line::
 
  ./manage.py sulci_train -n -s 4
 
+Finally, we can clean manually to reduce noise and remove useless rows, 
+for example, removing all synapses that have been seen just one time 
+(triggertodescriptor.weight == 1) or those where the pondered_weight is too low 
+(triggertodescriptor.pondered_weight < 0.01 for example). And after that, triggers
+with no synapse can be also deleted.
 
 
 Installation
