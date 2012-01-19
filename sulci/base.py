@@ -275,7 +275,7 @@ class Token(RetrievableObject):
         """
         Return the two previous token, or None if there is not two tokens before.
         """
-        if self.position >= 1:
+        if self.position >= 2:
             return self.get_neighbors(-2, -1)
     
     @property
@@ -283,7 +283,7 @@ class Token(RetrievableObject):
         """
         Return the two next token, or None if there is not two tokens after.
         """
-        if len(self.parent) - self.position >= 1:
+        if len(self.parent) - self.position > 2:
             return self.get_neighbors(1, 2)
 
     def get_neighbors(self, *args):#cache this
