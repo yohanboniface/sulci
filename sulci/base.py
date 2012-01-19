@@ -33,7 +33,7 @@ class TextManager(object):
         id_s = 0
         pos = 0
         for idx, tk in enumerate(text):
-            t, created = Token.get_or_create(idx, self, original=tk, parent=None, position=pos)
+            t, created = Token.get_or_create(idx, self, original=tk)
             if current_sample is None or t.begin_of_sample(previous_token):
                 current_sample, created = Sample.get_or_create(id_s, self, parent=self)
                 id_s += 1
@@ -213,21 +213,26 @@ class Token(RetrievableObject):
     This is an interface for the tokens to be tagged by the tagger.
     """
     
-    position = 0 # Not sure to put this here or in an init...
-    parent = None
-    
-    def __init__(self, pk, **kwargs):
+    def __init__(self, pk, original, parent=None, position=0, **kwargs):
+        """
+        pk = unique string representing object (used to store in cache)
+        original = raw string of token, when used in training mode, has tag and
+        lemme attached, eg. word/tag/lemme
+        parent = the parent sample; can be omitted here, but is needed for using
+        the token, so it have to be setted manually if not passed here
+        position = the position of the token in the parent sample
+        """
         self.id = pk
         self.verified_tag = None
-        orig = kwargs["original"].split("/")
+        orig = original.split("/")
         self.original = orig[0]
         self.lemme = orig[0] # Default value
         # This will be done in training mode
         if len(orig) > 1:
             self.verified_tag = orig[1]
             self.verified_lemme = len(orig) > 2 and orig[2] or self.original
-        self.parent = kwargs["parent"]
-        self.position = kwargs["position"]
+        self.parent = parent
+        self.position = position
         self.tag = ""
         self._len = None
     
