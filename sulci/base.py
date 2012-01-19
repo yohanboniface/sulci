@@ -30,19 +30,14 @@ class TextManager(object):
         ctokens = []
         current_sample = None
         previous_token = None
-        id_s = 0
-        pos = 0
+        sample_id = 0
         for idx, tk in enumerate(text):
             t, created = Token.get_or_create(idx, self, original=tk)
             if current_sample is None or t.begin_of_sample(previous_token):
-                current_sample, created = Sample.get_or_create(id_s, self, parent=self)
-                id_s += 1
+                current_sample, created = Sample.get_or_create(sample_id, self, parent=self)
+                sample_id += 1
                 csamples.append(current_sample)
-                pos = 0
-            current_sample.tokens.append(t)
-            t.parent = current_sample
-            t.position = pos
-            pos += 1
+            current_sample.append(t)
             ctokens.append(t)
             previous_token = t
         return csamples, ctokens
@@ -114,8 +109,8 @@ class Sample(RetrievableObject):
 
     def __init__(self, pk, parent=None, **kwargs):
         self.id = pk
-        self.tokens = []#Otherwise all the objects have the same reference
-        self._len = None#caching
+        self.tokens = []  # Otherwise all the objects have the same reference
+        self._len = None  # For caching
         self.tag = None
         self.parent = parent
         # This field is used  just in training mode.
@@ -146,12 +141,23 @@ class Sample(RetrievableObject):
     def __getitem__(self, key):
         return self.tokens[key]
     
+    def append(self, item):
+        if not isinstance(item, Token):
+            raise ValueError(
+                "Sample object can deal only with Token instances. "
+                "Got %s instead." % type(item)
+                )
+        item.position = len(self)
+        item.parent = self
+        self.tokens.append(item)
+        self._len = None  # Flush cache as we add a token
+    
     def has_position(self, pos):
         return 0 <= pos < len(self)
-
+    
     def meaning_words_count(self):
         return len([t for t in self.tokens if t.has_meaning()])
-
+    
     def is_token(self, stemm, position):
         """
         Check if there is stemm "stemm" in position "position".
@@ -220,7 +226,7 @@ class Token(RetrievableObject):
         lemme attached, eg. word/tag/lemme
         parent = the parent sample; can be omitted here, but is needed for using
         the token, so it have to be setted manually if not passed here
-        position = the position of the token in the parent sample
+        position = the position of the token in the parent sample (O indexed)
         """
         self.id = pk
         self.verified_tag = None
