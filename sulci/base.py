@@ -288,14 +288,14 @@ class Token(RetrievableObject):
             neighbors.append(self.parent[pos])
         return neighbors
     
-    def is_strong_ponctuation(self):
+    def is_strong_punctuation(self):
         if self.original in [u".", u"!", u"?", u"…"]: return True
         else: return False
     
     def begin_of_sample(self, previous_token):
         if previous_token is None: return True
         #what about ":"?
-        if (previous_token.is_strong_ponctuation() or previous_token.is_closing_quote())\
+        if (previous_token.is_strong_punctuation() or previous_token.is_closing_quote())\
            and (self.original[0].isupper() or self.is_opening_quote()):
             return True
         return False
