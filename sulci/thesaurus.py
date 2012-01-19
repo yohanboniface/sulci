@@ -148,7 +148,7 @@ class TriggerToDescriptor(models.Model):
         ordering = ["-weight"]
 
     def __unicode__(self):
-        return u"%s =(%f)=> %s" % (self.trigger, self.weight, self.descriptor)
+        return u"%s =[%f]=> %s" % (self.trigger, self.weight, self.descriptor)
 
 
 class Trigger(models.Model):
