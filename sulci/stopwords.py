@@ -32,4 +32,4 @@ usual_words = stop_words + [u'pourquoi', u'chez', u"avant", u"après", u"plus",
                             u"toujours", u"encore", u"parmi", u"malgré", u"depuis",
                             u"donc", u"tout", u"tous", u"toute", u"toutes", u"aussi",
                             u"très", u"avoir", u"faire", u"dire", u"an", u"autre",
-                            u"quant"]
+                            u"quant", u"ainsi"]
