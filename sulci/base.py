@@ -330,12 +330,11 @@ class Token(RetrievableObject):
         WATCH OUT of the sens you make the comparison between a Token and a Stemm
         other could be a string or a Token or a Stemm
         """
-#        from textmining import Stemm#Sucks
         s = other
         if isinstance(other, Token):
             s = other.original
         elif isinstance(other, object) and other.__class__.__name__ == "Stemm":
-            s = other.main_occurrence #Will come back one time.
+            s = other.main_occurrence  # Will come back one time.
         return self.original == s
     
     def __ne__(self, y):

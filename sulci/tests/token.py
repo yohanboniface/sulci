@@ -6,19 +6,32 @@ All tests regarding sulci.base.Token class.
 from django.test import TestCase
 
 from sulci.base import Token, Sample
+from sulci.textmining import Stemm
 
 __all__ = [
-    "TokenTest", 
+    "TokenInitTest", 
     "TokenIsStrongPunctuationTest", 
     "TokenGetNeighborsTest", 
-    'TokenNeighborsBigramTest'
+    'TokenNeighborsBigramTest',
+    'TokenComparisonTests',
 ]
 
-class TokenTest(TestCase):
+class TokenInitTest(TestCase):
     
     def test_should_create_a_token(self):
         token = Token("mot", original="mot")
         self.assertTrue(isinstance(token, Token))
+    
+    def test_should_define_verified_tag_and_lemme(self):
+        token = Token("xxx", original="mots/SBC:sg/mot")
+        self.assertEqual(token.verified_tag, "SBC:sg")
+        self.assertEqual(token.verified_lemme, "mot")
+    
+    def test_should_define_default_verified_lemme(self):
+        token = Token("xxx", original="mot/SBC:sg")
+        self.assertEqual(token.verified_tag, "SBC:sg")
+        self.assertEqual(token.verified_lemme, "mot")
+
 
 class TokenIsStrongPunctuationTest(TestCase):
     
@@ -82,3 +95,34 @@ class TokenNeighborsBigramTest(InSampleTokenBaseTest):
     def test_should_not_get_next_bigram(self):
         # There is no next bigram
         self.assertEqual(self.second.next_bigram, None)
+
+class TokenComparisonTests(TestCase):
+    
+    def test_could_compare_with_other_token(self):
+        token1 = Token("xxx", original="bla")
+        token2 = Token("yyy", original="bla")
+        token3 = Token("yyy", original="bleh")
+        self.assertTrue(token1 == token2)
+        self.assertTrue(token2 == token1)
+        self.assertFalse(token1 == token3)
+        self.assertFalse(token3 == token1)
+    
+    def test_could_compare_with_string(self):
+        token = Token("xxx", original="bla")
+        self.assertTrue(token == "bla")
+        self.assertTrue("bla" == token)
+        self.assertFalse(token == "bleh")
+    
+    def test_could_compare_a_stemme(self):
+        token1 = Token("xxx", original="bla")
+        token2 = Token("yyy", original="bla")
+        token3 = Token("aaa", original="bleh")
+        stemme1 = Stemm("zzz", text=None)
+        stemme2 = Stemm("bbb", text=None)
+        stemme1.occurrences.append(token1)
+        stemme2.occurrences.append(token3)
+        # We can only make the comparison with token before
+        # See Token.__eq__ and Stemm.__eq__ for details
+        self.assertTrue(token2 == stemme1)
+        self.assertFalse(token2 == stemme2)
+
