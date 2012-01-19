@@ -3,6 +3,7 @@
 This module provide some facilities who can be used outside sulci.
 """
 
+from sulci.thesaurus import Trigger, Descriptor, TriggerToDescriptor
 from sulci.log import sulci_logger
 
 def merge_descriptors(origin, destination, force=False):
@@ -34,3 +35,38 @@ def merge_descriptors(origin, destination, force=False):
     # Make origin an alias of destination
     origin.is_alias_of = destination
     origin.save()
+
+def remove_synapse(trigger, descriptor):
+    """
+    Remove a relation between a trigger and a descriptor.
+    
+    Both the parameters could be instances or str.
+    """
+    if not isinstance(trigger, Trigger):
+        if isinstance(trigger, str):
+            try:
+                trigger = Trigger.objects.get(original=trigger)
+            except Trigger.DoesNotExist:
+                print "No trigger has been found"
+                return
+        else:
+            raise ValueError("trigger must be either a str or Trigger instance")
+    if not isinstance(descriptor, Descriptor):
+        if isinstance(descriptor, str):
+            try:
+                descriptor = Descriptor.objects.get(name=descriptor)
+            except Descriptor.DoesNotExist:
+                print "No descriptor has been found"
+                return
+        else:
+            raise ValueError("descriptor must be either a str or Trigger instance")
+    
+    # Here we have both the instances, so we can do the job
+    try:
+        synapse = TriggerToDescriptor.objects.get(trigger=trigger, descriptor=descriptor)
+    except TriggerToDescriptor.DoesNotExist:
+        print "No synapse has been found between %s and %s" % (trigger, descriptor)
+    else:
+        print "Deleting synapse %s" % synapse
+        synapse.delete()
+
