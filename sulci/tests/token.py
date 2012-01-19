@@ -37,12 +37,12 @@ class TokenGetNeighborsTest(TestCase):
     
     def setUp(self):
         sentence = Sample("sample")
-        first = Token("one", "Une", parent=sentence, position=0)
-        sentence.tokens.append(first)
-        second = Token("two", "phrase", parent=sentence, position=1)
-        sentence.tokens.append(second)
-        third = Token("three", "simple", parent=sentence, position=2)
-        sentence.tokens.append(third)
+        first = Token("one", "Une")
+        sentence.append(first)
+        second = Token("two", "phrase")
+        sentence.append(second)
+        third = Token("three", "simple")
+        sentence.append(third)
         self.first = first
         self.second = second
         self.third = third
