@@ -300,8 +300,7 @@ class Token(RetrievableObject):
         return neighbors
     
     def is_strong_punctuation(self):
-        if self.original in [u".", u"!", u"?", u"…"]: return True
-        else: return False
+        return self.original in [u".", u"!", u"?", u"…"]
     
     def begin_of_sample(self, previous_token):
         if previous_token is None: return True
