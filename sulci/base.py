@@ -112,12 +112,12 @@ class Sample(RetrievableObject):
     To be factorised.
     """
 
-    def __init__(self, pk, **kwargs):
+    def __init__(self, pk, parent=None, **kwargs):
         self.id = pk
         self.tokens = []#Otherwise all the objects have the same reference
         self._len = None#caching
         self.tag = None
-        self.parent = kwargs["parent"]
+        self.parent = parent
         # This field is used  just in training mode.
         # The idea is : every time a token with wrong tag is processed but
         # not corrected, we store his index, to prevent from reprocessing it until 
@@ -281,6 +281,11 @@ class Token(RetrievableObject):
             return self.get_neighbors(1, 2)
 
     def get_neighbors(self, *args):#cache this
+        """
+        Returns tokens neighbors in sample in positions passed as args, if available.
+        
+        Eg. token.get_neighbors(1, 2) will return the next and next again tokens.
+        """
         neighbors = []
         for idx in args:
             pos = self.position + idx
