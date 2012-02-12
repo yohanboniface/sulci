@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding:Utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import re
 
@@ -11,12 +11,12 @@ from GenericCache.decorators import cached
 from utils import load_file, save_to_file, log
 from base import RetrievableObject
 
-#Cache
+# Cache
 cache = GenericCache()
 
 class RuleTemplate(RetrievableObject):
     """
-    Class for managing rules creation and analysis
+    Class for managing rules creation and analysis.
     """
     
     def __init__(self, pk, **kwargs):
@@ -27,10 +27,8 @@ class RuleTemplate(RetrievableObject):
         if not self.is_candidate(token, rule):
             return 0
         elif token.has_verified_tag(to_tag) and not token.is_tagged(to_tag):
-#            print 1, rule, to_tag, token.original, token.tag, token.verified_tag
             return 1
         else:
-#            print -1, rule, to_tag, token.original, token.tag, token.verified_tag
             return -1
     
     def get_to_tag(self, rule):
@@ -44,7 +42,6 @@ class RuleTemplate(RetrievableObject):
         to_tag = self.get_to_tag(rule)
         for token in tokens:
             if self.is_candidate(token, rule):
-#                print unicode(token), token.verified_tag, rule
                 token.tag = to_tag
                 # Maybe we should do this only in training mode
                 token.sample.reset_trainer_status()
@@ -52,42 +49,47 @@ class RuleTemplate(RetrievableObject):
     @classmethod
     def select_one(cls, rules, MAX, minval=2):
         """
-        rules is a iterable of tuples : (rule, good, bad)
-        Questions are :
-         - which rule to select ?
-         - what to advantage ?
-         - The difference between good and bad ?
-         - the rapport between good and bad ?
-         - a mix of both ?
-         - with which coeff ?
-        Remainder (from kilobug) :
-        En gros on a deux options :
-         - soit good/(good + bad) * A + good/MAX * B
-         - soit (good/(good + bad)) ^ A * good/MAX ^ B
-        (moyenne arithmétique ou géométrique)
-        Mais pour simplifier on doit pouvoir s'en sortir avec un seul coefficient :
-         - good/(good + bad) + good/MAX * B
-         - (good/(good + bad)) * (good/MAX) ^ B
-        For example :
-         - SBC:pl CHANGESUFFIX "rs" "r" g: 15 b : 0
-         - SBC:pl CHANGESUFFIX "s" "" g: 179 b : 18
-         => which one have to be chosen ?
-         The first means : go straight to human logic (try to create less error 
-         when applying rules)
-         The second : use your own logic (create error if it seems a good operation,
-         and create new rules to correct the new errors created)
+        Select one rule between a set of tested rules.
+
+        rules is a iterable of tuples : (rule, good, bad), where good is the 
+        number of errors corrected, and bad the number of error generated.
         """
-        #Sorting using the rapport good / bad,
-        #Giving advantage to the more numerous, if rapport is close.
-        coeff = 0.1#The lower the coeff, the stronger the rules with bad = 0
+        
+        # Questions are :
+        # - which rule to select ?
+        # - what to advantage ?
+        # - The difference between good and bad ?
+        # - the rapport between good and bad ?
+        # - a mix of both ?
+        # - with which coeff ?
+        # Remainder (from kilobug) :
+        # En gros on a deux options :
+        # - soit good/(good + bad) * A + good/MAX * B
+        # - soit (good/(good + bad)) ^ A * good/MAX ^ B
+        # (moyenne arithmétique ou géométrique)
+        # Mais pour simplifier on doit pouvoir s'en sortir avec un seul coefficient :
+        # - good/(good + bad) + good/MAX * B
+        # - (good/(good + bad)) * (good/MAX) ^ B
+        # For example :
+        # - SBC:pl CHANGESUFFIX "rs" "r" g: 15 b : 0
+        # - SBC:pl CHANGESUFFIX "s" "" g: 179 b : 18
+        # => which one have to be chosen ?
+        # The first means : go straight to human logic (try to create less error 
+        # when applying rules)
+        # The second : use your own logic (create error if it seems a good operation,
+        # and create new rules to correct the new errors created)
+
+        # Sorting using the rapport good / bad,
+        # Giving advantage to the more numerous, if rapport is close.
+        coeff = 0.1  # The lower the coeff, the stronger the rules with bad = 0
         g = lambda good, bad: ( float(good) / ( float(good) + float(bad) ) ) * ( ( float(good) / MAX ) ** coeff )
         try:
             return sorted([(r[0], g(r[1], r[2])) for r in rules if r[1] / max(r[2], 1) >= minval], key=itemgetter(1), reverse=True)[0]
         except IndexError:
             return None, None
-        #Sorting with the difference between good and bad,
-        #diving advantage to the less bad if same difference
-        #Adding 0.1 to prevent from division by 0.
+        # Sorting with the difference between good and bad,
+        # diving advantage to the less bad if same difference
+        # Adding 0.1 to prevent from division by 0.
 #        return sorted([(r[0], (r[1] - r[2] - (r[2] / (r[1] + 0.1)))) for r in rules], key=itemgetter(1), reverse=True)[0]
     
     def make_rules(self, token):
@@ -100,9 +102,9 @@ class RuleTemplate(RetrievableObject):
         return complement == self.get_complement(token)#cache this
     
     def is_candidate(self, token, rule):
-        #Should we check if word is in lexicon and to_tag a possible tag for it?
+        # Should we check if word is in lexicon and to_tag a possible tag for it?
         from_tag, to_tag, _, complement = self.uncompile_rule(rule)
-        #We not always have a from_tag (eg. template hassuf)
+        # We not always have a from_tag (eg. template hassuf)
         if (from_tag and token.tag != from_tag) or \
            not self.test_complement(token, complement):
             return False
@@ -122,9 +124,11 @@ class ContextualTemplateGenerator(type):
     @classmethod
     def get_instance(cls, s, **kwargs):
         """
-        s can be template name or rule.
+        Returns and instance of a rule, from a template name or a rule string.
+        
+        `s` can be template name or rule.
         """
-        if s.count(" ") > 0:#rule
+        if s.count(" ") > 0:  # rule
             _, _, name, _ = ContextualBaseTemplate.uncompile_rule(s)
         else:
             name = s
@@ -134,13 +138,18 @@ class ContextualTemplateGenerator(type):
     @classmethod
     def export(cls, rules):
         """
-        Rules are tuples (rule, score)
+        Export rules to the provisory config file.
+        
+        `rules` are tuples (rule, score).
         """
         save_to_file("corpus/contextual_rules.pdg", 
                      "\n".join(rule for rule, score in rules))
 
     @classmethod
     def load(cls):
+        """
+        Load rules from config file.
+        """
         if cls._loaded_rules is None:
             log("Loading contextual rules...", "CYAN", True)
             lx = load_file("corpus/contextual_rules.rls")
@@ -149,7 +158,7 @@ class ContextualTemplateGenerator(type):
 
 class ContextualBaseTemplate(RuleTemplate):
     """
-    Base class for the lexical rules.
+    Base class for the contextual rules.
     """
     __metaclass__ = ContextualTemplateGenerator
     _uncompiled_rules = {}
@@ -287,7 +296,7 @@ class NoLexiconCheckTemplate(LexicalBaseTemplate):
 
 class LexiconCheckTemplate(LexicalBaseTemplate):
     """
-    All the templates who have to check lexicon.
+    Base templates for those who have to check lexicon.
     """
     
     def make_rules(self, token):
@@ -308,14 +317,12 @@ class LexiconCheckTemplate(LexicalBaseTemplate):
         in lexicon.
         """
         return self.modified_token(token, complement) in self.lexicon
-    
-#    def make_rule(self, affix, name, to_tag):
-#        return u"%s %s %d %s" % (affix, name, len(affix), to_tag)    
-#    
-#    def make_frule(self, from_tag, affix, name, to_tag):
-#        return u"%s %s %s %d %s" % (from_tag, affix, name, len(affix), to_tag)    
+   
 
 class deletesuf(LexiconCheckTemplate):
+    """
+    Change current tag to tag X, if removing suffix Y lead in a entry of the lexicon.
+    """
     
     def get_complement(self, token):
         """
@@ -338,11 +345,16 @@ class deletesuf(LexiconCheckTemplate):
                token[:-len(complement)] in self.lexicon
 
 class fdeletesuf(deletesuf):
+    """
+    Change current tag to tag X, if removing suffix Y lead in a entry of lexicon
+    and if current tag is Z.
+    """
     pass
 
 class deletepref(LexiconCheckTemplate):
     """
     Change current tag to tag X, if removing prefix Y lead in a entry of the lexicon.
+    
     Prefix Y lenght from 1 to 4 (Y < 4) : 
     Syntax : Y deletepref len(Y) X
     Ex. : re deletepref 2 VNCFF 
@@ -359,7 +371,7 @@ class deletepref(LexiconCheckTemplate):
     
     def test_complement(self, token, complement):
         """
-        Test if token has the right prefix, and if deleting it result in a
+        Tests if token has the right prefix, and if deleting it result in a
         word in the lexicon
         """
         return token[:len(complement)] == complement and \
@@ -369,18 +381,20 @@ class fdeletepref(deletepref):
     """
     Change current tag to tag X, if removing prefix Y lead in a entry of the lexicon
     and if current tag is Z.
+    
     Prefix Y lenght from 1 to 4 (Y < 4) : 
-    Syntax : Z Y deletepref len(Y) X
-    Ex. : ADV re deletepref 2 VNCFF 
+    Syntax : Z Y fdeletepref len(Y) X
+    Ex. : ADV re fdeletepref 2 VNCFF 
     """
     pass
 
 class addpref(LexiconCheckTemplate):
     """
-    Change current tag to tag X, if removing prefix Y lead in a entry of the lexicon.
+    Change current tag to tag X, if adding prefix Y lead in a entry of the lexicon.
+    
     Prefix Y lenght from 1 to 4 (Y < 4) : 
-    Syntax : Y deletepref len(Y) X
-    Ex. : re deletepref 2 VNCFF 
+    Syntax : Y addpref len(Y) X
+    Ex. : er addpref 2 VNCFF 
     """
     
     def get_complement(self, token):
@@ -395,14 +409,23 @@ class addpref(LexiconCheckTemplate):
         return complement + token.original
 
 class faddpref(addpref):
+    """
+    Change current tag to tag X, if adding prefix Y lead in a entry of the lexicon
+    and if current tag is Z.
+
+    Prefix Y lenght from 1 to 4 (Y < 4) : 
+    Syntax : Z Y faddpref len(Y) X
+    Ex. : SBC:sg re faddpref 2 VNCFF 
+    """
     pass
 
 class addsuf(LexiconCheckTemplate):
     """
-    Change current tag to tag X, if removing prefix Y lead in a entry of the lexicon.
-    Prefix Y lenght from 1 to 4 (Y < 4) : 
-    Syntax : Y deletepref len(Y) X
-    Ex. : re deletepref 2 VNCFF 
+    Change current tag to tag X, if adding suffix Y lead in a entry of the lexicon.
+    
+    Suffix Y lenght from 1 to 4 (Y < 4) : 
+    Syntax : Y addsuf len(Y) X
+    Ex. : re addsuf 2 VNCFF 
     """
     
     def get_complement(self, token):
@@ -419,10 +442,24 @@ class addsuf(LexiconCheckTemplate):
 
 
 class faddsuf(addsuf):
+    """
+    Change current tag to tag X, if removing prefix Y lead in a entry of the
+    lexicon and current tag is Z.
+    
+    Suffix Y lenght from 1 to 4 (Y <= 4) : 
+    Syntax : Z Y faddsuf len(Y) X
+    Ex. : SBC:sg re faddsuf 2 VNCFF 
+    """
     pass
 
 class hassuf(NoLexiconCheckTemplate):
-    
+    """
+    Change current tag to tag X, if suffix is Y.
+
+    Suffix Y is length from 1 to 4 (y <= 4)    
+    Syntax: Y hassuf len(Y) X
+    Ex. : ment hassuf 4 ADV
+    """    
     def get_complement(self, token):
         """
         Return a tuple of afix, ceased_token.
@@ -436,9 +473,23 @@ class hassuf(NoLexiconCheckTemplate):
         return final
 
 class fhassuf(hassuf):
+    """
+    Change current tag to tag X, if suffix is Y and current tag is Z.
+
+    Suffix Y is length from 1 to 4 (y <= 4)    
+    Syntax: Z Y hassuf len(Y) X
+    Ex. : SBC:sg ment hassuf 4 ADV
+    """
     pass
 
 class haspref(NoLexiconCheckTemplate):
+    """
+    Change current tag to tag X, if prefix is Y.
+
+    Prefix Y is length from 1 to 4 (y <= 4)    
+    Syntax: Z Y haspref len(Y) X
+    Ex. : pro haspref 3 SBC:sg
+    """
     
     def get_complement(self, token):
         final = []
@@ -450,11 +501,18 @@ class haspref(NoLexiconCheckTemplate):
         return final
 
 class fhaspref(haspref):
+    """
+    Change current tag to tag X, if prefix is Y and current tag is Z.
+
+    Prefix Y is length from 1 to 4 (y <= 4)    
+    Syntax: Z Y hassuf len(Y) X
+    Ex. : ADV bla haspref 3 DTC:sg
+    """
     pass
 
 class goodright(NoLexiconCheckTemplate, ProximityCheckTemplate):
     """
-    The current word is at the right of the word x.
+    The current word is at the right of the word X.
     """
     def get_complement(self, token):
         return [unicode(t.original) for t in token.get_neighbors(-1)]
@@ -494,7 +552,7 @@ class WordTagBasedTemplate(ContextualBaseTemplate):
     """
     def get_complement(self, token):
         args = self.get_target()
-        nbors = token.get_neighbors(*args)#must return empty []
+        nbors = token.get_neighbors(*args)  # must return empty []
         if nbors:
             return [unicode(nbors[0].original), nbors[1].verified_tag]
         else:
@@ -600,7 +658,7 @@ class PREV2TAG(TagBasedTemplate):
 
 class SURROUNDTAG(TagBasedTemplate):
     """
-    The token after next token is tagged X.
+    The preceding word is tagged x and the following word is tagged y.
     """
     def get_target(self):
         return -1, 1

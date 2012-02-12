@@ -639,6 +639,10 @@ A chaque règle positive, ajouter des règles "négatives" :
 appliquer la première règle sauf si une des règles négatives s'applique ?
 Pour les règles négatives, ne retenir que 100 % de good ?
 
+Pouvoir gérer une "pondération" des collocation par défaut ou un truc du genre pour pouvoir processer des textes très court ? (Voire prendre en compte automatiquement la longueur du texte pour la pondération...)
+
+Cas de phrases à la con:
+Florilège: « En tant que chef de l'État, vous engageriez-vous à défendre les références à Dieu ou à la religion chrétienne dans des projets de constitution ou de traités ?», «Êtes-vous disposé à supprimer les subventions aux organismes culturels qui feraient la promotion d'œuvres artistiques portant volontairement atteinte à la foi et au sacré ?», «Comment comptez-vous protéger la vie humaine depuis la conception dans le sein de la mère jusqu'à la mort naturelle ?».
 
 ========================
 Apprentissage sémantique

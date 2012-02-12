@@ -23,7 +23,7 @@ class TextManager(object):
     def instantiate_text(self, text):
         """
         return samples and tokens.
-        text is tokenised
+        text is tokenized
         each token is : original + optionnal verified_tag (for training)
         """
         csamples = []
@@ -366,7 +366,7 @@ class Token(RetrievableObject):
         """
         Try to define if this word is a "mot outil".
         """
-        return self.tag in ["DTN:sg", "DTN:pl", "DTC:sg", "DTC:pl", "PLU", "COO", "PREP", "REL", "SUB"]
+        return self.tag in ["DTN:sg", "DTN:pl", "DTC:sg", "DTC:pl", "PLU", "COO", "PREP", "REL", "SUB"] or self in usual_words or (self.position == 0 and self.lower() in usual_words)
     
     def is_verb(self):
         """

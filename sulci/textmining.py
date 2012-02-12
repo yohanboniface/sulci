@@ -736,7 +736,10 @@ class Stemm(RetrievableObject):
         return self.is_valid_alone() and (self.count >= self.text.medium_word_count or self.istitle())
 
     @property
-    def main_occurrence(self):#cache me
+    def main_occurrence(self):
+        """
+        Returns the "main" one from the linked tokens.
+        """
         if self._main_occurrence is None:
             self._main_occurrence = sorted(words_occurrences([t for t in self.occurrences]).iteritems(),
                       key=itemgetter(1), reverse=True)[0][0]
