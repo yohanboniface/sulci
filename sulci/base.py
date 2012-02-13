@@ -387,7 +387,7 @@ class Token(RetrievableObject):
             "REL",
             "SUB",
         ]
-        return self.tag in tool_tags or self in usual_words \
+        return self.tag in tool_tags or self.original in usual_words \
                          or (self.position == 0 and self.lower() in usual_words)
 
     def is_verb(self):
