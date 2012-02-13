@@ -21,6 +21,9 @@ from django.conf import settings
 
 settings.configure()
 
+settings.SULCI_CLI_CONTENT_APP_NAME = 'dummy_app'
+settings.SULCI_CLI_CONTENT_MODEL_NAME = 'dummy_model'
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.

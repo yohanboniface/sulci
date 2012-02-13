@@ -35,6 +35,7 @@ Contents
    overview
    training
    contributing
+   management_commands
    api/sulci
 
 Indices and tables

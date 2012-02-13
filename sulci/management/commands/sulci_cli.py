@@ -38,7 +38,7 @@ class SulciBaseCommand(BaseCommand):
 
 class Command(SulciBaseCommand):
     """
-    Launch suci semantical tagger.
+    Launch sulci semantical tagger. See options for details.
     """
     help = __doc__
     
