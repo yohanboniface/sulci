@@ -62,6 +62,17 @@ Sample usage::
      (<Descriptor: diplomatie>, 14.798308089447328),
      (<Descriptor: Dmitri Medvedev>, 10.337552742616033)]
 
+Test Page
+---------
+
+A simple view is provided to easily test Sulci.
+You need to add the url in your urlconfs, for example::
+
+        url(r'^sulci/demo$', 'sulci.views.demo', name='sulci_demo'),
+
+Then you'll have to start the `Django runserver <https://docs.djangoproject.com/en/dev/ref/django-admin/#runserver-port-or-address-port>`_ 
+and browse the page http://localhost:8000/sulci/demo.
+
 Configure for training
 ----------------------
 
