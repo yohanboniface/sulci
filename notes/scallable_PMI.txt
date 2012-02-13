@@ -1,0 +1,100 @@
+Global Pointwise Mutual Interaction Computation
+
+Goal: compute PMI on a large corpus in "real-time"; that is: when data is added to (or removed from) the corpus, recompute the PMI of the whole dataset in a reasonable time.
+
+Notations:
+
+    L1 = length of the corpus, in words (including repetitions)
+    L2 = number of bigrams (sequences of 2 words) in the corpus (including repetitions)
+    L3 = number of trigrams in the corpus
+    Ln = number of n-grams in the corpus
+
+Example: if the corpus is made of two texts, "a a a b c" and "a b a d", then:
+
+    L1=9
+    L2=7
+    L3=5
+    L4=3
+    etc.
+
+More notations:
+
+    N(A) = number of occurrences of word A
+    N(AB) = number of occurrences of the digram AB
+    N(ABC) = guess what!
+
+Example with the same corpus as above:
+
+    N(a)=5
+    N(b)=2
+    N(ab)=2
+
+Yet more notations:
+
+    P(A) = probability of word A = N(A)/L1
+    P(AB) = probability of digram AB = N(AB)/L2
+    P(X) where X is a n-gram = probability of the n-gram X = N(X)/Ln
+
+Last run of notations (I promise):
+
+    I(X) where X is a n-gram made of ABC... = pointwise mutual information of the n-gram
+    = log2 (P(X)/(P(A)P(B)P(C)...))
+
+
+Assume we store somewhere the values of the following things:
+
+    L1, L2, ..., Lmax (this is super easy) - that will be our "corpus length information"
+    N(X) where X is a n-gram, with n from 1 to some maximal number "max" - that will be our "n-grams occurrence information"
+
+Then we have the following:
+
+    if we need the PMI of some n-gram X, we just need to compute N(X)/Ln (reminder: n is the length of the n-gram X)
+    if we need to get the best n-grams for a fixed value of n (for instance, the bigrams with the best PMI) we just need to get the n-grams with the highest N value. That's easy.
+    if we need to get the best n-grams for variable value of n, then we need to divide N(X) by L(n), which makes the problem slightly more complex.
+
+
+Now, the though part: how do we store efficiently Ln and N(X)? How do we update those values efficiently?
+
+Idea: use REDIS for that. The key will be n or X, the value will be the number. REDIS allows atomic incrby/decrby. So the (distributed) algorithm is the following:
+
+    in the beginning, Ln=0 for every value of n.
+    in the beginning, N(X)=0 for every value of X.
+    another way to put it is that when fetching Ln or N(X), if n or X does not exist, return 0.
+    distribute the corpus over the computation nodes (e.g., one article per computation node; corpus items should not be split over two nodes)
+    each node will compute local values of L(1..n) and N(X) (for every n-gram in the corpus item), and after computation, add the values to those in the REDIS database
+    if you need to remove something from the corpus, compoute local values again and substract them
+    optionnally, at the end of the computation, put the list of modified items in a queue for later use
+    optionnally, at the end of the computation, retrieve the (updated) values of Ln and N(X) to see which n-grams scored the best (see "concurrency issues" below however)
+
+Expected performance:
+
+    this works well if the computation time is larger than the "commit to the database" time
+    REDIS scales very well if you mainly use INCRBY/DECRBY/GET operations (all is done in memory)
+    however, it is not very efficient if you need to retrieve the n-grams with the highest PMI
+
+
+How do I get my PMI
+
+    if you need the PMI of a specific n-gram X: super easy, fetch N(X) and Ln and you're done
+    if you need high-ranked PMIs: walk through the whole dataset (slow!), or use a side index (REDIS can store it too)
+    if you need the "n-grams with a good PMI" after analyzing a text: this can be done optionnally (see above) but the measurement is not guaranteed to be accurate (however, the larger the corpus, the lower the error, isn't it nice?)
+
+
+Issues
+
+    if you compute the PMI in the add/remove run, you can have concurrency issue, since updates to Ln and N(X) can intermix with other workers; REDIS can do basic transactions but maybe the perf hit is not worth it
+        if you put the altered n-grams in a queue, you can have some other worker computing the PMI pseudo-atomically (for instance on a REDIS replicate)
+        you can also have cronjobs computing the stuff
+    if you use PMI for text classification, you won't end with the same results for the same text depending of the rest of the corpus. Guess what: that's expected
+        however, you can periodically rescan the olders texts, just to check which n-grams are in the text and see how they score now (this requires a readonly access to the REDIS)
+    what if the data in REDIS is corrupted? Since it's all differencial, you have to recompute everything, right?
+        THAT'S RIGHT! Seriously, keep together in the REDIS a map of which article has been indexed when and do regular backups; if things break, you can go back to a previous state
+    I really want to see (live!) n-grams with good PMI!
+        let's say you want those above a threshold of 10; each time you spot a n-gram above this value (while doing the computation), push it to REDIS using a sorted set. That should work pretty well.
+
+
+Remarks
+
+    Since REDIS is key/value based, you can shard the keys if you need to scale the load; the real (potential) issue would rather be on the latency of the REDIS?
+
+
