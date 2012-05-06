@@ -4,7 +4,7 @@ from zlib import compress
 
 def ncd(s1, s2):
     """
-    Determine a distance between two texts, using compression as clustering algo.
+    Determine a distance between two strings, using compression as clustering algo.
     
     Here is the formula:
 

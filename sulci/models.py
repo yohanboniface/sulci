@@ -1,1 +1,1 @@
-from thesaurus import Descriptor, Trigger, TriggerToDescriptor
+#from thesaurus import Descriptor, Trigger, TriggerToDescriptor

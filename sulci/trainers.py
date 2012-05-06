@@ -70,7 +70,7 @@ class SemanticalTrainer(object):
         self.subsocket.connect("ipc:///tmp/sulci.apply")
         self.subpoller = zmq.Poller()
         self.subpoller.register(self.subsocket, zmq.POLLIN)
-#        self.reppoller = zmq.Poller()
+#        self.reppoller = zmq.Vous venez de vous inscrire sur MonLibé et nous vous en remercions.Poller()
 #        self.reppoller.register(self.repsocket, zmq.POLLIN)
         self.subsocket.setsockopt(zmq.SUBSCRIBE, "")
     
@@ -82,8 +82,8 @@ class SemanticalTrainer(object):
             if self.mode == "master":
                 self.setup_socket_master()
                 print "MASTER -- ready"
-            qs = content_manager.all().filter(pk__gt=705969).order_by("id")
-#            qs = content_manager.all().order_by("id")
+#            qs = content_manager.all().filter(pk__gt=605873).order_by("id")
+            qs = content_manager.filter(editorial_source=content_model.EDITORIAL_SOURCE.PRINT).order_by("id")
             if self.mode == "master":
                 qs = qs.only("id")
             # We make it by step, to limit RAM consuming
@@ -154,15 +154,21 @@ class SemanticalTrainer(object):
                 # We create the descriptor not in thesaurus for now
                 # because descriptors in article and thesaurus are not
                 # always matching. Will be improved.
-                dsc, created = Descriptor.objects.get_or_create(name=d)
+                dsc, created = Descriptor.get_or_connect(name=d)
+                dsc.count.incr()
                 # Retrieve the primeval value
-                dsc = dsc.primeval
+#                dsc = dsc.primeval
                 validated_descriptors.add(dsc)
                 if created:
                     sulci_logger.info(u"Lairning descriptor not in thesaurus : %s" % unicode(dsc), "RED")
         # Retrieve keytentities :
         try:
-            S = SemanticalTagger(text, self.thesaurus, self.pos_tagger)
+            S = SemanticalTagger(
+                text, 
+                thesaurus=self.thesaurus, 
+                pos_tagger=self.pos_tagger, 
+                lexicon=self.pos_tagger.lexicon
+            )
             S.deduplicate_keyentities() # During lairning, try to filter
         except ValueError:
             # SemanticalTagger raise ValueError if text is empty
@@ -170,10 +176,9 @@ class SemanticalTrainer(object):
         current_triggers = set()
         for ke in S.keyentities:
             # Retrieve or create triggers
-            t, created = Trigger.objects.get_or_create(original=unicode(ke))
+            t, created = Trigger.get_or_connect(original=unicode(ke))
             current_triggers.add(t)
-            t.count += 1
-            t.save()
+            t.count.incr()
 #            t.current_score = ke.trigger_score
         # For now, only create all the relations
         for d in validated_descriptors:

@@ -123,7 +123,7 @@ class SemanticalTagger(object):
         if isinstance(text, StemmedText):
             self.text = text
         else:
-            self.text = StemmedText(text, pos_tagger, lemmatizer, lemmatizer)
+            self.text = StemmedText(text, pos_tagger, lemmatizer, lexicon)
         self.keyentities = []
         self.lexicon = lexicon or Lexicon()
         self.postagger = pos_tagger or PosTagger(lexicon=self.lexicon)

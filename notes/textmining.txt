@@ -274,6 +274,8 @@ Faire un outil qui liste les mots d'un texte par tag (avec un tag optionnel si o
 Faire un outil qui permet de lister les tags d'un mot dans le corpus (pas le lexique du coup), plus pouvoir lister les occurrences d'un mot avec un tag donné
 Penser à une option pour le case insensitive
 
+Pour les entités clés, utiliser des patterns, genre: SBC de SBC, SBC ADJ*x, etc.
+
 
 =============
 Lemmatisation
