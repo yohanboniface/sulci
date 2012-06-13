@@ -37,7 +37,7 @@ class SemanticalTrainer(object):
         """
         # TODO Add aliases...
         for d in self.thesaurus:
-            t = Trigger.objects.create(original=unicode(d))
+            t = Trigger.get_or_connect(original=unicode(d))
             t.connect(d, 1)
     
     def setup_socket_master(self):
@@ -83,7 +83,7 @@ class SemanticalTrainer(object):
                 self.setup_socket_master()
                 print "MASTER -- ready"
 #            qs = content_manager.all().filter(pk__gt=605873).order_by("id")
-            qs = content_manager.filter(editorial_source=content_model.EDITORIAL_SOURCE.PRINT).order_by("id")
+            qs = content_manager.order_by("id")[:100]
             if self.mode == "master":
                 qs = qs.only("id")
             # We make it by step, to limit RAM consuming

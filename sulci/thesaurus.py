@@ -26,7 +26,7 @@ import re
 import codecs
 import os
 
-from limpyd import model
+from limpyd import model, fields
 
 from sulci.textutils import tokenize_text, lev
 from sulci.base import RetrievableObject
@@ -54,7 +54,7 @@ class Thesaurus(object):
         return Descriptor.objects.get(name=unicode(key))
     
     def normalize_item(self, item):
-        from textmining import KeyEntity#Sucks...
+        from textmining import KeyEntity  # Sucks...
         if isinstance(item, KeyEntity):
             tup = tuple([unicode(t) for t in item.stemms])
         elif isinstance(item, list):
@@ -98,6 +98,7 @@ class Descriptor(model.RedisModel):
     name = model.HashableField(indexable = True)
     description = model.StringField()
     count = model.StringField()
+    max_weight = model.HashableField(default=0)
 #    is_alias_of = model.ReferenceField('Descriptor')
     
     def __init__(self, *args, **kwargs):
@@ -107,16 +108,22 @@ class Descriptor(model.RedisModel):
     def __unicode__(self):
         return self.name.hget().decode('utf-8')
 
-    @property
-    def max_weight(self):
-        if self._max_weight is None: # Thread cache
-            try:
-                #Ordered by -weight by default
-                self._max_weight = self.triggertodescriptor_set.all()[0].weight
-            except TriggerToDescriptor.DoesNotExist:
-                # Should not occur.
-                self._max_weight = 0
-        return self._max_weight
+    def __str__(self):
+        return self.name.hget()
+
+    def __repr__(self):
+        return "<Descriptor %s: %s>" % (self.pk.get(), self.name.hget())
+
+    # @property
+    # def max_weight(self):
+    #     if self._max_weight is None: # Thread cache
+    #         try:
+    #             #Ordered by -weight by default
+    #             self._max_weight = self.triggertodescriptor_set.all()[0].weight
+    #         except TriggerToDescriptor.DoesNotExist:
+    #             # Should not occur.
+    #             self._max_weight = 0
+    #     return self._max_weight
     
     @property
     def primeval(self):
@@ -162,6 +169,85 @@ class Descriptor(model.RedisModel):
 #        return u"%s =[%f]=> %s" % (self.trigger, self.weight, self.descriptor)
 
 
+class TriggerToDescriptor(model.RedisModel):
+    """
+    Helper to manage the trigger to descriptor relation.
+    """
+    trigger_id = model.HashableField(indexable=True)
+    descriptor_id = model.HashableField(indexable=True)
+    weight = model.HashableField(default=1)
+
+    # def __init__(self, trigger, descriptor):
+    #     """
+    #     Trigger and descriptor could be instances, or pk.
+    #     """
+    #     super(TriggerToDescriptor, self).__init__(*args, **kwargs)
+    #     self._trigger = None  # Used for caching the linked trigger instance
+    #     self._descriptor = None  # idem for descriptor linked instance
+    #     if isinstance(trigger, (int, str)):
+    #         # shortcut to be able to pass the pk as parameter
+    #         trigger_id = int(trigger)
+    #     elif isinstance(trigger, Trigger):
+    #         trigger_id = trigger.pk
+    #         self._trigger = trigger  # Cache the instance
+    #     else:
+    #         raise ValueError("trigger param must be either a pk or a Trigger "
+    #                          "instance, not %s" % type(trigger))
+    #     if isinstance(descriptor, (int, str)):
+    #         descriptor_id = int(trigger)
+    #     elif isinstance(descriptor, Descriptor):
+    #         descriptor_id = descriptor.pk
+    #         self._descriptor = descriptor
+    #     else:
+    #         raise ValueError("descriptor param must be either a pk or a "
+    #                          "Descriptor instance, not %s" % type(descriptor))
+
+    @property
+    def trigger(self):
+        """
+        Returns the trigger instance corresponding to the pk stored.
+        """
+        if not "_trigger" in dir(self) \
+                            or self._trigger.pk.get() != self.trigger_id.hget():
+            # Fetch or refetch it
+            self._trigger = Trigger(self.trigger_id.hget())
+        return self._trigger
+
+    @property
+    def descriptor(self):
+        """
+        Return the descriptor instance corresponding to the pk stored.
+        """
+        if not "_descriptor" in dir(self) \
+                       or self._descriptor.pk.get() != self.descriptor_id.hget():
+            # Fetch or refetch it
+            self._descriptor = Descriptor(self.descriptor_id.hget())
+        return self._descriptor
+
+    def post_command(self, sender, name, result, args, kwargs):
+        if (isinstance(sender, fields.RedisField)
+            and sender.name == "weight" 
+            and name in sender.available_modifiers
+            and self.trigger_id.hget() is not None):  # Means instantiation is done
+            if int(self.weight.hget()) > int(self.trigger.max_weight.hget()):
+                self.trigger.max_weight.hset(self.weight.hget())
+            if int(self.weight.hget()) > int(self.descriptor.max_weight.hget()):
+                self.descriptor.max_weight.hset(self.weight.hget())
+        return result
+
+    @property
+    def pondered_weight(self):
+       """
+       Give the weight of the relation, relative to the max weight of the
+       trigger and the max weight of the descriptor.
+       """
+       # current weigth relative to trigger max weight
+       weight = int(self.weight.hget()) / int(self.trigger.max_weight.hget())
+       # current weight relative to descriptor max weight
+       weight *= int(self.weight.hget()) / int(self.descriptor.max_weight.hget())
+       return weight
+
+
 class Trigger(model.RedisModel):
     """
     The trigger is a keyentity who suggest some descriptors when in a text.
@@ -170,8 +256,8 @@ class Trigger(model.RedisModel):
     This score is populated during the sementical training.
     """
     original = model.HashableField(indexable=True)
-    count = model.StringField()
-    descriptors = model.SortedSetField()
+    count = model.StringField(default=0)
+    max_weight = model.HashableField(default=0)
 
     def __init__(self, *args, **kwargs):
         self._max_weight = None
@@ -194,39 +280,41 @@ class Trigger(model.RedisModel):
 #            self._cached_descriptors = list(self.descriptors.all())
 #        return self._cached_descriptors
 
-
     @property
     def _synapses(self):
         if self._cached_synapses is None:
-            self._cached_synapses = list(self.triggertodescriptor_set.select_related().all()[:20])
+            self._cached_synapses = \
+                        TriggerToDescriptor.collection(trigger_id=self.pk.get())[:20]
         return self._cached_synapses
-    
+
     def __unicode__(self):
-        return unicode(self.original)
-    
+        return unicode(self.original.hget())
+
     def __contains__(self, key):
         if isinstance(key, Descriptor):
-            return self.descriptors.zscore(key.pk) is not None
+            return TriggerToDescriptor.exists(trigger_id=self.pk.get(), descriptor_id=key.pk.pk())
         elif isinstance(key, str):
+            # FIXME: remove
             return key in self.original.hget()
-    
+
     def __setitem__(self, key, value):
         if not isinstance(key, Descriptor):
             raise ValueError("Key must be Descriptor instance, got %s (%s) instead" 
                                                         % (str(key), type(key)))
         # Flush descriptors cache
         self._cached_descriptors = None
-        self.descriptors.zincrby(key.pk, amount=value)
+        t2d = TriggerToDescriptor(trigger_id=self.pk.get(), descriptor_id=key.pk.get())
+        t2d.weight.hincrby(amount=value)
     
     def __getitem__(self, key):
-        return TriggerToDescriptor.objects.get(descriptor=key, trigger=self)
+        return TriggerToDescriptor.get(descriptor_id=key.pk.get(), trigger=self.pk.get())
     
 #    def __delitem__(self, key):
 #        return self._descriptors.__delitem__(key)
     
     def __iter__(self):
-        return self._synapses.__iter__()
-    
+        return TriggerToDescriptor.instances(trigger_id=self.pk.get())
+
     # Django call the __len__ method for every related model when using
     # select_related...
 #    def __len__(self):
@@ -235,19 +323,22 @@ class Trigger(model.RedisModel):
     def items(self):
         return self._descriptors
     
-    def __hash__(self):
-        return self.original.__hash__()
-    
-    @property
-    def max_weight(self):
-        if self._max_weight is None: # Thread cache
-            try:
-                #Ordered by -weight by default
-                self._max_weight = self.triggertodescriptor_set.all().only('weight')[0].weight
-            except TriggerToDescriptor.DoesNotExist:
-                # Should not occur.
-                self._max_weight = 0
-        return self._max_weight
+    # @property
+    # def max_weight(self):
+    #     if self._max_weight is None: # Thread cache
+    #         try:
+    #             max_descriptor_pk = self.descriptors.zrevrange(0, 1)[0]
+    #         except IndexError:
+    #             self._max_weight = 0
+    #         else:
+    #             self._max_weight = self.descriptors.zscore(max_descriptor_pk)
+    #         # try:
+    #         #     #Ordered by -weight by default
+    #         #     self._max_weight = self.triggertodescriptor_set.all().only('weight')[0].weight
+    #         # except TriggerToDescriptor.DoesNotExist:
+    #         #     # Should not occur.
+    #         #     self._max_weight = 0
+    #     return self._max_weight
 #        return max(self[d.descriptor].weight for d in self)
     
 #    def init_descriptors(self, **kwargs):

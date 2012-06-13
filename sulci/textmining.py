@@ -236,7 +236,7 @@ class SemanticalTagger(object):
             self._triggers = set()
             for kp in self.keyentities:
                 try:
-                    t = Trigger.objects.get(original=unicode(kp))
+                    t = Trigger.get(original=unicode(kp))
                     self._triggers.add((t, kp.trigger_score))
                 except Trigger.DoesNotExist:
                     pass
@@ -261,15 +261,14 @@ class SemanticalTagger(object):
             for d in t:
                 # Preventing from rehiting the db
                 # By him-self, Django to retrieve the reverse FK in the cache...
-                d.trigger = t
-                if d.weight > 2: # How to define this min ?
-                    key = d.descriptor.pk
+                if d.weight.hget() > 2: # How to define this min ?
+                    key = d.descriptor.pk.get()
                     # Add the descriptor if needed
                     if not key in self._scored_descriptors:
                         self._scored_descriptors[key] = {"weight":0, "descriptor": d.descriptor}
                     # Trying to keep the same instance when the same
                     # descriptor is seen few times (should occurs)
-                    d.descriptor = self._scored_descriptors[key]["descriptor"]
+                    d._descriptor = self._scored_descriptors[key]["descriptor"]
                     # Update descriptor final score
                     self._scored_descriptors[key]["weight"] += d.pondered_weight * score
             total_score += score
@@ -324,12 +323,12 @@ class SemanticalTagger(object):
         for kp in sorted(self.keyentities, key=lambda kp: kp.trigger_score, reverse=True)[:20]:
             sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
         sulci_logger.debug(u"Triggers and relation with descriptors", "BLUE", True)
-        for t, score in self.triggers:
-            if len(t._synapses) > 0:
-                sulci_logger.debug(u"%s (Local score : %f)" % (unicode(t), score), "GRAY", highlight=True)
-                sulci_logger.debug(u"Trigger total count : %d" % t.count, "GRAY")
-                for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
-                    sulci_logger.debug(u"%s %f" % (unicode(d), d.pondered_weight), "CYAN")
+        # for t, score in self.triggers:
+        #     if len(t._synapses) > 0:
+        #         sulci_logger.debug(u"%s (Local score : %f)" % (unicode(t), score), "GRAY", highlight=True)
+        #         sulci_logger.debug(u"Trigger total count : %d" % t.count, "GRAY")
+        #         for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
+        #             sulci_logger.debug(u"%s %f" % (unicode(d), d.pondered_weight), "CYAN")
 
 class KeyEntity(RetrievableObject):
     count = 0
