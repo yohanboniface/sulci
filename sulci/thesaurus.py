@@ -38,17 +38,11 @@ class Thesaurus(object):
         self.descriptors = Descriptor.collection()
     
     def __contains__(self, item):
-        """
-        TODO.
-        """
-        try:
-            d = self[item]
-            return True
-        except Descriptor.DoesNotExist:
-            return False
+        # TODO: accept also Desciptor instances as param
+        return Descriptor.exists(name=item)
     
     def __iter__(self): 
-        return self.descriptors.__iter__()
+        return Descriptor.instances()
     
     def __getitem__(self, key):
         return Descriptor.objects.get(name=unicode(key))
@@ -95,9 +89,9 @@ class Descriptor(model.RedisModel):
     """
     
 #    parent = model.ReferenceField('Descriptor')
-    name = model.HashableField(indexable = True)
-    description = model.StringField()
-    count = model.StringField()
+    name = model.HashableField(unique=True)
+    description = model.HashableField()
+    count = model.HashableField(default=0)
     max_weight = model.HashableField(default=0)
 #    is_alias_of = model.ReferenceField('Descriptor')
     
@@ -255,8 +249,8 @@ class Trigger(model.RedisModel):
     between the trigger and a descriptor is stored in the relation.
     This score is populated during the sementical training.
     """
-    original = model.HashableField(indexable=True)
-    count = model.StringField(default=0)
+    original = model.HashableField(unique=True)
+    count = model.HashableField(default=0)
     max_weight = model.HashableField(default=0)
 
     def __init__(self, *args, **kwargs):

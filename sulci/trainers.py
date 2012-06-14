@@ -82,8 +82,8 @@ class SemanticalTrainer(object):
             if self.mode == "master":
                 self.setup_socket_master()
                 print "MASTER -- ready"
-#            qs = content_manager.all().filter(pk__gt=605873).order_by("id")
-            qs = content_manager.order_by("id")[:100]
+            qs = content_manager.all().filter(pk__gt=614891).order_by("id")[:10000]
+            # qs = content_manager.all().order_by("id")[:10000]
             if self.mode == "master":
                 qs = qs.only("id")
             # We make it by step, to limit RAM consuming
@@ -155,7 +155,7 @@ class SemanticalTrainer(object):
                 # because descriptors in article and thesaurus are not
                 # always matching. Will be improved.
                 dsc, created = Descriptor.get_or_connect(name=d)
-                dsc.count.incr()
+                dsc.count.hincrby(1)
                 # Retrieve the primeval value
 #                dsc = dsc.primeval
                 validated_descriptors.add(dsc)
@@ -178,7 +178,7 @@ class SemanticalTrainer(object):
             # Retrieve or create triggers
             t, created = Trigger.get_or_connect(original=unicode(ke))
             current_triggers.add(t)
-            t.count.incr()
+            t.count.hincrby(1)
 #            t.current_score = ke.trigger_score
         # For now, only create all the relations
         for d in validated_descriptors:
