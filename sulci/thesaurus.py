@@ -45,7 +45,7 @@ class Thesaurus(object):
         return Descriptor.instances()
     
     def __getitem__(self, key):
-        return Descriptor.objects.get(name=unicode(key))
+        return Descriptor.get(name=unicode(key))
     
     def normalize_item(self, item):
         from textmining import KeyEntity  # Sucks...
@@ -171,30 +171,6 @@ class TriggerToDescriptor(model.RedisModel):
     descriptor_id = model.HashableField(indexable=True)
     weight = model.HashableField(default=1)
 
-    # def __init__(self, trigger, descriptor):
-    #     """
-    #     Trigger and descriptor could be instances, or pk.
-    #     """
-    #     super(TriggerToDescriptor, self).__init__(*args, **kwargs)
-    #     self._trigger = None  # Used for caching the linked trigger instance
-    #     self._descriptor = None  # idem for descriptor linked instance
-    #     if isinstance(trigger, (int, str)):
-    #         # shortcut to be able to pass the pk as parameter
-    #         trigger_id = int(trigger)
-    #     elif isinstance(trigger, Trigger):
-    #         trigger_id = trigger.pk
-    #         self._trigger = trigger  # Cache the instance
-    #     else:
-    #         raise ValueError("trigger param must be either a pk or a Trigger "
-    #                          "instance, not %s" % type(trigger))
-    #     if isinstance(descriptor, (int, str)):
-    #         descriptor_id = int(trigger)
-    #     elif isinstance(descriptor, Descriptor):
-    #         descriptor_id = descriptor.pk
-    #         self._descriptor = descriptor
-    #     else:
-    #         raise ValueError("descriptor param must be either a pk or a "
-    #                          "Descriptor instance, not %s" % type(descriptor))
 
     @property
     def trigger(self):
@@ -297,9 +273,9 @@ class Trigger(model.RedisModel):
                                                         % (str(key), type(key)))
         # Flush descriptors cache
         self._cached_descriptors = None
-        t2d = TriggerToDescriptor(trigger_id=self.pk.get(), descriptor_id=key.pk.get())
+        t2d, _ = TriggerToDescriptor.get_or_connect(trigger_id=self.pk.get(), descriptor_id=key.pk.get())
         t2d.weight.hincrby(amount=value)
-    
+
     def __getitem__(self, key):
         return TriggerToDescriptor.get(descriptor_id=key.pk.get(), trigger=self.pk.get())
     
@@ -374,7 +350,16 @@ class Trigger(model.RedisModel):
     
     @classmethod
     def clean_all_connections(cls):
-        TriggerToDescriptor.objects.filter(weight__lte=0).delete()
+        """
+        Delete all the useless connections.
+        """
+        for inst in TriggerToDescriptor.instances():
+            print "processing", inst, int(inst.weight.hget())
+            if int(inst.weight.hget()) <= 1:
+                print inst.pk.get()
+                sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()))
+                # inst.delete()
+        # TriggerToDescriptor.objects.filter(weight__lte=0).delete()
     
     def export(self):
         """
