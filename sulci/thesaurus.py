@@ -89,10 +89,10 @@ class Descriptor(model.RedisModel):
     """
     
 #    parent = model.ReferenceField('Descriptor')
-    name = model.HashableField(unique=True)
-    description = model.HashableField()
-    count = model.HashableField(default=0)
-    max_weight = model.HashableField(default=0)
+    name = fields.HashableField(unique=True)
+    description = fields.HashableField()
+    count = fields.HashableField(default=0)
+    max_weight = fields.HashableField(default=0)
 #    is_alias_of = model.ReferenceField('Descriptor')
     
     def __init__(self, *args, **kwargs):
@@ -128,48 +128,14 @@ class Descriptor(model.RedisModel):
             return self
         return self.is_alias_of.primeval
 
-#class TriggerToDescriptor(model.Model):
-#    """
-#    This is the "synapse" of the trigger to descriptor relation.
-#    """
-#    descriptor = model.ReferenceField(Descriptor)
-#    trigger = model.ReferenceField("Trigger")
-#    weight = model.FloatField(default=0)
-#    
-#    @property
-#    def pondered_weight(self):
-#        """
-#        Give the weight of the relation, relative to the max weight of the
-#        trigger and the max weight of the descriptor.
-#        """
-#        # current weigth relative to trigger max weight
-#        weight = self.weight / self.trigger.max_weight
-#        # current weight relative to descriptor max weight
-#        weight *= self.weight / self.descriptor.max_weight
-##        # current weight relative to trigger count
-##        # we use logarithm to limit negative impact for very common triggers
-##        weight *= math.log(self.weight) / math.log(self.trigger.count)
-##        # current weight relative to descriptor occurrences in training
-##        # Using log to limit impact
-##        weight *= \
-##           math.log(self.weight) / math.log(self.descriptor.trained_occurrences)
-#        return weight
-#    
-#    class Meta:
-#        unique_together = ("descriptor", "trigger")
-#        ordering = ["-weight"]
-
-#    def __unicode__(self):
-#        return u"%s =[%f]=> %s" % (self.trigger, self.weight, self.descriptor)
-
 
 class TriggerToDescriptor(model.RedisModel):
     """
     Helper to manage the trigger to descriptor relation.
     """
-    trigger_id = model.HashableField(indexable=True)
-    descriptor_id = model.HashableField(indexable=True)
-    weight = model.HashableField(default=1)
+    trigger_id = fields.HashableField(indexable=True)
+    descriptor_id = fields.HashableField(indexable=True)
+    weight = fields.HashableField(default=1)
 
 
     @property
@@ -225,9 +191,9 @@ class Trigger(model.RedisModel):
     between the trigger and a descriptor is stored in the relation.
     This score is populated during the sementical training.
     """
-    original = model.HashableField(unique=True)
-    count = model.HashableField(default=0)
-    max_weight = model.HashableField(default=0)
+    original = fields.HashableField(unique=True)
+    count = fields.HashableField(default=0)
+    max_weight = fields.HashableField(default=0)
 
     def __init__(self, *args, **kwargs):
         self._max_weight = None

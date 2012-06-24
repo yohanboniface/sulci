@@ -70,7 +70,7 @@ class SemanticalTrainer(object):
         self.subsocket.connect("ipc:///tmp/sulci.apply")
         self.subpoller = zmq.Poller()
         self.subpoller.register(self.subsocket, zmq.POLLIN)
-#        self.reppoller = zmq.Vous venez de vous inscrire sur MonLibé et nous vous en remercions.Poller()
+#        self.reppoller = zmq.Poller()
 #        self.reppoller.register(self.repsocket, zmq.POLLIN)
         self.subsocket.setsockopt(zmq.SUBSCRIBE, "")
     
@@ -82,7 +82,8 @@ class SemanticalTrainer(object):
             if self.mode == "master":
                 self.setup_socket_master()
                 print "MASTER -- ready"
-            qs = content_manager.all().filter(pk__gt=614891).order_by("id")[:10000]
+            # qs = content_manager.all().filter(editorial_source=content_model.EDITORIAL_SOURCE.PRINT).order_by("id")
+            qs = content_manager.all().filter(pk__gt=704041, editorial_source=content_model.EDITORIAL_SOURCE.PRINT).order_by("id")
             # qs = content_manager.all().order_by("id")[:10000]
             if self.mode == "master":
                 qs = qs.only("id")
