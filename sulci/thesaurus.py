@@ -214,6 +214,12 @@ class Trigger(model.RedisModel):
     def __unicode__(self):
         return unicode(self.original.hget())
 
+    def __str__(self):
+        return self.original.hget()
+
+    def __repr__(self):
+        return "<Trigger %s: %s>" % (self.pk.get(), self.original.hget())
+
     def __contains__(self, key):
         if isinstance(key, Descriptor):
             return TriggerToDescriptor.exists(trigger_id=self.pk.get(), descriptor_id=key.pk.pk())
