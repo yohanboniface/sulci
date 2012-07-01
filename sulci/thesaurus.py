@@ -201,24 +201,11 @@ class Trigger(model.RedisModel):
 
     def __init__(self, *args, **kwargs):
         self._max_weight = None
-        # We cache relatins to descriptors. But during training, some other processes
-        # could create and modify relations. This is a potential source of
-        # bad behaviour, but at the moment I prefer to have good performance
-        # cause I launch very often the script for testing it...
-#        self._cached_descriptors = None
         self._cached_synapses = None
         super(Trigger, self).__init__(*args, **kwargs)
 #        self.id = pk#Tuple of original string
 #        self.original = u" ".join(pk)
 #        self.parent = kwargs["parent"]
-#        self._descriptors = {}
-#        self.init_descriptors(**kwargs)
-    
-#    @property
-#    def _descriptors(self):
-#        if self._cached_descriptors is None:
-#            self._cached_descriptors = list(self.descriptors.all())
-#        return self._cached_descriptors
 
     @property
     def _synapses(self):
@@ -241,28 +228,14 @@ class Trigger(model.RedisModel):
         if not isinstance(key, Descriptor):
             raise ValueError("Key must be Descriptor instance, got %s (%s) instead" 
                                                         % (str(key), type(key)))
-        # Flush descriptors cache
-        self._cached_descriptors = None
         t2d, _ = TriggerToDescriptor.get_or_connect(trigger_id=self.pk.get(), descriptor_id=key.pk.get())
         t2d.weight.hincrby(amount=value)
 
     def __getitem__(self, key):
         return TriggerToDescriptor.get(descriptor_id=key.pk.get(), trigger=self.pk.get())
-    
-#    def __delitem__(self, key):
-#        return self._descriptors.__delitem__(key)
-    
+
     def __iter__(self):
         return self._synapses.__iter__()
-
-    # Django call the __len__ method for every related model when using
-    # select_related...
-#    def __len__(self):
-#        return len(self._descriptors)
-    
-    def items(self):
-        return self._descriptors
-
     
     def connect(self, descriptor, score=1):
         """
@@ -304,12 +277,3 @@ class Trigger(model.RedisModel):
             if weight <= 1:
                 # sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()))
                 inst.delete()
-    
-    def export(self):
-        """
-        Return a string for file storage.
-        """
-        if len(self) == 0:
-            sulci_logger.debug(u"No descriptors for %s" % unicode(self), "RED")
-            return None
-        return u"%s\t%s" % (unicode(self), u"\t".join(u"%s %f" % (unicode(k), float(v)) for k, v in self.items()))
