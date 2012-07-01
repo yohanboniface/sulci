@@ -185,9 +185,9 @@ class TriggerToDescriptor(model.RedisModel):
         trigger and the max weight of the descriptor.
         """
         # current weigth relative to trigger max weight
-        weight = int(self.weight.hget()) / int(self.trigger.max_weight.hget())
+        weight = float(self.weight.hget()) / float(self.trigger.max_weight.hget())
         # current weight relative to descriptor max weight
-        weight *= int(self.weight.hget()) / int(self.descriptor.max_weight.hget())
+        weight *= float(self.weight.hget()) / float(self.descriptor.max_weight.hget())
         return weight
 
     @classmethod
