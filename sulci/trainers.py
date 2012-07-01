@@ -83,7 +83,7 @@ class SemanticalTrainer(object):
                 self.setup_socket_master()
                 print "MASTER -- ready"
             # qs = content_manager.all().filter(editorial_source=content_model.EDITORIAL_SOURCE.PRINT).order_by("id")
-            qs = content_manager.all().filter(pk__gt=704041, editorial_source=content_model.EDITORIAL_SOURCE.PRINT).order_by("id")
+            qs = content_manager.all().filter(pk__gt=760741, editorial_source=content_model.EDITORIAL_SOURCE.PRINT).order_by("id")
             # qs = content_manager.all().order_by("id")[:10000]
             if self.mode == "master":
                 qs = qs.only("id")
@@ -110,12 +110,13 @@ class SemanticalTrainer(object):
                         forloop_remaining -= 1
                         t_now = time.time()
                         t_diff = t_now - t_init
-                        time_remaining = (t_diff / (total - forloop_remaining) * forloop_remaining)
+                        average = t_diff / (total - forloop_remaining)
+                        time_remaining = average * forloop_remaining
                         ETA = datetime.datetime.now() + datetime.timedelta(0,time_remaining)
                         # Using print, as I launch this huge script
                         # with python -O (so not __debug__, so no log)
-                        print "MASTER -- %s -- %s remaining to process -- ETA : %s" %\
-                               (status, forloop_remaining, ETA.strftime("%a %d %R"))
+                        print "MASTER -- %s -- %s remaining to process -- Avg: %s s -- ETA : %s" %\
+                               (status, forloop_remaining, round(average, 2), ETA.strftime("%a %d %R"))
             if self.mode == "master":
                 self.pubsocket.send(" stop")
     
