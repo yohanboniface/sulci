@@ -228,7 +228,7 @@ class Trigger(model.RedisModel):
         return self._cached_synapses
 
     def __unicode__(self):
-        return self.original.hget()
+        return self.original.hget().decode('utf-8')
 
     def __str__(self):
         return self.original.hget()
