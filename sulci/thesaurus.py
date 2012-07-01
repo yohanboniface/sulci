@@ -203,9 +203,6 @@ class Trigger(model.RedisModel):
         self._max_weight = None
         self._cached_synapses = None
         super(Trigger, self).__init__(*args, **kwargs)
-#        self.id = pk#Tuple of original string
-#        self.original = u" ".join(pk)
-#        self.parent = kwargs["parent"]
 
     @property
     def _synapses(self):
