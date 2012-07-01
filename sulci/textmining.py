@@ -256,7 +256,6 @@ class SemanticalTagger(object):
         total_score = 0
         max_score = 0
         for t, score in self.triggers:
-#                sulci_logger.debug(u"%s => (%s)" % (repr(kp), unicode(t)), "YELLOW")
             # Take the trigger relations
             for d in t:
                 # Preventing from rehiting the db

@@ -31,6 +31,7 @@ from limpyd import model, fields
 from sulci.textutils import tokenize_text, lev
 from sulci.base import RetrievableObject
 from sulci.utils import save_to_file, get_dir
+from sulci.log import sulci_logger
 
 class Thesaurus(object):
 
@@ -133,6 +134,7 @@ class TriggerToDescriptor(model.RedisModel):
     """
     Helper to manage the trigger to descriptor relation.
     """
+    pk = fields.PKField()
     trigger_id = fields.HashableField(indexable=True)
     descriptor_id = fields.HashableField(indexable=True)
     weight = fields.HashableField(default=1)
@@ -173,15 +175,28 @@ class TriggerToDescriptor(model.RedisModel):
 
     @property
     def pondered_weight(self):
-       """
-       Give the weight of the relation, relative to the max weight of the
-       trigger and the max weight of the descriptor.
-       """
-       # current weigth relative to trigger max weight
-       weight = int(self.weight.hget()) / int(self.trigger.max_weight.hget())
-       # current weight relative to descriptor max weight
-       weight *= int(self.weight.hget()) / int(self.descriptor.max_weight.hget())
-       return weight
+        """
+        Give the weight of the relation, relative to the max weight of the
+        trigger and the max weight of the descriptor.
+        """
+        # current weigth relative to trigger max weight
+        weight = int(self.weight.hget()) / int(self.trigger.max_weight.hget())
+        # current weight relative to descriptor max weight
+        weight *= int(self.weight.hget()) / int(self.descriptor.max_weight.hget())
+        return weight
+
+    @classmethod
+    def get_or_connect(cls, trigger_id, descriptor_id):
+        """
+        Get instances by pk to prevent from creating several times the same relation.
+        """
+        pk = "%s|%s" % (trigger_id, descriptor_id)
+        inst, created = super(cls, TriggerToDescriptor).get_or_connect(pk=pk)
+        if created:
+            # update the fields
+            inst.trigger_id.hset(trigger_id)
+            inst.descriptor_id.hset(descriptor_id)
+        return inst, created
 
 
 class Trigger(model.RedisModel):
@@ -220,7 +235,7 @@ class Trigger(model.RedisModel):
     def _synapses(self):
         if self._cached_synapses is None:
             self._cached_synapses = \
-                        TriggerToDescriptor.collection(trigger_id=self.pk.get())[:20]
+                        TriggerToDescriptor.instances(trigger_id=self.pk.get()).sort(by="-weight")[:20]
         return self._cached_synapses
 
     def __unicode__(self):
@@ -249,7 +264,7 @@ class Trigger(model.RedisModel):
 #        return self._descriptors.__delitem__(key)
     
     def __iter__(self):
-        return TriggerToDescriptor.instances(trigger_id=self.pk.get())
+        return self._synapses.__iter__()
 
     # Django call the __len__ method for every related model when using
     # select_related...
@@ -258,36 +273,7 @@ class Trigger(model.RedisModel):
     
     def items(self):
         return self._descriptors
-    
-    # @property
-    # def max_weight(self):
-    #     if self._max_weight is None: # Thread cache
-    #         try:
-    #             max_descriptor_pk = self.descriptors.zrevrange(0, 1)[0]
-    #         except IndexError:
-    #             self._max_weight = 0
-    #         else:
-    #             self._max_weight = self.descriptors.zscore(max_descriptor_pk)
-    #         # try:
-    #         #     #Ordered by -weight by default
-    #         #     self._max_weight = self.triggertodescriptor_set.all().only('weight')[0].weight
-    #         # except TriggerToDescriptor.DoesNotExist:
-    #         #     # Should not occur.
-    #         #     self._max_weight = 0
-    #     return self._max_weight
-#        return max(self[d.descriptor].weight for d in self)
-    
-#    def init_descriptors(self, **kwargs):
-#        """
-#        Take a text descriptors storage and create the links.
-#        """
-#        #original may be the full orginal line
-#        if "original" in kwargs:
-#            for d in kwargs["original"].split("\t")[1:]:#TODO check errors
-#                ds = d.split()
-#                original = ds[:-1]
-#                dsc, created = Descriptor.get_or_create(original, self.parent, original=original)
-#                self.connect(dsc, float(ds[-1]))
+
     
     def connect(self, descriptor, score=1):
         """
@@ -315,17 +301,20 @@ class Trigger(model.RedisModel):
                 sulci_logger.debug(u"Removed connection %s - %s" % (self, descriptor), "RED")        
     
     @classmethod
-    def clean_all_connections(cls):
+    def remove_useless_connections(cls):
         """
         Delete all the useless connections.
         """
         for inst in TriggerToDescriptor.instances():
-            print "processing", inst, int(inst.weight.hget())
-            if int(inst.weight.hget()) <= 1:
-                print inst.pk.get()
-                sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()))
-                # inst.delete()
-        # TriggerToDescriptor.objects.filter(weight__lte=0).delete()
+            try:
+                weight = int(inst.weight.hget())
+            except TypeError:
+                sulci_logger.info("Removing TriggerToDescriptor %s without weight, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()), "RED")
+                inst.delete()
+                continue
+            if weight <= 1:
+                # sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()))
+                inst.delete()
     
     def export(self):
         """
