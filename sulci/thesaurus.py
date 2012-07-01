@@ -39,7 +39,7 @@ class Thesaurus(object):
         self.descriptors = Descriptor.collection()
     
     def __contains__(self, item):
-        # TODO: accept also Desciptor instances as param
+        # TODO: accept also Descriptor instances as param
         return Descriptor.exists(name=item)
     
     def __iter__(self): 
@@ -128,6 +128,22 @@ class TriggerToDescriptor(model.RedisModel):
     descriptor_id = fields.HashableField(indexable=True)
     weight = fields.HashableField(default=1)
 
+    def __repr__(self):
+        return "<TriggerToDescriptor %s>" % self.__str__()
+
+    def __unicode__(self):
+        return "%s=[%s]>%s" % (
+            unicode(self.trigger),
+            self.weight.hget(),
+            unicode(self.descriptor)
+        )
+
+    def __str__(self):
+        return "%s=[%s]>%s" % (
+            str(self.trigger),
+            self.weight.hget(),
+            str(self.descriptor)
+        )
 
     @property
     def trigger(self):
@@ -212,7 +228,7 @@ class Trigger(model.RedisModel):
         return self._cached_synapses
 
     def __unicode__(self):
-        return unicode(self.original.hget())
+        return self.original.hget()
 
     def __str__(self):
         return self.original.hget()
