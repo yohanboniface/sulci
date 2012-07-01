@@ -243,15 +243,7 @@ class Trigger(model.RedisModel):
         In each case, update the connection weight.
         Delete the connection if the score is negative.
         """
-#        if not descriptor in self:
-##            sulci_logger.debug(u"Creating connection %s - %s" % (self, descriptor), "CYAN")
-#            self[descriptor] = 0.0
         self[descriptor] = score
-#        rel.weight += score
-#        rel.save()
-#        if self[descriptor] < 0:
-#            del self[descriptor]
-#            sulci_logger.debug(u"Removed connection %s - %s" % (self, descriptor), "RED")
     
     def clean_connections(self):
         """
@@ -275,5 +267,5 @@ class Trigger(model.RedisModel):
                 inst.delete()
                 continue
             if weight <= 1:
-                # sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()))
+                sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()))
                 inst.delete()
