@@ -109,17 +109,6 @@ class Descriptor(model.RedisModel):
     def __repr__(self):
         return "<Descriptor %s: %s>" % (self.pk.get(), self.name.hget())
 
-    # @property
-    # def max_weight(self):
-    #     if self._max_weight is None: # Thread cache
-    #         try:
-    #             #Ordered by -weight by default
-    #             self._max_weight = self.triggertodescriptor_set.all()[0].weight
-    #         except TriggerToDescriptor.DoesNotExist:
-    #             # Should not occur.
-    #             self._max_weight = 0
-    #     return self._max_weight
-    
     @property
     def primeval(self):
         """
