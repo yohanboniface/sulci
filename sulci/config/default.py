@@ -1,0 +1,3 @@
+SULCI_CONTENT_PROPERTY = "content"
+SULCI_KEYWORDS_PROPERTY = "keywords"
+DEBUG = False

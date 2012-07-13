@@ -4,19 +4,14 @@ import os
 import time
 import datetime
 
-#from collections import defaultdict
-#from operator import itemgetter
-
-from django.conf import settings
-
 from sulci.utils import load_file, save_to_file
 from sulci.thesaurus import Trigger, Descriptor
 from sulci.textmining import SemanticalTagger
 from sulci.textutils import tokenize_text
 from sulci.rules_templates import LemmatizerTemplateGenerator, RuleTemplate,\
                            ContextualTemplateGenerator, LexicalTemplateGenerator
-from sulci import content_model, content_manager
 from sulci.log import sulci_logger
+from sulci import config
 
 class SemanticalTrainer(object):
     """
@@ -144,25 +139,24 @@ class SemanticalTrainer(object):
         if isinstance(inst, int):
             #We guess we have a pk here
             inst = content_model.objects.get(pk=inst)
-        text = getattr(inst, settings.SULCI_CLI_CONTENT_PROPERTY)
-        descriptors = getattr(inst, settings.SULCI_CLI_KEYWORDS_PROPERTY)
-        # hack
-        if descriptors == "" or text == "": return
+        text = getattr(inst, config.SULCI_CONTENT_PROPERTY)
+        descriptors = config.descriptors_getter(inst)
+        if not descriptors or not text:
+            return
         validated_descriptors = set()
         # Retrieve descriptors
-        for d in descriptors.split(","):
-            d = d.strip().replace(u"’", u"'")
-            if not d == "":
-                # We create the descriptor not in thesaurus for now
-                # because descriptors in article and thesaurus are not
-                # always matching. Will be improved.
-                dsc, created = Descriptor.get_or_connect(name=d)
-                dsc.count.hincrby(1)
-                # Retrieve the primeval value
+        for d in descriptors:
+            # d = d.strip().replace(u"’", u"'")
+            # We create the descriptor not in thesaurus for now
+            # because descriptors in article and thesaurus are not
+            # always matching. Will be improved.
+            dsc, created = Descriptor.get_or_connect(name=d)
+            dsc.count.hincrby(1)
+            # Retrieve the primeval value
 #                dsc = dsc.primeval
-                validated_descriptors.add(dsc)
-                if created:
-                    sulci_logger.info(u"Lairning descriptor not in thesaurus : %s" % unicode(dsc), "RED")
+            validated_descriptors.add(dsc)
+            if created:
+                sulci_logger.info(u"Lairning descriptor not in thesaurus : %s" % unicode(dsc), "RED")
         # Retrieve keytentities :
         try:
             S = SemanticalTagger(

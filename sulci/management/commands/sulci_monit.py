@@ -2,11 +2,6 @@
 # -*- coding:Utf-8 -*-
 import time
 
-from optparse import make_option
-
-from django.core.management.base import BaseCommand
-from django.conf import settings
-
 from sulci.pos_tagger import PosTagger
 from sulci.lexicon import Lexicon
 from sulci.corpus import Corpus, TextCorpus
@@ -17,7 +12,6 @@ from sulci.trainers import SemanticalTrainer, LemmatizerTrainer, LexicalTrainer,
                                                    ContextualTrainer, POSTrainer
 from sulci.lemmatizer import Lemmatizer
 from sulci.utils import load_file
-from sulci import content_model
 from sulci_cli import SulciBaseCommand
 
 class Command(SulciBaseCommand):
@@ -25,41 +19,100 @@ class Command(SulciBaseCommand):
     Command for monitoring the corpus and data of Sulci.
     """
     help = __doc__
-    option_list = SulciBaseCommand.option_list + (
-        make_option("-u", "--check_corpus", action="store_true", 
-                    dest="check_corpus", default = None, 
-                    help="""
-                         Check the corpus.
-                         Use -w, -g or -p to specify what to check.
-                         Use -p to specify a path to check a specific text.
-                         """),
-        make_option("-x", "--check_lexicon", action="store_true", dest="check_lexicon",
-                    default = None, 
-                    help="Check lexicon. Use -w to check a specific word to check."),
-        make_option("-w", "--word", action="store", type="string", 
-                    dest="word", default = None, 
-                    help="Retrieve word usage in corpus."),
-        make_option("-e", "--display_errors", action="store_true", dest="display_errors", 
-                    help="Display errors remaining in corpus after runing the pos tagger."),
-        make_option("-c", "--count", action="store_true", dest="count", 
-                    help="Display number of words. Use -u or -x to specify corpus of lexicon"),
-        make_option("-g", "--tags_stats", action="store_true", dest="tags_stats", 
-                    help="Display tags usage statistics. Use -w to specify a word."),
-        make_option("-m", "--use_lemmes", action="store_true", dest="use_lemmes", 
-                    help="Use lemmes"),
-        make_option("-M", "--lemme", action="store", type="string", dest="lemme", 
-                    default=None, help = "Specify a lemme when needed"),
-        make_option("-t", "--tag", action="store", type="string", dest="tag", 
-                    default=None, help = "Specify a tag when needed"),
-        make_option("-p", "--path", action="store",type="string", dest="path", 
-                    default=None,
-                    help="Specify a file path when needed. Relative to /sulci/"),
-        make_option("-i", "--case_insensitive", action="store_true", dest="case_insensitive", 
-                    help="Case insensitive"),
+
+    def define_args(self):
+        super(Command, self).define_args()
+        self.parser.add_argument(
+            "-u",
+            "--check_corpus",
+            action="store_true", 
+            dest="check_corpus", default = None, 
+            help="""
+                 Check the corpus.
+                 Use -w, -g or -p to specify what to check.
+                 Use -p to specify a path to check a specific text.
+                 """
+        )
+        self.parser.add_argument(
+            "-x",
+            "--check_lexicon",
+            action="store_true",
+            dest="check_lexicon",
+            default = None, 
+            help="Check lexicon. Use -w to check a specific word to check."
+        )
+        self.parser.add_argument(
+            "-w",
+            "--word",
+            action="store",
+            type=str,
+            dest="word",
+            default = None, 
+            help="Retrieve word usage in corpus."
+        )
+        self.parser.add_argument(
+            "-e",
+            "--display_errors",
+            action="store_true",
+            dest="display_errors", 
+            help="Display errors remaining in corpus after runing the pos tagger."
+        )
+        self.parser.add_argument(
+            "-c",
+            "--count",
+            action="store_true",
+            dest="count", 
+            help="Display number of words. Use -u or -x to specify corpus of lexicon"
+        )
+        self.parser.add_argument(
+            "-g",
+            "--tags_stats",
+            action="store_true",
+            dest="tags_stats", 
+            help="Display tags usage statistics. Use -w to specify a word."
+        )
+        self.parser.add_argument(
+            "-m",
+            "--use_lemmes",
+            action="store_true",
+            dest="use_lemmes", 
+            help="Use lemmes"
+        )
+        self.parser.add_argument(
+            "-M",
+            "--lemme",
+            action="store",
+            type=str,
+            dest="lemme", 
+            default=None,
+            help = "Specify a lemme when needed"
+        )
+        self.parser.add_argument(
+            "-t",
+            "--tag",
+            action="store",
+            type=str,
+            dest="tag", 
+            default=None, help = "Specify a tag when needed"
+        )
+        self.parser.add_argument(
+            "-p",
+            "--path",
+            action="store",
+            type=str,
+            dest="path", 
+            default=None,
+            help="Specify a file path when needed. Relative to /sulci/"
+        )
+        self.parser.add_argument(
+            "-i",
+            "--case_insensitive",
+            action="store_true",
+            dest="case_insensitive", 
+            help="Case insensitive"
         )
     
     def handle(self, *args, **options):
-        super(Command, self).handle(self, *args, **options)
         C = Corpus()
         L = Lexicon()
         P = PosTagger(lexicon=L)
@@ -100,4 +153,5 @@ class Command(SulciBaseCommand):
             import ipdb; ipdb.set_trace()
 
 if __name__ == '__main__':
-    main()
+    command = Command()
+    command.handle()

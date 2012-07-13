@@ -1,7 +1,7 @@
 import logging
 import logging.handlers
 
-from django.conf import settings
+from sulci import config
 
 class MemoryStorageHandler(logging.handlers.MemoryHandler):
     """
@@ -87,7 +87,7 @@ sulci_logger.setLevel(logging.DEBUG)
 # We add a console handler
 h = logging.StreamHandler()
 # We set a debug level to console only if debug is True
-if settings.DEBUG:
+if config.DEBUG:
     h.setLevel(logging.DEBUG)
 else:
     h.setLevel(logging.INFO)

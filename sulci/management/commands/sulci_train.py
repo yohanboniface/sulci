@@ -4,9 +4,6 @@ import time
 
 from optparse import make_option
 
-from django.core.management.base import BaseCommand
-from django.conf import settings
-
 from sulci.pos_tagger import PosTagger
 from sulci.lexicon import Lexicon
 from sulci.corpus import Corpus, TextCorpus
@@ -16,7 +13,8 @@ from sulci.log import sulci_logger
 from sulci.trainers import SemanticalTrainer, LemmatizerTrainer, LexicalTrainer,\
                                                    ContextualTrainer, POSTrainer
 from sulci.lemmatizer import Lemmatizer
-from sulci import content_model
+from sulci import config
+
 from sulci_cli import SulciBaseCommand
 
 class Command(SulciBaseCommand):
@@ -84,7 +82,7 @@ class Command(SulciBaseCommand):
             S = SemanticalTrainer(T,P,self.MODE)
             if self.PK:
                 # Should not have PK in MODE == "master"
-                a = content_model.objects.get(pk=self.PK)
+                a = config.content_model_getter(self.PK)
                 S.train(a)
             else:
                 if self.FORCE:
@@ -96,8 +94,8 @@ class Command(SulciBaseCommand):
             if not self.PK:
                 print "A PK is needed. Use -k xxx"
             else:
-                a = content_model.objects.get(pk=self.PK)
-                t = getattr(a, settings.SULCI_CONTENT_PROPERTY)
+                a = config.content_model_getter(self.PK)
+                t = getattr(a, config.SULCI_CONTENT_PROPERTY)
                 T = TextCorpus()
                 T.prepare(t, P, M)
                 T.export(self.PK, self.FORCE, self.ADD_LEMMES)
@@ -105,4 +103,5 @@ class Command(SulciBaseCommand):
             import ipdb; ipdb.set_trace()
 
 if __name__ == '__main__':
-    main()
+    command = Command()
+    command.handle()

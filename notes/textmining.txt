@@ -690,6 +690,8 @@ rendre les scores proportionnels, sinon potentiellement plus un mot apparaît pl
 Supprimer les relations dès lors qu'elles sont négatives ? (Sachant qu'elles peuvent quand même en théorie redevenir positives...)
 Mettre 0 comme valeur par défaut quand on attache un descripteur ? Ou sinon comment calculer cette valeur ? Utiliser le score courant me semble une bonne piste.
 
+Dans l'apprentissage, au lieu de partir du principe que 1 trigger déclenche un descripteur, partir du principe que TOUS les triggers liés ont permis de déclencher CHAQUE descripteur, puis à l'article suivant qui contient tel descripteur, faire une intersection des triggers, et ainsi de suite
+
 Ressources en ligne
 -------------------
 

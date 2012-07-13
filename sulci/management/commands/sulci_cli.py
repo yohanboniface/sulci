@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:Utf-8 -*-
 import time
-
-from optparse import make_option
-
-from django.core.management.base import BaseCommand
-from django.conf import settings
+import argparse
 
 from sulci.pos_tagger import PosTagger
 from sulci.lexicon import Lexicon
@@ -14,27 +10,53 @@ from sulci.textmining import SemanticalTagger
 from sulci.thesaurus import Thesaurus
 from sulci.log import sulci_logger
 from sulci.lemmatizer import Lemmatizer
-from sulci import content_model
+from sulci import config
 
-
-class SulciBaseCommand(BaseCommand):
+class SulciBaseCommand(object):
     """
     Common options and methods for all sulci commands
     """
-    option_list = BaseCommand.option_list + (
-        make_option("-f", "--force", action="store_true", dest="force", 
-                    help="Some options can take a FORCE option"),
-        make_option("-d", "--ipdb", action="store_true", dest="ipdb", 
-                    help="Launch ipdb at the end of the process"),
-        make_option("-k", "--pk", action="store", type="int", dest="pk",
-                    default = None, help = "Pk of model to process"),
-        make_option("-l", "--limit", type="int", action="store", dest="limit",
-                    default=None, help = "Limit the process."),
+
+    def __init__(self):
+        self.parser = argparse.ArgumentParser()
+        self.define_args()
+        args = self.parser.parse_args()
+        for arg, value in args.__dict__.iteritems():
+            setattr(self, arg.upper(), value)
+
+    def define_args(self):
+        self.parser.add_argument(
+            "-f",
+            "--force",
+            action="store_true",
+            dest="force",
+            help="Some options can take a FORCE option"
         )
-    
-    def handle(self, *args, **options):
-        for option in self.option_list:
-            setattr(self, option.dest.upper(), options.get(option.dest))
+        self.parser.add_argument(
+            "-d",
+            "--ipdb",
+            action="store_true",
+            dest="ipdb",
+            help="Launch ipdb at the end of the process"
+        )
+        self.parser.add_argument(
+            "-k",
+            "--pk",
+            action="store",
+            type=str,
+            dest="pk",
+            default=None,
+            help="Pk of model to process"
+        )
+        self.parser.add_argument(
+            "-l",
+            "--limit",
+            type=int,
+            action="store",
+            dest="limit",
+            default=None, help = "Limit the process."
+        )
+
 
 class Command(SulciBaseCommand):
     """
@@ -42,8 +64,7 @@ class Command(SulciBaseCommand):
     """
     help = __doc__
     
-    def handle(self, *args, **options):
-        super(Command, self).handle(self, *args, **options)
+    def handle(self, *args):
         if not self.PK:
             sulci_logger.info(u"A PK is needed. Use -k xxx", "RED")
         else:
@@ -51,8 +72,8 @@ class Command(SulciBaseCommand):
             L = Lexicon()
             P = PosTagger(lexicon=L)
             M = Lemmatizer(L)
-            a = content_model.objects.get(pk=self.PK)
-            t = getattr(a, settings.SULCI_CONTENT_PROPERTY)
+            a = config.content_model_getter(self.PK)
+            t = getattr(a, config.SULCI_CONTENT_PROPERTY)
             T = Thesaurus()
             S = SemanticalTagger(t, T, P, lexicon=L)
             if __debug__:
@@ -65,4 +86,5 @@ class Command(SulciBaseCommand):
             import ipdb; ipdb.set_trace()
 
 if __name__ == '__main__':
-    main()
+    command = Command()
+    command.handle()
