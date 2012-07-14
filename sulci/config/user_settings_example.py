@@ -12,3 +12,9 @@ def descriptors_getter(inst):
     # This should return a list of descriptors (str)
     # It's used only for the training part
     pass
+
+def content_model_ids_for_trainer(start=None):
+    # This must return a list of primary keys of content model to
+    # give to the trainer
+    # `start` is not used at the moment
+    pass

@@ -2,8 +2,6 @@
 # -*- coding:Utf-8 -*-
 import time
 
-from optparse import make_option
-
 from sulci.pos_tagger import PosTagger
 from sulci.lexicon import Lexicon
 from sulci.corpus import Corpus, TextCorpus
@@ -22,31 +20,78 @@ class Command(SulciBaseCommand):
     Sulci command for training the algoritms.
     """
     help = __doc__
-    option_list = SulciBaseCommand.option_list + (
-        make_option("-x", "--lexicon", action="store_true", 
-                    dest="lexicon", help = "Build the lexicon"),
-        make_option("-e", "--lexical", action="store_true", 
-                    dest="lexical", help = "Launch the lexical trainer"),
-        make_option("-c", "--contextual", action="store_true", 
-                    dest="contextual", help = "Launch the contextual trainer"),
-        make_option("-m", "--mode", action="store", type="string", dest="mode",
-                    default = None, 
-                    help="Trainer mode : master, slave, or full (default)"),
-        make_option("-r", "--lemmatizer", action="store_true", dest="lemmatizer", 
-                    help = "Launch Lemmatizer training."),
-        make_option("-s", "--subprocesses", action="store", type="int", 
-                    dest="subprocesses",
-                    default = None, help = "Launch trainer with x subprocesses"),
-        make_option("-n", "--semantical", action="store_true", dest="semantical", 
-                    help = "Launch the sementical training. Launch it with python -O."),
-        make_option("-a", "--add_candidate", action="store_true", 
-                    dest="add_candidate", help="Prepare article for manual POS indexing"),
-        make_option("-b", "--add_lemmes", action="store_true", dest="add_lemmes", 
-                    help="Add lemme also when preparing a text for POS indexing"),
+
+    def define_args(self):
+        super(Command, self).define_args()
+        self.parser.add_argument(
+            "-x",
+            "--lexicon",
+            action="store_true",
+            dest="lexicon",
+            help = "Build the lexicon"
         )
-    
+        self.parser.add_argument(
+            "-e",
+            "--lexical",
+            action="store_true",
+            dest="lexical",
+            help = "Launch the lexical trainer"
+        )
+        self.parser.add_argument(
+            "-c",
+            "--contextual",
+            action="store_true",
+            dest="contextual",
+            help = "Launch the contextual trainer"
+        )
+        self.parser.add_argument(
+            "-m",
+            "--mode",
+            action="store",
+            type=str,
+            dest="mode",
+            default = None,
+            help="Trainer mode : master, slave, or full (default)"
+        )
+        self.parser.add_argument(
+            "-r",
+            "--lemmatizer",
+            action="store_true",
+            dest="lemmatizer", 
+            help = "Launch Lemmatizer training."
+        )
+        self.parser.add_argument(
+            "-s",
+            "--subprocesses",
+            action="store",
+            type=int, 
+            dest="subprocesses",
+            default = None,
+            help = "Launch trainer with x subprocesses"
+        )
+        self.parser.add_argument(
+            "-n",
+            "--semantical",
+            action="store_true",
+            dest="semantical", 
+            help = "Launch the sementical training. Launch it with python -O."
+        )
+        self.parser.add_argument(
+            "-a",
+            "--add_candidate",
+            action="store_true", 
+            dest="add_candidate",
+            help="Prepare article for manual POS indexing"
+        )
+        self.parser.add_argument(
+            "-b",
+            "--add_lemmes",
+            action="store_true",
+            dest="add_lemmes", 
+            help="Add lemme also when preparing a text for POS indexing"
+        )
+
     def handle(self, *args, **options):
-        super(Command, self).handle(self, *args, **options)
         C = Corpus()
         L = Lexicon()
         M = Lemmatizer(L)
@@ -63,7 +108,7 @@ class Command(SulciBaseCommand):
             for i in xrange(0,self.SUBPROCESSES):
                 sulci_logger.info(u"Opening slave subprocess %d" % i, "BLUE", True)
                 python_kind = not __debug__ and ["-O"] or []
-                subprocess.Popen(["python"] + python_kind + ["manage.py", "sulci_train", training_kind, "--mode=slave"])
+                subprocess.Popen(["python"] + python_kind + ["sulci_train.py", training_kind, "--mode=slave"])
             # Set the mode to the trainer
             self.MODE = "master"
             # Wait to leave time to slave to launch

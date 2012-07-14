@@ -77,11 +77,9 @@ class SemanticalTrainer(object):
             if self.mode == "master":
                 self.setup_socket_master()
                 print "MASTER -- ready"
-            # qs = content_manager.all().filter(editorial_source=content_model.EDITORIAL_SOURCE.PRINT).order_by("id")
-            qs = content_manager.all().filter(pk__gt=760741, editorial_source=content_model.EDITORIAL_SOURCE.PRINT).order_by("id")
-            # qs = content_manager.all().order_by("id")[:10000]
-            if self.mode == "master":
-                qs = qs.only("id")
+            qs = config.content_model_pks_for_trainer()
+            # if self.mode == "master":
+            #     qs = qs.only("id")
             # We make it by step, to limit RAM consuming
             step = 1000
             forloop_remaining = total = len(qs)
@@ -90,12 +88,12 @@ class SemanticalTrainer(object):
                 _to = _from + step
                 current_qs = qs[_from:_to]
                 print "MASTER -- Processing qs from %d to %d" % (_from, _to)
-                for a in current_qs:
+                for pk in current_qs:
                     if self.mode == "master":
-                        self.reqsocket.send_multipart([str(a.pk)])
+                        self.reqsocket.send_multipart([str(pk)])
                     # We are training all objects, but without slaves.
                     else:
-                        self.train(a)
+                        self.train(pk)
                 if self.mode == "master":
                     # Waiting for answers
                     # The need is also to send the "stop" action only at the end
@@ -129,16 +127,16 @@ class SemanticalTrainer(object):
             # We receive an action to do, with a pk
             idx, pk = self.repsocket.recv_multipart()
             print "SLAVE %s processing pk %s" % (os.getpid(), pk)
-            self.train(int(pk))
+            self.train(pk)
             self.repsocket.send_multipart([idx, "Processed pk %s" % pk])
     
     def train(self, inst):
         """
         For the moment, human defined descriptors are a string with "," separator.
         """
-        if isinstance(inst, int):
+        if isinstance(inst, (int, str)):
             #We guess we have a pk here
-            inst = content_model.objects.get(pk=inst)
+            inst = config.content_model_getter(inst)
         text = getattr(inst, config.SULCI_CONTENT_PROPERTY)
         descriptors = config.descriptors_getter(inst)
         if not descriptors or not text:
@@ -146,6 +144,7 @@ class SemanticalTrainer(object):
         validated_descriptors = set()
         # Retrieve descriptors
         for d in descriptors:
+            if not d: continue
             # d = d.strip().replace(u"’", u"'")
             # We create the descriptor not in thesaurus for now
             # because descriptors in article and thesaurus are not

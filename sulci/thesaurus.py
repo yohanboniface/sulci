@@ -32,6 +32,7 @@ from sulci.textutils import tokenize_text, lev
 from sulci.base import RetrievableObject
 from sulci.utils import save_to_file, get_dir
 from sulci.log import sulci_logger
+from sulci import config
 
 class Thesaurus(object):
 
@@ -84,7 +85,12 @@ class Thesaurus(object):
         save_to_file("corpus/triggers.trg", "")
 
 
-class Descriptor(model.RedisModel): 
+class BaseModel(model.RedisModel):
+
+    CONNECTION_SETTINGS = config.DATABASES[config.DEFAULT_DATABASE]
+
+
+class Descriptor(BaseModel):
     """
     Entries of the Thesaurus.
     """
@@ -119,7 +125,7 @@ class Descriptor(model.RedisModel):
         return self.is_alias_of.primeval
 
 
-class TriggerToDescriptor(model.RedisModel):
+class TriggerToDescriptor(BaseModel):
     """
     Helper to manage the trigger to descriptor relation.
     """
@@ -204,7 +210,7 @@ class TriggerToDescriptor(model.RedisModel):
         return inst, created
 
 
-class Trigger(model.RedisModel):
+class Trigger(BaseModel):
     """
     The trigger is a keyentity who suggest some descriptors when in a text.
     It is linked to one or more descriptors, and the distance of the link
