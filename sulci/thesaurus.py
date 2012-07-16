@@ -156,7 +156,7 @@ class TriggerToDescriptor(BaseModel):
         """
         Returns the trigger instance corresponding to the pk stored.
         """
-        if not "_trigger" in dir(self) \
+        if not hasattr(self, "_trigger") \
                             or self._trigger.pk.get() != self.trigger_id.hget():
             # Fetch or refetch it
             self._trigger = Trigger(self.trigger_id.hget())
@@ -167,7 +167,7 @@ class TriggerToDescriptor(BaseModel):
         """
         Return the descriptor instance corresponding to the pk stored.
         """
-        if not "_descriptor" in dir(self) \
+        if not hasattr(self, "_descriptor") \
                        or self._descriptor.pk.get() != self.descriptor_id.hget():
             # Fetch or refetch it
             self._descriptor = Descriptor(self.descriptor_id.hget())
