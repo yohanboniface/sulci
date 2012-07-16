@@ -127,19 +127,24 @@ class SemanticalTrainer(object):
             # We receive an action to do, with a pk
             idx, pk = self.repsocket.recv_multipart()
             print "SLAVE %s processing pk %s" % (os.getpid(), pk)
+            t_before = time.time()
             self.train(pk)
-            self.repsocket.send_multipart([idx, "Processed pk %s" % pk])
+            tot_time = time.time() - t_before
+            self.repsocket.send_multipart(
+                [idx, "Processed pk %s (%s s)" % (pk, round(tot_time, 2))]
+            )
     
     def train(self, inst):
         """
         For the moment, human defined descriptors are a string with "," separator.
         """
         if isinstance(inst, (int, str)):
-            #We guess we have a pk here
+            # We guess we have a pk here
             inst = config.content_model_getter(inst)
         text = getattr(inst, config.SULCI_CONTENT_PROPERTY)
         descriptors = config.descriptors_getter(inst)
         if not descriptors or not text:
+            # sulci_logger.info(u"Skipping item without data: %s" % inst)
             return
         validated_descriptors = set()
         # Retrieve descriptors
