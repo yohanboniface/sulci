@@ -63,8 +63,8 @@ class StemmedText(TextManager):
     def create_stemm(self):
         self._stemms = set() # A set because order don't mind
                              # And we want no duplicates
+        self.lemmatizer.do(self.tokens)
         for tkn in self.tokens:
-            self.lemmatizer.do(tkn)
             # We don't take the sg or pl in the tag name
             stm, created = Stemm.get_or_create((unicode(tkn.lemme), tkn.tag.split(u":")[0]), self, original=unicode(tkn.lemme), text=self)
             stm.occurrences.append(tkn)
