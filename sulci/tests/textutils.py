@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase
+import unittest
 
 from sulci.textutils import modern_istitle, normalize_text, tokenize_text
 
-class TextUtilsTests(TestCase):
+
+class TextUtilsTests(unittest.TestCase):
 
     def test_modern_istitle(self):
         self.failIf(modern_istitle("al-Assad") != True)
@@ -13,7 +14,7 @@ class TextUtilsTests(TestCase):
         self.failIf(modern_istitle("eMac") != True)
         self.failIf(modern_istitle("Basic") != True)
         self.failIf(modern_istitle("BASIC") != True)
-    
+
     def test_normalize_text(self):
         self.failIf(u"’" in normalize_text(u"’"))
         self.failIf(u"qu' " not in normalize_text(u"lorsqu'il"))
@@ -37,12 +38,12 @@ class TextUtilsTests(TestCase):
         self.failIf(normalize_text(u'ce camion-ci.') != u'ce camion - ci.')
         self.failIf(normalize_text(u'camion-citerne') != u'camion-citerne')
         self.failIf(normalize_text(u"est-ce\n") != u"est - ce\n")
-    
+
     def test_tokenize_text(self):
-        
-        def do(t, out): # shortener
+
+        def do(t, out):  # shortener
             self.failIf(tokenize_text(t) != out)
-        
+
         do(u"un deux trois", [u"un", u"deux", u"trois"])
         do(u"en 2011", [u"en", u"2011"])
         do(u"M. Duchmol", [u"M.", u"Duchmol"])
@@ -70,5 +71,8 @@ class TextUtilsTests(TestCase):
 #        do(u"il est 19h30", [u"il", u"est", u"19h30"])
 #        do(u"5e position", [u"5e", u"position"])
 #        do(u"1er du mois", [u"1er", u"du", u"mois"])
-        do(u"c'est-à-dire", [u"c'est-à-dire",])
+        do(u"c'est-à-dire", [u"c'est-à-dire"])
 #        do(u"http://libe.fr", [u"http://libe.fr",])
+
+if __name__ == "__main__":
+    unittest.main()
