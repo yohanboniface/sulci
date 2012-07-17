@@ -49,7 +49,7 @@ class Lemmatizer(TextManager):
         A Token object or a list of token objects is expected.
         Return the token or the list.
         """
-        tks = hasattr(token, "__iter__") and token or [token]
+        tks = token if hasattr(token, "__iter__") else [token]
         rules = LemmatizerTemplateGenerator.load() # Cache me
         for rule in rules:
             template, _ = LemmatizerTemplateGenerator.get_instance(rule)
@@ -58,5 +58,5 @@ class Lemmatizer(TextManager):
         for tk in tks:
             if tk in self.lexicon and tk.tag in self.lexicon[tk]:
                 tk.lemme = self.lexicon[tk][tk.tag]
-        return hasattr(token, "__iter__") and tks or tks[0]
+        return tks if hasattr(token, "__iter__") else tks[0]
 

@@ -36,21 +36,21 @@ class PosTagger(object):
         """
         Apply lexical tag to a token or list of tokens
         """
-        tks = hasattr(token, "__iter__") and token or [token]
+        tks = token if hasattr(token, "__iter__") else [token]
         rules = LexicalTemplateGenerator.load()
         for rule in rules:
             template, _ = LexicalTemplateGenerator.get_instance(rule, self.lexicon)
             template.apply_rule(tks, rule)
         # Return a list if a list was given
-        return hasattr(token, "__iter__") and tks or tks[0]
+        return tks if hasattr(token, "__iter__") else tks[0]
     
     def contextual_tag(self, token):
-        tks = hasattr(token, "__iter__") and token or [token]
+        tks = token if hasattr(token, "__iter__") else [token]
         rules = ContextualTemplateGenerator.load()
         for rule in rules:
             template, _ = ContextualTemplateGenerator.get_instance(rule)
             template.apply_rule(tks, rule)
-        return hasattr(token, "__iter__") and tks or tks[0]
+        return tks if hasattr(token, "__iter__") else tks[0]
     
     def get_tag(self, tokens):
         final = []

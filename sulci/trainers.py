@@ -144,7 +144,7 @@ class SemanticalTrainer(object):
         text = getattr(inst, config.SULCI_CONTENT_PROPERTY)
         descriptors = config.descriptors_getter(inst)
         if not descriptors or not text:
-            # sulci_logger.info(u"Skipping item without data: %s" % inst)
+            sulci_logger.info(u"Skipping item without data")
             return
         validated_descriptors = set()
         # Retrieve descriptors
