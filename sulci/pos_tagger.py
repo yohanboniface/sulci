@@ -21,7 +21,7 @@ class PosTagger(object):
             return self.lexicon[token].default_tag
         elif modern_istitle(token):
             return "SBP:sg"
-#        elif token.endswith("s") or token.endswith("x"):
+#        elif token.endswith(["s", "x"]):
 #            return "SBC:pl"
         else:
             return "SBC:sg"
