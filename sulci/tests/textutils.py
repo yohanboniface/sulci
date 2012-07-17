@@ -4,6 +4,10 @@ import unittest
 
 from sulci.textutils import modern_istitle, normalize_text, tokenize_text, strip_tags, unescape_entities
 
+__all__ = [
+    "TextUtilsTests",
+]
+
 
 class TextUtilsTests(unittest.TestCase):
 
