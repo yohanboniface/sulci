@@ -175,7 +175,7 @@ class TriggerToDescriptor(BaseModel):
 
     def post_command(self, sender, name, result, args, kwargs):
         if (isinstance(sender, fields.RedisField)
-            and sender.name == "weight" 
+            and sender.name == "weight"
             and name in sender.available_modifiers
             and self.trigger_id.hget() is not None):  # Means instantiation is done
             if int(self.weight.hget()) > int(self.trigger.max_weight.hget()):
@@ -208,6 +208,29 @@ class TriggerToDescriptor(BaseModel):
             inst.trigger_id.hset(trigger_id)
             inst.descriptor_id.hset(descriptor_id)
         return inst, created
+
+    @classmethod
+    def remove_useless_connections(cls):
+        """
+        Delete all the useless connections.
+        """
+        instances = True
+        start = 0
+        step = 10000
+        while instances:
+            end = start + step
+            instances = cls.instances()[start:end]
+            start = end
+            for inst in instances:
+                try:
+                    weight = int(inst.weight.hget())
+                except TypeError:
+                    sulci_logger.info("Removing TriggerToDescriptor %s without weight, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()), "RED")
+                    inst.delete()
+                    continue
+                if weight <= 1:
+                    sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()))
+                    inst.delete()
 
 
 class Trigger(BaseModel):
@@ -251,7 +274,7 @@ class Trigger(BaseModel):
 
     def __setitem__(self, key, value):
         if not isinstance(key, Descriptor):
-            raise ValueError("Key must be Descriptor instance, got %s (%s) instead" 
+            raise ValueError("Key must be Descriptor instance, got %s (%s) instead"
                                                         % (str(key), type(key)))
         t2d, _ = TriggerToDescriptor.get_or_connect(trigger_id=self.pk.get(), descriptor_id=key.pk.get())
         t2d.weight.hincrby(amount=value)
@@ -261,7 +284,7 @@ class Trigger(BaseModel):
 
     def __iter__(self):
         return self._synapses.__iter__()
-    
+
     def connect(self, descriptor, score=1):
         """
         Create a connection with the descriptor if doesn't yet exists.
@@ -269,7 +292,7 @@ class Trigger(BaseModel):
         Delete the connection if the score is negative.
         """
         self[descriptor] = score
-    
+
     def clean_connections(self):
         """
         Remove the negative connections.
@@ -277,20 +300,4 @@ class Trigger(BaseModel):
         for descriptor in self._descriptors.copy().__iter__():
             if self[descriptor] < 0:
                 del self[descriptor]
-                sulci_logger.debug(u"Removed connection %s - %s" % (self, descriptor), "RED")        
-    
-    @classmethod
-    def remove_useless_connections(cls):
-        """
-        Delete all the useless connections.
-        """
-        for inst in TriggerToDescriptor.instances():
-            try:
-                weight = int(inst.weight.hget())
-            except TypeError:
-                sulci_logger.info("Removing TriggerToDescriptor %s without weight, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()), "RED")
-                inst.delete()
-                continue
-            if weight <= 1:
-                sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()))
-                inst.delete()
+                sulci_logger.debug(u"Removed connection %s - %s" % (self, descriptor), "RED")
