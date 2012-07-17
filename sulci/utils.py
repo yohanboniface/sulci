@@ -4,20 +4,18 @@ Sulci internal generic utils.
 """
 import codecs
 import os
-import logging
-
-from django.conf import settings
 
 from sulci.log import sulci_logger
 
-def save_to_file(filename, content, verbose = False):
+
+def save_to_file(filename, content, verbose=False):
     if verbose:
         print "INFOS **** Writing to file: %s" % filename
-#    print content
     pwd = not filename.startswith("/") and get_dir() or ""
-    f = codecs.open(pwd + filename, 'w', "utf-8") 
+    f = codecs.open(pwd + filename, 'w', "utf-8")
     f.write(content)
-    f.close()    
+    f.close()
+
 
 def load_file(path):
     pwd = not path.startswith("/") and get_dir() or ""
@@ -26,6 +24,7 @@ def load_file(path):
     f.close()
     return c
 
+
 def get_dir(fileref=__file__):
     """
     Return absolute path of a file with the trailing slash.
@@ -33,17 +32,21 @@ def get_dir(fileref=__file__):
     pwd = os.path.realpath(os.path.dirname(fileref))
     return "%s/" % pwd
 
+
 def sort(seq, attr, reverse=True):
-    intermed = [ (getattr(seq[i],attr), i, seq[i]) for i in xrange(len(seq)) ]
+    intermed = [(getattr(seq[i], attr), i, seq[i]) for i in xrange(len(seq))]
     intermed.sort()
-    if reverse: intermed.reverse()
-    return [ tup[-1] for tup in intermed ]
+    if reverse:
+        intermed.reverse()
+    return [tup[-1] for tup in intermed]
+
 
 def product(nums):
     """
     Like sum, but for product.
     """
-    return reduce(lambda x,y:x*y,nums)
+    return reduce(lambda x, y: x * y, nums)
+
 
 def has_index(indexable, value):
     try:
@@ -52,27 +55,32 @@ def has_index(indexable, value):
     except ValueError:
         return False
 
+
 def uniqify(seq, idfun=None):
     """
     From http://www.peterbe.com/plog/uniqifiers-benchmark
     """
     # order preserving
     if idfun is None:
-        def idfun(x): return x
+        def idfun(x):
+            return x
     seen = {}
     result = []
     for item in seq:
         marker = idfun(item)
-        if marker in seen: continue
+        if marker in seen:
+            continue
         seen[marker] = 1
         result.append(item)
     return result
 
+
 class Memoize:
-    def __init__ (self, f):
+    def __init__(self, f):
         self.f = f
         self.mem = {}
-    def __call__ (self, *args, **kwargs):
+
+    def __call__(self, *args, **kwargs):
         if (args, str(kwargs)) in self.mem:
             return self.mem[args, str(kwargs)]
         else:
@@ -80,7 +88,7 @@ class Memoize:
             self.mem[args, str(kwargs)] = tmp
             return tmp
 
+
 # Utils functions
 def log(s, color=None, highlight=False, mode=None):
-    sulci_logger.debug(s, color, highlight)    
-
+    sulci_logger.debug(s, color, highlight)
