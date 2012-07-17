@@ -2,10 +2,18 @@
 
 import unittest
 
-from sulci.textutils import modern_istitle, normalize_text, tokenize_text
+from sulci.textutils import modern_istitle, normalize_text, tokenize_text, strip_tags
 
 
 class TextUtilsTests(unittest.TestCase):
+
+    def test_strip_tags(self):
+        def do(value):
+            self.assertEqual(strip_tags(value), u"Just a test")
+        do(u'<b>Just a test</b>')
+        do(u'<b class="foo">Just a test</b>')
+        do(u'<span class="foo">Just a</span> test')
+        do(u'<span class="foo">Just <a href="#">a</a></span> <i>test</i>')
 
     def test_modern_istitle(self):
         self.failIf(modern_istitle("al-Assad") != True)

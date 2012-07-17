@@ -6,8 +6,12 @@ import re
 
 from collections import defaultdict
 
-from django.utils.html import strip_tags
 from django.utils.text import unescape_entities
+
+
+def strip_tags(value):
+    """Returns the given HTML with all tags stripped."""
+    return re.sub(ur'<[^>]*?>', '', value)
 
 
 def modern_istitle(word):
@@ -34,12 +38,29 @@ def clean(s, l):
     return s
 
 
+def to_unicode(text):
+    """
+    Sulci works with unicode sting.
+    We don't know the encoding of input.
+    """
+    if isinstance(text, unicode):
+        return text
+    else:
+        try:
+            # is text in utf-8
+            text = text.decode('utf-8')
+        except UnicodeEncodeError:
+            text = text.decode('latin-1')
+        return text
+
+
 def normalize_text(text, language="fr"):
     """
     Normalize text : clean, strip tags...
     Tests needed.
     """
     if language == "fr":
+        text = to_unicode(text)
         text = strip_tags(unescape_entities(text))
         text = text.replace(u"’", u"'")
         # qu' lorsqu', etc.
