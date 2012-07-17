@@ -2,7 +2,7 @@
 
 import unittest
 
-from sulci.textutils import modern_istitle, normalize_text, tokenize_text, strip_tags
+from sulci.textutils import modern_istitle, normalize_text, tokenize_text, strip_tags, unescape_entities
 
 
 class TextUtilsTests(unittest.TestCase):
@@ -14,6 +14,10 @@ class TextUtilsTests(unittest.TestCase):
         do(u'<b class="foo">Just a test</b>')
         do(u'<span class="foo">Just a</span> test')
         do(u'<span class="foo">Just <a href="#">a</a></span> <i>test</i>')
+
+    def test_unescape_entities(self):
+        self.assertEqual(unescape_entities('&eacute;'), u"é")
+        self.assertEqual(unescape_entities('&amp;'), u"&")
 
     def test_modern_istitle(self):
         self.failIf(modern_istitle("al-Assad") != True)

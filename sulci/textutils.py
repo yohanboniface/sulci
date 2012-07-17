@@ -3,15 +3,22 @@
 Sulci raw text utils.
 """
 import re
+import HTMLParser
 
 from collections import defaultdict
 
-from django.utils.text import unescape_entities
+
+HTML_PARSER = HTMLParser.HTMLParser()
 
 
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
     return re.sub(ur'<[^>]*?>', '', value)
+
+
+def unescape_entities(text):
+    # TODO: unescape also XML entities
+    return HTML_PARSER.unescape(text)
 
 
 def modern_istitle(word):
