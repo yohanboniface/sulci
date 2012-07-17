@@ -4,14 +4,14 @@ Here is the modelization:
 
 `Thesaurus`
 
-    Its a wrapper to interact with the descriptors 
+    Its a wrapper to interact with the descriptors
 
 `Descriptor`
 
     This is a semantical entity, which will be used to describe the content.
-    
+
     It has the fields:
-    
+
     - name: the human readable name of the decriptor
     - description: some text to describe better the meaning of the descriptor
     - parent: a parent descriptor
@@ -22,33 +22,30 @@ Here is the modelization:
     This is a piece of text that has been selected as having meaning.
 
 """
-import re
 import codecs
-import os
 
 from limpyd import model, fields
 
-from sulci.textutils import tokenize_text, lev
-from sulci.base import RetrievableObject
 from sulci.utils import save_to_file, get_dir
 from sulci.log import sulci_logger
 from sulci import config
+
 
 class Thesaurus(object):
 
     def __init__(self, path="thesaurus.txt"):
         self.descriptors = Descriptor.collection()
-    
+
     def __contains__(self, item):
         # TODO: accept also Descriptor instances as param
         return Descriptor.exists(name=item)
-    
-    def __iter__(self): 
+
+    def __iter__(self):
         return Descriptor.instances()
-    
+
     def __getitem__(self, key):
         return Descriptor.get(name=unicode(key))
-    
+
     def normalize_item(self, item):
         from textmining import KeyEntity  # Sucks...
         if isinstance(item, KeyEntity):
@@ -63,7 +60,7 @@ class Thesaurus(object):
 
     @property
     def triggers(self):
-        if self._triggers is None:#cached and lazy
+        if self._triggers is None:  # cached and lazy
             self._triggers = set()
             self.load_triggers()
         return self._triggers
@@ -76,7 +73,7 @@ class Thesaurus(object):
             t, created = Trigger.get_or_create(line, self, parent=self, original=line)
             self._triggers.add(t)
         f.close()
-    
+
     @classmethod
     def reset_triggers(self):
         """
@@ -94,18 +91,18 @@ class Descriptor(BaseModel):
     """
     Entries of the Thesaurus.
     """
-    
+
 #    parent = model.ReferenceField('Descriptor')
     name = fields.HashableField(unique=True)
     description = fields.HashableField()
     count = fields.HashableField(default=0)
     max_weight = fields.HashableField(default=0)
 #    is_alias_of = model.ReferenceField('Descriptor')
-    
+
     def __init__(self, *args, **kwargs):
         self._max_weight = None
         super(Descriptor, self).__init__(*args, **kwargs)
-    
+
     def __unicode__(self):
         return self.name.hget().decode('utf-8')
 
