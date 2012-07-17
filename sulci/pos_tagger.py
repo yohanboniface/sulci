@@ -1,16 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-
-from collections import defaultdict
-from operator import itemgetter
-
-from sulci.utils import load_file, save_to_file
-from sulci.rules_templates import ContextualTemplateGenerator, \
-                            LexicalTemplateGenerator, RuleTemplate
+from sulci.rules_templates import ContextualTemplateGenerator, LexicalTemplateGenerator
 from sulci.base import Token
 from sulci.textutils import modern_istitle
+
 
 class PosTagger(object):
     """
@@ -19,7 +13,7 @@ class PosTagger(object):
 
     def __init__(self, lexicon):
         self.lexicon = lexicon
-    
+
     def default_tag(self, token):
         if isinstance(token, Token):
             token = token.original
@@ -31,7 +25,7 @@ class PosTagger(object):
 #            return "SBC:pl"
         else:
             return "SBC:sg"
-    
+
     def lexical_tag(self, token):
         """
         Apply lexical tag to a token or list of tokens
@@ -43,7 +37,7 @@ class PosTagger(object):
             template.apply_rule(tks, rule)
         # Return a list if a list was given
         return tks if hasattr(token, "__iter__") else tks[0]
-    
+
     def contextual_tag(self, token):
         tks = token if hasattr(token, "__iter__") else [token]
         rules = ContextualTemplateGenerator.load()
@@ -51,18 +45,18 @@ class PosTagger(object):
             template, _ = ContextualTemplateGenerator.get_instance(rule)
             template.apply_rule(tks, rule)
         return tks if hasattr(token, "__iter__") else tks[0]
-    
+
     def get_tag(self, tokens):
         final = []
         for token in tokens:
             final.append((token, self.default_tag(token)))
         return final
-    
+
     def tag(self, token, mode="final"):
         token.tag = self.default_tag(token)
         return token
         #manage final and just lexical modes
-    
+
     def tag_all(self, tokens, lexical=True, contextual=True):
         for tk in tokens:
             self.tag(tk)
@@ -70,5 +64,3 @@ class PosTagger(object):
             self.lexical_tag(tokens)
         if contextual:
             self.contextual_tag(tokens)
-
-
