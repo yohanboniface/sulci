@@ -210,14 +210,11 @@ class TriggerToDescriptor(BaseModel):
     def remove_useless_connections(cls):
         """
         Delete all the useless connections.
+
+        First loop on all the descriptors to consume less RAM.
         """
-        instances = True
-        start = 0
-        step = 10000
-        while instances:
-            end = start + step
-            instances = cls.instances()[start:end]
-            start = end
+        for descriptor_id in Descriptor.collection():
+            instances = cls.instances(descriptor_id=descriptor_id)
             for inst in instances:
                 try:
                     weight = int(inst.weight.hget())
