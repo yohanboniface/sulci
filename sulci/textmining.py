@@ -4,8 +4,11 @@
 import math
 
 from operator import itemgetter
+
 from GenericCache.GenericCache import GenericCache
 from GenericCache.decorators import cached
+
+from limpyd import model, fields
 
 from sulci.utils import uniqify, sort, product
 from sulci.textutils import lev, normalize_text, words_occurrences
@@ -131,43 +134,39 @@ class SemanticalTagger(object):
         # Min_count may be proportionnal to text length...
         return sort([s for s in self.text.stemms if s.has_interest_alone()], "count", reverse=True)
 
-    def ngrams(self, min_length=2, max_length=15, min_count=2):
+    def ngrams(self, min_length=2, max_length=15):
         final = {}
         for idxs, sentence in enumerate(self.text.samples):
-            sentence = tuple(sentence)
             for begin in range(0, len(sentence)):
                 id_max = min(len(sentence) + 1, begin + max_length + 1)
                 for end in range(begin + min_length, id_max):
                     g = sentence[begin:end]
-                    #We make the comparison on stemmes
+                    # We make the comparison on stemmes
                     idxg = tuple([w.stemm for w in g])
                     if not g[0].has_meaning() or not g[len(g) - 1].has_meaning():
                         continue  # continuing just this for loop. Good ?
-#                    if "projet" in g: sulci_logger.debug(g, RED)
-#                    if g[1].original == "Bourreau" and len(g) == 2: print g
                     if not idxg in final:
                         final[idxg] = {"count": 1, "stemms": [t.stemm for t in g]}
                     else:
                         final[idxg]["count"] += 1
-#                        if g[1].original == "Bourreau" and len(g) == 2: print "yet", idxg, final[idxg]['stemms'], final[idxg]["count"]
-#        return final
-#        pouet = sorted([u" ".join([s.main_occurrence.original for s in v["stemms"]]) for k, v in final.iteritems()])
-#        for ppouet in pouet:
-#            print ppouet
-        return sorted([(v["stemms"], v["count"]) for k, v in final.iteritems() if self.filter_ngram(v)], key=itemgetter(1), reverse=True)
+        return final
 
-    def filter_ngram(self, candidate):
+    def filtered_ngrams(self, min_length=2, max_length=15, min_count=2):
+        ngrams = self.ngrams(min_length, max_length)
+        return sorted([(v["stemms"], v["count"]) for k, v in ngrams.iteritems() if self.filter_ngram(v, min_count)], key=itemgetter(1), reverse=True)
+
+    def filter_ngram(self, candidate, min_count=2):
         """
         Here we try to keep the right ngrams to make keyentities.
         """
-        return candidate["count"] >= 2 \
+        return candidate["count"] >= min_count \
                or all([s.istitle() for s in candidate["stemms"]]) \
                or False
 
     def make_keyentities(self, min_length=2, max_length=10, min_count=2):
         # From ngrams
         keyentities = []
-        candidates = self.ngrams()
+        candidates = self.filtered_ngrams()
         # Candidates are tuples : (ngram, ngram_score)
         sulci_logger.debug("Ngrams candidates", "BLUE", highlight=True)
         for c in candidates:
@@ -754,3 +753,23 @@ class Stemm(RetrievableObject):
         Number of occurrences of this stemm.
         """
         return len(self.occurrences)
+
+
+class GlobalPMI(model.RedisModel):
+    """
+    Store in redis the PMI for the whole corpus.
+
+    ngrams = count for each referenced ngram in the corpus
+    ncount = count for each length of ngram in the corpus
+    """
+    ngrams = fields.SortedSetField()
+    ncount = fields.SortedSetField()
+
+    MAX_LENGTH = 15
+
+    def add_ngram(self, ngram):
+        """
+        Ngram is expected to be a KeyEntity instance.
+        """
+        self.ngrams.zincrby(ngram)
+        self.ncount.zincrby(len(ngram))
