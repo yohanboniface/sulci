@@ -3,7 +3,7 @@
 import unittest
 import argparse
 
-from sulci.tests import textutils, sample, token
+from sulci.tests import textutils, sample, token, stemmedtext
 
 
 if __name__ == "__main__":
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     else:
         # Run all the tests
         suites = []
-        for mod in [textutils, sample, token]:
+        for mod in [textutils, sample, token, stemmedtext]:
             suite = unittest.TestLoader().loadTestsFromModule(mod)
             suites.append(suite)
         suite = unittest.TestSuite(suites)
