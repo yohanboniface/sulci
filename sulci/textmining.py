@@ -1,19 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:Utf-8 -*-
 
-import os
-import re
-import urllib2
-import time, datetime
 import math
 
-from collections import defaultdict
 from operator import itemgetter
 from GenericCache.GenericCache import GenericCache
 from GenericCache.decorators import cached
 
 from sulci.utils import uniqify, sort, product
-from sulci.stopwords import stop_words, usual_words
 from sulci.textutils import lev, normalize_text, words_occurrences
 from sulci.base import RetrievableObject, Token, TextManager
 from sulci.pos_tagger import PosTagger
@@ -24,6 +18,7 @@ from sulci.log import sulci_logger
 
 #Cache
 cache = GenericCache()
+
 
 class StemmedText(TextManager):
     """
@@ -44,13 +39,13 @@ class StemmedText(TextManager):
         self.lemmatizer = lemmatizer or Lemmatizer(self.lexicon)
         self.make()
         self._stemms = None
-    
+
     def __iter__(self):
         return self.words.__iter__()
-    
+
     def __len__(self):
         return len(self.words)
-    
+
     def make(self):
         """
         Text is expected to be tokenized.
@@ -59,10 +54,10 @@ class StemmedText(TextManager):
         self.samples, self.tokens = self.instantiate_text(self.tokenize(self.normalized_text))
         self.postagger.tag_all(self.tokens)
         self.create_stemm()
-    
+
     def create_stemm(self):
-        self._stemms = set() # A set because order don't mind
-                             # And we want no duplicates
+        self._stemms = set()  # A set because order don't mind
+                              # And we want no duplicates
         self.lemmatizer.do(self.tokens)
         for tkn in self.tokens:
             # We don't take the sg or pl in the tag name
@@ -72,7 +67,7 @@ class StemmedText(TextManager):
             self._stemms.add(stm)
         sulci_logger.debug("Initial stemms", "BLUE", highlight=True)
         sulci_logger.debug([unicode(s) for s in self._stemms], "CYAN")
-    
+
     @property
     @cached(cache)
     def medium_word_count(self):
@@ -91,7 +86,7 @@ class StemmedText(TextManager):
 
     @property
     def stemms(self):
-        if self._stemms is None: # Should not occurs
+        if self._stemms is None:  # Should not occurs
             self._stemms = uniqify([t.stemm for t in self.meaning_words], lambda x: x.id)
         return self._stemms
 
@@ -106,10 +101,10 @@ class StemmedText(TextManager):
         Return the number of words in the text.
         """
         return sum([s.meaning_words_count() for s in self.samples])
-    
+
     def distinct_words(self):
         return uniqify(self.words, lambda x: x.original)
-    
+
     def distincts_meaning_words(self):
         return uniqify(self.meaning_words, lambda x: x.original)
 
@@ -131,24 +126,23 @@ class SemanticalTagger(object):
         self.make_keyentities()
         self._triggers = None
         self._stemms = None
-    
+
     def keystems(self, min_count=3):
-        #Min_count may be proportionnal to text length...
+        # Min_count may be proportionnal to text length...
         return sort([s for s in self.text.stemms if s.has_interest_alone()], "count", reverse=True)
-    
-    def ngrams(self, min_length = 2, max_length = 15, min_count = 2):
+
+    def ngrams(self, min_length=2, max_length=15, min_count=2):
         final = {}
-    #    sentence = tuple(sentences[0])
         for idxs, sentence in enumerate(self.text.samples):
             sentence = tuple(sentence)
-            for begin in range(0,len(sentence)):
+            for begin in range(0, len(sentence)):
                 id_max = min(len(sentence) + 1, begin + max_length + 1)
                 for end in range(begin + min_length, id_max):
                     g = sentence[begin:end]
                     #We make the comparison on stemmes
                     idxg = tuple([w.stemm for w in g])
-                    if not g[0].has_meaning() or not g[len(g)-1].has_meaning():
-                        continue#continuing just this for loop. Good ?
+                    if not g[0].has_meaning() or not g[len(g) - 1].has_meaning():
+                        continue  # continuing just this for loop. Good ?
 #                    if "projet" in g: sulci_logger.debug(g, RED)
 #                    if g[1].original == "Bourreau" and len(g) == 2: print g
                     if not idxg in final:
@@ -170,7 +164,7 @@ class SemanticalTagger(object):
                or all([s.istitle() for s in candidate["stemms"]]) \
                or False
 
-    def make_keyentities(self, min_length = 2, max_length = 10, min_count = 2):
+    def make_keyentities(self, min_length=2, max_length=10, min_count=2):
         # From ngrams
         keyentities = []
         candidates = self.ngrams()
@@ -181,7 +175,7 @@ class SemanticalTagger(object):
         for candidate in candidates:
             kp, created = KeyEntity.get_or_create([unicode(s.main_occurrence) for s in candidate[0]],
                                                   self.text,
-                                                  stemms=candidate[0], 
+                                                  stemms=candidate[0],
                                                   count=candidate[1],
                                                   text=self.text)
             keyentities.append(kp)
@@ -191,15 +185,15 @@ class SemanticalTagger(object):
         for c in candidates:
             sulci_logger.debug(unicode(c), "CYAN")
         for candidate in candidates:
-            kp, created = KeyEntity.get_or_create([unicode(candidate.main_occurrence)], 
+            kp, created = KeyEntity.get_or_create([unicode(candidate.main_occurrence)],
                                                   self.text,
-                                                  stemms=[candidate], 
+                                                  stemms=[candidate],
                                                   count=candidate.count,
                                                   text=self.text)
             keyentities.append(kp)
         self.keyentities = keyentities
 #        self.deduplicate_keyentities()
-    
+
     def deduplicate_keyentities(self):
         """
         If a KeyEntity is contained in an other (same stemms in same place) longuer
@@ -210,11 +204,11 @@ class SemanticalTagger(object):
         tmp_keyentities = sorted(self.keyentities, key=lambda kp: len(kp))
         sulci_logger.debug([unicode(kp) for kp in tmp_keyentities], "GRAY")
         for idx, one in enumerate(tmp_keyentities):
-            for two in tmp_keyentities[idx+1:]:
+            for two in tmp_keyentities[idx + 1:]:
                 if one in self.keyentities and two in self.keyentities:
                     if one.is_duplicate(two):
                         sulci_logger.debug(u"%s is duplicate %s" % (unicode(one), unicode(two)), "MAGENTA")
-                        if one > two:#and not two.is_strong()
+                        if one > two:  # and not two.is_strong()
                             sulci_logger.debug(u"%s will be deleted" % unicode(two), "RED")
                             self.keyentities.remove(two)
                         elif two > one:
@@ -223,10 +217,10 @@ class SemanticalTagger(object):
                         else:
                             sulci_logger.debug(u"No deletion")
         sulci_logger.debug(u"... keyentities deduplicated", "BLUE", highlight=True)
-    
+
     def keyentities_for_trainer(self):
         return sorted(self.keyentities, key=lambda kp: kp.frequency_relative_pmi_confidence * kp._confidences["pos"], reverse=True)[:20]
-    
+
     @property
     def triggers(self):
         """
@@ -241,15 +235,15 @@ class SemanticalTagger(object):
                 except Trigger.DoesNotExist:
                     pass
         return self._triggers
-    
+
     @property
     def descriptors(self):
         return self.get_descriptors()
-    
+
     def get_descriptors(self, min_score=10):
         """
         Final descriptors for the text.
-        
+
         Only descriptors triggered up to min_score will be returned.
         """
         self._scored_descriptors = {}
@@ -260,27 +254,27 @@ class SemanticalTagger(object):
             for d in t:
                 # Preventing from rehiting the db
                 # By him-self, Django to retrieve the reverse FK in the cache...
-                if d.weight.hget() > 2: # How to define this min ?
+                if d.weight.hget() > 2:  # How to define this min ?
                     key = d.descriptor.pk.get()
                     # Add the descriptor if needed
                     if not key in self._scored_descriptors:
-                        self._scored_descriptors[key] = {"weight":0, "descriptor": d.descriptor}
+                        self._scored_descriptors[key] = {"weight": 0, "descriptor": d.descriptor}
                     # Trying to keep the same instance when the same
                     # descriptor is seen few times (should occurs)
                     d._descriptor = self._scored_descriptors[key]["descriptor"]
                     # Update descriptor final score
                     self._scored_descriptors[key]["weight"] += d.pondered_weight * score
             total_score += score
-            max_score = max(max_score,score)
+            max_score = max(max_score, score)
         # We make a percentage of the max score possible
         for key, d in self._scored_descriptors.items():
             self._scored_descriptors[key]["weight"] = d["weight"] / max_score * 100.0
         return [
-            (d["descriptor"], d["weight"]) for key,d in 
-            sorted(self._scored_descriptors.items(), key=lambda t: t[1]["weight"], reverse=True) 
+            (d["descriptor"], d["weight"]) for key, d in
+            sorted(self._scored_descriptors.items(), key=lambda t: t[1]["weight"], reverse=True)
             if d["weight"] > min_score
                ]
-    
+
     def debug(self):
         sulci_logger.debug("Normalized text", "WHITE")
         sulci_logger.debug(self.text.normalized_text, "WHITE")
@@ -329,6 +323,7 @@ class SemanticalTagger(object):
                 for d in sorted(t, key=lambda t2d: t2d.weight, reverse=True):
                     sulci_logger.debug(u"%s %f" % (unicode(d), d.pondered_weight), "CYAN")
 
+
 class KeyEntity(RetrievableObject):
     count = 0
     _confidences = {}
@@ -348,16 +343,16 @@ class KeyEntity(RetrievableObject):
                            }
         self.compute_confidence()
         self._istitle = None
-    
+
     def __unicode__(self):
         return u" ".join([unicode(t.main_occurrence) for t in self.stemms])
-    
+
     def __repr__(self):
         return u"<KE %s>" % u" ".join([repr(t) for t in self.stemms]).decode("utf-8")
-    
+
     def __iter__(self):
         return self.stemms.__iter__()
-    
+
     def __len__(self):
         return len(self.stemms)
 
@@ -381,12 +376,12 @@ class KeyEntity(RetrievableObject):
 
     def __gt__(self, other):
         """
-        We try here to define which from two keyentities competitor is the 
+        We try here to define which from two keyentities competitor is the
         best concentrate of information.
         (Remember that if an expression A is included in B, A is mathematicaly
         almost frequent than B.)
         Examples :
-        - Ernesto Che Guevara, is more informative than "Che" or "Che 
+        - Ernesto Che Guevara, is more informative than "Che" or "Che
         Guevara", even if "Che Guevara" is very more frequent.
         - "loi Création et Internet" is more concentrate, and so more informative,
         than "le projet de loi Création et Internet"
@@ -413,7 +408,7 @@ class KeyEntity(RetrievableObject):
             # maybe there the scenario for training should be different
             # to create the less noise relations possible
             return False
-        else: # No title in the comparison
+        else:  # No title in the comparison
             if not self.statistical_mutual_information_confidence() == other.statistical_mutual_information_confidence():
                 return self.statistical_mutual_information_confidence() > other.statistical_mutual_information_confidence()
             elif not self.heuristical_mutual_information_confidence() == other.heuristical_mutual_information_confidence():
@@ -422,7 +417,8 @@ class KeyEntity(RetrievableObject):
                 return self.confidence > other.confidence
             elif not len(self) == len(other):
                 return len(self) > len(other)
-            else: return False
+            else:
+                return False
 
     def __lt__(self, other):
         return other > self
@@ -442,7 +438,7 @@ class KeyEntity(RetrievableObject):
         Do not use.
         """
         raise NotImplementedError("This have no sens.")
-    
+
     def istitle(self):
         """
         A keyEntity is a title when all its stemms are title.
@@ -450,21 +446,24 @@ class KeyEntity(RetrievableObject):
         if self._istitle is None:
             self._istitle = all(s.istitle() for s in self)
         return self._istitle
-    
+
     def index(self, key):
         return self.stemms.index(key)
-    
+
     def __contains__(self, item):
         """
         Special behaviour if item is KeyEntity :
         determine if item is contained in self, or self in item.
         """
         if isinstance(item, KeyEntity):
-            if len(item) > len(self): return False
-            #item is shorter or equal
-            if not item[0] in self: return False#The first element is not there
+            if len(item) > len(self):
+                return False
+            # item is shorter or equal
+            if not item[0] in self:
+                # The first element is not there
+                return False
             idx = self.index(item[0])
-            return item[:] == self[idx:idx+len(item)]
+            return item[:] == self[idx:idx + len(item)]
         else:
             return self.stemms.__contains__(item)
 
@@ -472,17 +471,17 @@ class KeyEntity(RetrievableObject):
     def confidence(self):
         return self.collocation_confidence * self.keyconcept_confidence
 #        return product([100] + [v for k, v in self._confidences.items()])
-    
+
     @property
     def trigger_score(self):
         """
         Score used by trigger, may be the final confidence ?
         """
         return self.frequency_relative_pmi_confidence * self._confidences["pos"]
-    
+
     @property
     def collocation_confidence(self):
-        return ((self._confidences["heuristical_mutual_information"] 
+        return ((self._confidences["heuristical_mutual_information"]
                 + self._confidences["statistical_mutual_information"]) / 2) \
                 * self._confidences["pos"]
 #                self._confidences["title"] * self._confidences["thesaurus"] \
@@ -491,15 +490,15 @@ class KeyEntity(RetrievableObject):
     def keyconcept_confidence(self):
 #        return ((self._confidences["nrelative_frequency"] + self._confidences["frequency"]) / 2 )
         return self._confidences["nrelative_frequency"]
-    
+
     @property
     def frequency_relative_pmi_confidence(self):
         return self._confidences["statistical_mutual_information"] \
                * self._confidences["nrelative_frequency"]
-    
+
     def compute_confidence(self):
         """
-        Compute scores that will be used to order, select, deduplicate 
+        Compute scores that will be used to order, select, deduplicate
         keytentities.
         """
         self._confidences["frequency"] = self.frequency_confidence()
@@ -548,10 +547,11 @@ class KeyEntity(RetrievableObject):
             to_test = [n.main_occurrence for n in self if n.main_occurrence.has_meaning()]
             for item in to_test:
                 # Proportion and occurrences
-                if item.istitle(): confidence += factor / len(to_test) + 0.1
+                if item.istitle():
+                    confidence += factor / len(to_test) + 0.1
             self._confidences["title"] = confidence
         return self._confidences["title"]
-    
+
     def pos_confidence(self):
         """
         Give a score linked to the POS of the subelements.
@@ -570,7 +570,7 @@ class KeyEntity(RetrievableObject):
                     confidence += 0.1
             self._confidences["pos"] = confidence / len(self)
         return self._confidences["pos"]
-    
+
     def heuristical_mutual_information_confidence(self):
         """
         Return the probability of all the terms of the ngram to appear together.
@@ -591,18 +591,20 @@ class KeyEntity(RetrievableObject):
             #We test just from interessant stemms, but we keep original position
             candidates = [(k, v) for k, v in enumerate(self) if v.is_valid()]
             alone_count = {}
-            if len(self) == 1: return 1#Just one word, PMI doesn't make sense
-            if len(candidates) == 0: return 0.1
+            if len(self) == 1:
+                return 1  # Just one word, PMI doesn't make sense
+            if len(candidates) == 0:
+                return 0.1
             for position, stemm in candidates:
                 alone_count[position] = 0
                 neighbours = [(s, p - position) for p, s in enumerate(self) if not s is stemm]
                 for tkn in stemm.occurrences:
                     if not tkn.is_neighbor(neighbours):
                         alone_count[position] += 1
-            res = [v for k,v in alone_count.items()]
+            res = [v for k, v in alone_count.items()]
             if sum(res) == 0:
-                return 3 * len(self)#We trust this collocation
-            elif 0 in res:#Almost one important term appears just in this context
+                return 3 * len(self)  # We trust this collocation
+            elif 0 in res:  # Almost one important term appears just in this context
                 return 2
             else:
                 #We don't know, but not so confident...
@@ -618,9 +620,10 @@ class KeyEntity(RetrievableObject):
         probability of each member of the ngram.
         """
         if self._confidences["statistical_mutual_information"] is None:
-            if len(self) == 1: return 1.0#TODO : find better way for 1-grams...
+            if len(self) == 1:
+                return 1.0  # TODO : find better way for 1-grams...
             ngram_possible = len(self.text) - len(self) + 1
-            members_probability = product([1.0 * s.count/len(self.text) for s in self])
+            members_probability = product([1.0 * s.count / len(self.text) for s in self])
             self._confidences["statistical_mutual_information"] = \
             math.log(1.0 * self.count / ngram_possible / members_probability)
         return self._confidences["statistical_mutual_information"]
@@ -630,11 +633,12 @@ class KeyEntity(RetrievableObject):
         Try to find a descriptor in thesaurus, calculate levenshtein distance,
         and make a score.
         This may not be < 1, because if there is a descriptor, is a good point
-        for the collocation, but if not, is doesn't means that this is not a 
+        for the collocation, but if not, is doesn't means that this is not a
         real collocation.
         """
         if self._confidences["thesaurus"] is None:
-            if self.descriptor is None: return 1
+            if self.descriptor is None:
+                return 1
             else:
                 sorig = unicode(self)
                 dorig = unicode(self.descriptor)
@@ -661,6 +665,7 @@ class KeyEntity(RetrievableObject):
         self._confidences["nrelative_frequency"] = max(other._confidences["nrelative_frequency"],
                                              self._confidences["nrelative_frequency"])
 
+
 class Stemm(RetrievableObject):
     """
     Subpart of text, grouped by meaning (stem).
@@ -676,13 +681,13 @@ class Stemm(RetrievableObject):
         self.text = kwargs["text"]
         self.occurrences = []
         self._main_occurrence = None
-    
+
     def __unicode__(self):
         return unicode(self.id)
-    
+
     def __repr__(self):
         return u"<Stemm '%s'>" % unicode(self.id)
-    
+
     def __hash__(self):
         return self.id.__hash__()
 
@@ -695,9 +700,9 @@ class Stemm(RetrievableObject):
         """
         s = y
         if isinstance(y, Token):
-            s = s.stemm # Will turn one time.
+            s = s.stemm  # Will turn one time.
         elif isinstance(y, Stemm):
-            s = s.id 
+            s = s.id
         return self.id == s
 
     def __ne__(self, y):
@@ -708,11 +713,11 @@ class Stemm(RetrievableObject):
 #        return all([o.istitle() for o in self.occurrences])
         #We try to use the majority instead of all (sometimes a proper name is also a common one)...
 #        return [o.istitle() for o in self.occurrences].count(True) >= len(self.occurrences) / 2
-    
+
     @property
     def tag(self):
         return self.main_occurrence.tag
-    
+
     def is_valid(self):
         return self.main_occurrence.has_meaning()
 
@@ -749,4 +754,3 @@ class Stemm(RetrievableObject):
         Number of occurrences of this stemm.
         """
         return len(self.occurrences)
-

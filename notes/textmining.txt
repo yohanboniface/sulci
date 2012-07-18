@@ -27,7 +27,7 @@ L'étiquettage associe une catégorie syntaxique unique à chaque mot d'un texte
 
 *Collocation*
 Suite de mots considérés comme un même élément sémantique (dans un contexte donné). Ex. : chat noir, New York, avenue des Champs-Elysées...
-En toute rigueur, le sens du tout ne correspond pas au sens de chacune des parties.
+En toute rigueur, le sens du tout ne correspond pas à la somme des sens de chacune des parties.
 
 *Bigram*
 Paire de mots d'un texte apparaissant côté à côte. Si la fréquence est élevée, le bigram est une collocation.
