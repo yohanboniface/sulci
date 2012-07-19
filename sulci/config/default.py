@@ -11,6 +11,11 @@ DATABASES = {
         "host": "localhost",
         "port": 6379,
         "db": 1
+    },
+    "tests": {
+        "host": "localhost",
+        "port": 6379,
+        "db": 15
     }
 }
 DEFAULT_DATABASE = "lemondediplo"

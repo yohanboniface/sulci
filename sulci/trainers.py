@@ -4,35 +4,18 @@ import os
 import time
 import datetime
 
-from sulci.thesaurus import Trigger, Descriptor
-from sulci.textmining import SemanticalTagger
+from sulci.thesaurus import Trigger, TriggerToDescriptor, Descriptor
+from sulci.textmining import SemanticalTagger, GlobalPMI
 from sulci.rules_templates import LemmatizerTemplateGenerator, RuleTemplate,\
                            ContextualTemplateGenerator, LexicalTemplateGenerator
 from sulci.log import sulci_logger
 from sulci import config
 
 
-class SemanticalTrainer(object):
+class ZMQTrainer(object):
     """
-    Create and update triggers. And make triggertodescription ponderation.
+    Factorize the ZMQ configuration here.
     """
-    PENDING_EXT = ".pdg"
-    VALID_EXT = ".trg"
-
-    def __init__(self, thesaurus, pos_tagger, mode="full"):
-        self.thesaurus = thesaurus
-        self.pos_tagger = pos_tagger
-        self.mode = mode
-
-    def begin(self):
-        """
-        Make one trigger for each descriptor of the thesaurus.
-        Have to be called one time at the begining, and that's all.
-        """
-        # TODO Add aliases...
-        for d in self.thesaurus:
-            t = Trigger.get_or_connect(original=unicode(d))
-            t.connect(d, 1)
 
     def setup_socket_master(self):
         """
@@ -67,6 +50,12 @@ class SemanticalTrainer(object):
 #        self.reppoller = zmq.Poller()
 #        self.reppoller.register(self.repsocket, zmq.POLLIN)
         self.subsocket.setsockopt(zmq.SUBSCRIBE, "")
+
+
+class ContentBaseTrainer(ZMQTrainer):
+    """
+    Factorize here the training based on content processing (articles...).
+    """
 
     def do(self, *args):
         if self.mode == "slave":
@@ -133,6 +122,19 @@ class SemanticalTrainer(object):
             self.repsocket.send_multipart(
                 [idx, "Processed pk %s (%s s)" % (pk, round(tot_time, 2))]
             )
+
+
+class SemanticalTrainer(ContentBaseTrainer):
+    """
+    Create and update triggers. And make TriggerToDescriptor ponderation.
+    """
+    PENDING_EXT = ".pdg"
+    VALID_EXT = ".trg"
+
+    def __init__(self, thesaurus, pos_tagger, mode="full"):
+        self.thesaurus = thesaurus
+        self.pos_tagger = pos_tagger
+        self.mode = mode
 
     def train(self, inst):
         """
@@ -223,7 +225,41 @@ class SemanticalTrainer(object):
         Delete all the connection where score < 0.
         """
         # We maybe have to clean connections where pondered_weigth is < 0.1.
-        Trigger.clean_all_connections()
+        TriggerToDescriptor.clean_all_connections()
+
+
+class GlobalPMITrainer(ContentBaseTrainer):
+    """
+    Create and update the global PMI data.
+    """
+
+    def __init__(self, thesaurus, pos_tagger, mode="full"):
+        self.thesaurus = thesaurus
+        self.pos_tagger = pos_tagger
+        self.mode = mode
+        self.global_pmi = GlobalPMI.get(corpus=config.DEFAULT_DATABASE)
+
+    def train(self, inst):
+        if isinstance(inst, (int, str)):
+            # We guess we have a pk here
+            inst = config.content_model_getter(inst)
+        text = getattr(inst, config.SULCI_CONTENT_PROPERTY)
+        try:
+            S = SemanticalTagger(
+                text,
+                thesaurus=self.thesaurus,
+                pos_tagger=self.pos_tagger,
+                lexicon=self.pos_tagger.lexicon
+            )
+            S.deduplicate_keyentities()  # During lairning, try to filter
+        except ValueError:
+            # SemanticalTagger raise ValueError if text is empty
+            return
+        # We want also the unigrams
+        # Note that the stopwords will not be returned
+        ngrams = S.ngrams(min_length=1, max_length=5)
+        for key, values in ngrams.iteritems():
+            self.global_pmi.add_ngram(values['stemms'], amount=values['count'])
 
 
 class RuleTrainer(object):

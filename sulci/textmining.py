@@ -8,7 +8,7 @@ from operator import itemgetter
 from GenericCache.GenericCache import GenericCache
 from GenericCache.decorators import cached
 
-from limpyd import model, fields
+from limpyd import fields
 
 from sulci.utils import uniqify, sort, product
 from sulci.textutils import lev, normalize_text, words_occurrences
@@ -18,6 +18,8 @@ from sulci.lexicon import Lexicon
 from sulci.thesaurus import Trigger, Thesaurus
 from sulci.lemmatizer import Lemmatizer
 from sulci.log import sulci_logger
+from sulci.base import BaseRedisModel
+from sulci import config
 
 #Cache
 cache = GenericCache()
@@ -314,6 +316,9 @@ class SemanticalTagger(object):
         sulci_logger.debug(u"Keyentities by nrelative * pos confidence", "BLUE", True)
         for kp in sorted(self.keyentities, key=lambda kp: kp.trigger_score, reverse=True)[:20]:
             sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
+        sulci_logger.debug(u"Keyentities by gobal pmi confidence", "BLUE", True)
+        for kp in sorted(self.keyentities, key=lambda kp: kp._confidences['global_mutual_information'], reverse=True)[:20]:
+            sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp._confidences['global_mutual_information']), "YELLOW")
         sulci_logger.debug(u"Triggers and relation with descriptors", "BLUE", True)
         for t, score in self.triggers:
             if len(t._synapses) > 0:
@@ -336,6 +341,8 @@ class KeyEntity(RetrievableObject):
                             "title": None,
                             "heuristical_mutual_information": None,
                             "statistical_mutual_information": None,
+                            "global_mutual_information": None,
+                            "global_probability": None,
                             "nrelative_frequency": None,
 #                            "thesaurus": None,
                             "pos": None
@@ -506,6 +513,8 @@ class KeyEntity(RetrievableObject):
         self._confidences["pos"] = self.pos_confidence()
         self._confidences["heuristical_mutual_information"] = self.heuristical_mutual_information_confidence()
         self._confidences["statistical_mutual_information"] = self.statistical_mutual_information_confidence()
+        self._confidences["global_mutual_information"] = self.global_mutual_information_confidence()
+        self._confidences["global_probability"] = self.global_probability_confidence()
 
     def frequency_confidence(self):
         """
@@ -626,6 +635,24 @@ class KeyEntity(RetrievableObject):
             self._confidences["statistical_mutual_information"] = \
             math.log(1.0 * self.count / ngram_possible / members_probability)
         return self._confidences["statistical_mutual_information"]
+
+    def global_mutual_information_confidence(self):
+        global_pmi_getter = GlobalPMI.get(config.DEFAULT_DATABASE)
+        local_pmi = self._confidences['statistical_mutual_information']
+        global_pmi = global_pmi_getter.global_pmi(self)
+        if not global_pmi:
+            # KeyEntity was not in corpus
+            return local_pmi
+        return local_pmi / global_pmi
+
+    def global_probability_confidence(self):
+        global_pmi_getter = GlobalPMI.get(config.DEFAULT_DATABASE)
+        local_probability = self._confidences['nrelative_frequency']
+        global_probability = global_pmi_getter.global_probability(self)
+        if not global_probability:
+            # KeyEntity was not in corpus
+            return local_probability
+        return local_probability / global_probability
 
     def thesaurus_confidence(self):
         """
@@ -755,21 +782,43 @@ class Stemm(RetrievableObject):
         return len(self.occurrences)
 
 
-class GlobalPMI(model.RedisModel):
+class GlobalPMI(BaseRedisModel):
     """
     Store in redis the PMI for the whole corpus.
 
+    corpus = name of the corpus (used as pk also)
     ngrams = count for each referenced ngram in the corpus
     ncount = count for each length of ngram in the corpus
     """
+    corpus = fields.PKField()
     ngrams = fields.SortedSetField()
     ncount = fields.SortedSetField()
 
     MAX_LENGTH = 15
 
-    def add_ngram(self, ngram):
+    def stemm_list_to_string(self, stemms):
+        # stemm.id is a tuple (lemme, POS_tag)
+        return " ".join("%s/%s" % stemm.id for stemm in stemms)
+
+    def add_ngram(self, ngram, amount):
         """
-        Ngram is expected to be a KeyEntity instance.
+        Ngram is expected to be a list of Stemm instances or a KeyEntity instances.
         """
-        self.ngrams.zincrby(ngram)
-        self.ncount.zincrby(len(ngram))
+        ngram_key = self.stemm_list_to_string(ngram)
+        self.ngrams.zincrby(ngram_key, amount=amount)
+        self.ncount.zincrby(len(ngram), amount)
+
+    def global_probability(self, ngram):
+        """
+        Ngram is expected to be a list of Stemm instances or a KeyEntity instances.
+        """
+        ngram_key = self.stemm_list_to_string(ngram)
+        ngram_score = self.ngrams.zscore(ngram_key) or 1
+        ngram_length_score = self.ncount.zscore(len(ngram)) or 1
+        return 1.0 * ngram_score / ngram_length_score
+
+    def global_pmi(self, ngram):
+        ngram_probability = self.global_probability(ngram)
+        # use iterable also for one element
+        members_probability = product(self.global_probability([s]) for s in ngram if s.is_valid_alone())
+        return math.log(ngram_probability / members_probability)

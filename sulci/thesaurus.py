@@ -24,11 +24,11 @@ Here is the modelization:
 """
 import codecs
 
-from limpyd import model, fields
+from limpyd import fields
 
+from sulci.base import BaseRedisModel
 from sulci.utils import save_to_file, get_dir
 from sulci.log import sulci_logger
-from sulci import config
 
 
 class Thesaurus(object):
@@ -82,12 +82,7 @@ class Thesaurus(object):
         save_to_file("corpus/triggers.trg", "")
 
 
-class BaseModel(model.RedisModel):
-
-    CONNECTION_SETTINGS = config.DATABASES[config.DEFAULT_DATABASE]
-
-
-class Descriptor(BaseModel):
+class Descriptor(BaseRedisModel):
     """
     Entries of the Thesaurus.
     """
@@ -122,7 +117,7 @@ class Descriptor(BaseModel):
         return self.is_alias_of.primeval
 
 
-class TriggerToDescriptor(BaseModel):
+class TriggerToDescriptor(BaseRedisModel):
     """
     Helper to manage the trigger to descriptor relation.
     """
@@ -227,7 +222,7 @@ class TriggerToDescriptor(BaseModel):
                     inst.delete()
 
 
-class Trigger(BaseModel):
+class Trigger(BaseRedisModel):
     """
     The trigger is a keyentity who suggest some descriptors when in a text.
     It is linked to one or more descriptors, and the distance of the link

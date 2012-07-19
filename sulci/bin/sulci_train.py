@@ -5,15 +5,15 @@ import time
 from sulci.pos_tagger import PosTagger
 from sulci.lexicon import Lexicon
 from sulci.corpus import Corpus, TextCorpus
-from sulci.textmining import SemanticalTagger
 from sulci.thesaurus import Thesaurus
 from sulci.log import sulci_logger
 from sulci.trainers import SemanticalTrainer, LemmatizerTrainer, LexicalTrainer,\
-                                                   ContextualTrainer, POSTrainer
+                                           ContextualTrainer, GlobalPMITrainer
 from sulci.lemmatizer import Lemmatizer
 from sulci import config
 
 from sulci_cli import SulciBaseCommand
+
 
 class Command(SulciBaseCommand):
     """
@@ -28,21 +28,21 @@ class Command(SulciBaseCommand):
             "--lexicon",
             action="store_true",
             dest="lexicon",
-            help = "Build the lexicon"
+            help="Build the lexicon"
         )
         self.parser.add_argument(
             "-e",
             "--lexical",
             action="store_true",
             dest="lexical",
-            help = "Launch the lexical trainer"
+            help="Launch the lexical trainer"
         )
         self.parser.add_argument(
             "-c",
             "--contextual",
             action="store_true",
             dest="contextual",
-            help = "Launch the contextual trainer"
+            help="Launch the contextual trainer"
         )
         self.parser.add_argument(
             "-m",
@@ -50,36 +50,43 @@ class Command(SulciBaseCommand):
             action="store",
             type=str,
             dest="mode",
-            default = None,
+            default=None,
             help="Trainer mode : master, slave, or full (default)"
         )
         self.parser.add_argument(
             "-r",
             "--lemmatizer",
             action="store_true",
-            dest="lemmatizer", 
-            help = "Launch Lemmatizer training."
+            dest="lemmatizer",
+            help="Launch Lemmatizer training."
         )
         self.parser.add_argument(
             "-s",
             "--subprocesses",
             action="store",
-            type=int, 
+            type=int,
             dest="subprocesses",
-            default = None,
-            help = "Launch trainer with x subprocesses"
+            default=None,
+            help="Launch trainer with x subprocesses"
         )
         self.parser.add_argument(
             "-n",
             "--semantical",
             action="store_true",
-            dest="semantical", 
-            help = "Launch the sementical training. Launch it with python -O."
+            dest="semantical",
+            help="Launch the sementical training. Launch it with python -O."
+        )
+        self.parser.add_argument(
+            "-p",
+            "--pmi",
+            action="store_true",
+            dest="pmi",
+            help="Launch the PMI training. Launch it with python -O."
         )
         self.parser.add_argument(
             "-a",
             "--add_candidate",
-            action="store_true", 
+            action="store_true",
             dest="add_candidate",
             help="Prepare article for manual POS indexing"
         )
@@ -87,7 +94,7 @@ class Command(SulciBaseCommand):
             "-b",
             "--add_lemmes",
             action="store_true",
-            dest="add_lemmes", 
+            dest="add_lemmes",
             help="Add lemme also when preparing a text for POS indexing"
         )
 
@@ -103,9 +110,10 @@ class Command(SulciBaseCommand):
             training_kind = self.LEXICAL and "-e"\
                             or self.LEMMATIZER and "-r"\
                             or self.SEMANTICAL and "-n"\
-                            or "-c" # CONTEXTUAL
+                            or self.PMI and "-p"\
+                            or "-c"  # CONTEXTUAL
             # Create slaves
-            for i in xrange(0,self.SUBPROCESSES):
+            for i in xrange(0, self.SUBPROCESSES):
                 sulci_logger.info(u"Opening slave subprocess %d" % i, "BLUE", True)
                 python_kind = not __debug__ and ["-O"] or []
                 subprocess.Popen(["python"] + python_kind + ["sulci_train.py", training_kind, "--mode=slave"])
@@ -114,17 +122,21 @@ class Command(SulciBaseCommand):
             # Wait to leave time to slave to launch
             time.sleep(1)
         if self.LEXICAL:
-            T = LexicalTrainer(P,C,self.MODE)
+            T = LexicalTrainer(P, C, self.MODE)
             T.do()
         elif self.CONTEXTUAL:
-            T = ContextualTrainer(P,C,self.MODE)
+            T = ContextualTrainer(P, C, self.MODE)
             T.do()
         elif self.LEMMATIZER:
-            T = LemmatizerTrainer(M,self.MODE)
+            T = LemmatizerTrainer(M, self.MODE)
             T.do()
+        elif self.PMI:
+            T = Thesaurus()
+            G = GlobalPMITrainer(T, P, self.MODE)
+            G.do()
         elif self.SEMANTICAL:
             T = Thesaurus()
-            S = SemanticalTrainer(T,P,self.MODE)
+            S = SemanticalTrainer(T, P, self.MODE)
             if self.PK:
                 # Should not have PK in MODE == "master"
                 a = config.content_model_getter(self.PK)
@@ -145,7 +157,8 @@ class Command(SulciBaseCommand):
                 T.prepare(t, P, M)
                 T.export(self.PK, self.FORCE, self.ADD_LEMMES)
         if self.IPDB:
-            import ipdb; ipdb.set_trace()
+            import ipdb
+            ipdb.set_trace()
 
 if __name__ == '__main__':
     command = Command()

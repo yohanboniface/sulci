@@ -3,9 +3,12 @@
 
 import os
 
+from limpyd import model
+
 from sulci.utils import load_file, get_dir
 from sulci.textutils import tokenize_text
 from sulci.stopwords import usual_words
+from sulci import config
 
 
 class TextManager(object):
@@ -448,3 +451,8 @@ class Token(RetrievableObject):
 
     def show_context(self):
             return self.parent.show_context(self.position)
+
+
+class BaseRedisModel(model.RedisModel):
+
+    CONNECTION_SETTINGS = config.DATABASES[config.DEFAULT_DATABASE]
