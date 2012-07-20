@@ -51,13 +51,17 @@ class BaseValidator(TextManager):
         sulci_logger.info(valids)
         sulci_logger.info("Output", "YELLOW", True)
         sulci_logger.info(candidates)
-        for e in candidates[:]:  # Make a copy, to be able to modify it
+        valids_copy = valids
+        for e in candidates:
             if e in valids:
+                # One candidate was expected, good
                 true_positives.append(e)
+                valids_copy.remove(e)
             else:
-                false_negatives.append(e)
-            candidates.remove(e)
-        false_positives = candidates
+                # This candidate was not expected
+                false_positives.append(e)
+        # Extected items not in candidates
+        false_negatives = valids_copy
         sulci_logger.info("True positives", "YELLOW", True)
         sulci_logger.info(true_positives, "BLUE")
         sulci_logger.info("False positives", "YELLOW", True)
