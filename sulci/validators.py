@@ -86,4 +86,4 @@ class KeyEntityValidator(BaseValidator):
             flat_output.append(
                 " ".join(stemm.main_occurrence.lemme for stemm in ke)
             )
-        return self.compare_lists(flat_output, raw_output)
+        return self.compare_lists(raw_output, flat_output)
