@@ -64,7 +64,7 @@ class BaseValidator(TextManager):
         sulci_logger.info(false_positives, "RED")
         sulci_logger.info("False negatives", "YELLOW", True)
         sulci_logger.info(false_negatives, "RED")
-        score = len(true_positives) - len(false_positives) - len(false_negatives)
+        score = 1.0 * (len(false_positives) + len(false_negatives)) / len(valids) * -1
         sulci_logger.info("Score", "YELLOW", True)
         sulci_logger.info(score, "RED", True)
         return score
