@@ -389,6 +389,10 @@ class Token(RetrievableObject):
             "PREP",
             "REL",
             "SUB",
+            "PRO:sg",
+            "PRO:pl",
+            "PRV:sg"
+            "PRV:pl"
         ]
         return self.tag in tool_tags or self.original in usual_words \
                          or (self.position == 0 and self.lower() in usual_words)
