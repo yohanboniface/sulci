@@ -3,6 +3,7 @@ import logging.handlers
 
 from sulci import config
 
+
 class MemoryStorageHandler(logging.handlers.MemoryHandler):
     """
     All the logging info is stored in a python list.
@@ -11,6 +12,7 @@ class MemoryStorageHandler(logging.handlers.MemoryHandler):
         for record in self.buffer:
             self.target.append(record)
         self.buffer = []
+
 
 class ConsoleColorFormatter(logging.Formatter):
     """
@@ -36,6 +38,7 @@ class ConsoleColorFormatter(logging.Formatter):
             record.msg = u"%s%s%s" % (prefix, record.msg, suffix)
         return logging.Formatter.format(self, record)
 
+
 class HTMLColorFormatter(logging.Formatter):
     """
     Add CSS style and HTML tag for HTML output.
@@ -51,6 +54,7 @@ class HTMLColorFormatter(logging.Formatter):
         record.msg = u"%s%s%s" % (prefix, record.msg, suffix)
         return logging.Formatter.format(self, record)
 
+
 # Custom logger class
 class ColoredLogger(logging.Logger):
     """
@@ -64,11 +68,11 @@ class ColoredLogger(logging.Logger):
         Add color parameter and pass it to log via extra parameter.
         This parameter will be added as property to the LogRecord.
         """
-        logging.Logger.log(self, lvl, msg, extra={"color":color, "highlight": highlight})
-    
+        logging.Logger.log(self, lvl, msg, extra={"color": color, "highlight": highlight})
+
     def debug(self, msg, color="GREEN", highlight=False):
         self.log(logging.DEBUG, msg, color, highlight)
-    
+
     def info(self, msg, color="WHITE", highlight=False):
         self.log(logging.INFO, msg, color, highlight)
 
