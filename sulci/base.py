@@ -4,6 +4,7 @@
 import os
 
 from limpyd import model
+from limpyd.database import RedisDatabase
 
 from sulci.utils import load_file, get_dir
 from sulci.textutils import tokenize_text
@@ -459,4 +460,5 @@ class Token(RetrievableObject):
 
 class BaseRedisModel(model.RedisModel):
 
-    CONNECTION_SETTINGS = config.DATABASES[config.DEFAULT_DATABASE]
+    abstract = True
+    database = RedisDatabase(**config.DATABASES[config.DEFAULT_DATABASE])
