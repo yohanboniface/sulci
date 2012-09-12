@@ -1,0 +1,105 @@
+<html lang="fr">
+<head>
+    <title>Sulci démo</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}django_sulci/css/sulci.css" />
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $('#sulci_form').submit(function() {
+            var form = this, data = {};
+            for (var i in form.elements) {
+                if(form.elements.hasOwnProperty(i)) {
+                    var el = form.elements[i];
+                    if(el.type == "submit") {
+                        continue;
+                    }
+                    else if (el.type == "checkbox") {
+                        data[el.name] = el.checked;
+                    }
+                    else {
+                        data[el.name] = el.value;                        
+                    }
+                }
+            }
+            var result_to_html = function (array) {
+                var html = "";
+                for (var i in array) {
+                    if(array.hasOwnProperty(i)) {
+                        var d = array[i], title = d[0], score = d[1];
+                        html += "<div><em>" + title + "</em> " + score + "</div>";
+                    }
+                }
+                return html;                
+            }
+            $("#descriptors").html('<img src="{{ STATIC_URL }}django_sulci/img/loader.gif" />');
+            $("#keyentities").html("");
+            $("#sulci_debug").html("");
+            $.post(form.action, data, function(data) {
+                var html = result_to_html(data.descriptors)
+                if (html) {
+                    html = "<h3>Descriptors</h3>" + html
+                    $("#descriptors").html(html);
+                }
+                var html = result_to_html(data.keyentities)
+                if (html) {
+                    html = "<h3>Extracted entities</h3>" + html
+                    $("#keyentities").html(html);
+                }
+                if (data.debug) {
+                    var html = "";
+                    for (var i in data.debug) {
+                        if(data.debug.hasOwnProperty(i)) {
+                            var s = data.debug[i];
+                            html += "<div>" + s + "</div>";
+                        }
+                    }
+                    html = "<h3>Debug</h3>" + html
+                    $("#sulci_debug").html(html).show();
+                }
+            });
+            return false;
+        });
+    });
+    </script>
+</head>
+<body>
+    <div class="col12">
+        <h1>Sulci : french text mining</h1>
+    </div>
+    <div class="col8">
+        <div id="main_form">
+            <h3>Testing the web service</h3>
+            <p>Just fill in the form to test the web service. <br />Or send a POST request to <a href="{% url sulci_ws %}">{% url sulci_ws %}</a> to start using it from your project!</p>
+            <form action="{% url sulci_ws %}" method="post" id="sulci_form" />
+            {% for field in form %}
+            <p>
+                <label for="id_{{ field.name }}">{{ field.name }}</label>
+                <span class="helptext">{{ field.help_text }}</span>
+                {{ field }}
+            </p>
+            {% endfor %}
+            {% csrf_token %} 
+            <input type="submit" />
+            </form>
+        </div>
+        <div id="descriptors" class="entity_list"></div>
+        <div id="keyentities" class="entity_list"></div>
+    </div>
+    <div class="col4">
+        <h3>About</h3>
+        <p>Sulci is a <em>French</em> text-mining open source, initially developped in the <a href="http://www.liberation.fr">Libération</a> lab, for its internal use. Now it has been released and made public. And two new corpus have been trained: le Monde diplomatique and Rezo.net.</p>
+        <p>It's in <i>molto alpha</i> stage, but nevertheless used in production by Libération.</p>
+        <p>The <em>Sulci</em> training process is supervised, which means that it works better with texts close to the corpus used in training; and it makes semantic inference, which means that it will output only entities of the <i>thesaurus</i> for the training (nevertheless, you can ask it to output also the <i>extract keyentities</i> from the processed content.</p>
+        <p>Planned: training with Wikipedia corpus; training with Twitter corpus.</p>
+        <p>Further reading:</p>
+        <ul>
+            <li><a href="https://github.com/yohanboniface/sulci">source code</a></li>
+            <li><a href="http://sulci.readthedocs.org/en/latest/">developper documentation</a></li>
+            <li><a href="http://fabelier.org/sulci_fabelier/presentation.html">slides of the Fabelier workshop</a></li>
+            <li>IRC chan: #sulci on irc.freenode.net</li>
+        </ul>
+    </div>
+    <div class="col12" id="sulci_debug">
+    </div>
+</body>
+</html>
