@@ -637,7 +637,7 @@ class KeyEntity(RetrievableObject):
         return self._confidences["statistical_mutual_information"]
 
     def global_mutual_information_confidence(self):
-        global_pmi_getter = GlobalPMI.get(config.DEFAULT_DATABASE)
+        global_pmi_getter = GlobalPMI.get(config.get_current_db_name())
         local_pmi = self._confidences['statistical_mutual_information']
         global_pmi = global_pmi_getter.global_pmi(self)
         if not global_pmi:
@@ -646,7 +646,7 @@ class KeyEntity(RetrievableObject):
         return local_pmi / global_pmi
 
     def global_probability_confidence(self):
-        global_pmi_getter = GlobalPMI.get(config.DEFAULT_DATABASE)
+        global_pmi_getter = GlobalPMI.get(config.get_current_db_name())
         local_probability = self._confidences['nrelative_frequency']
         global_probability = global_pmi_getter.global_probability(self)
         if not global_probability:

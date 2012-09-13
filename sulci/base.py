@@ -5,6 +5,7 @@ import os
 
 from limpyd import model
 from limpyd.database import RedisDatabase
+from limpyd import redis_connect
 
 from sulci.utils import load_file, get_dir
 from sulci.textutils import tokenize_text
@@ -458,7 +459,41 @@ class Token(RetrievableObject):
             return self.parent.show_context(self.position)
 
 
+class SulciDatabase(RedisDatabase):
+    """
+    A database able to be set at runtime.
+    """
+
+    def __init__(self):
+        self._connections = {}
+
+    @property
+    def connection(self):
+        db_name = config.get_current_db_name()
+        if not db_name in self._connections:
+            self._connections[db_name] = redis_connect(config.DATABASES[db_name])
+        return self._connections[db_name]
+
+
 class BaseRedisModel(model.RedisModel):
 
     abstract = True
-    database = RedisDatabase(**config.DATABASES[config.DEFAULT_DATABASE])
+    database = SulciDatabase()
+
+
+class UseDB():
+    """
+    Changes the current db name and restore it.
+    """
+
+    def __init__(self, db_name):
+        self.default_db_name = config.get_current_db_name()
+        self.db_name = db_name
+
+    def __enter__(self):
+        if self.db_name in config.DATABASES:
+            config.CURRENT.DB = self.db_name
+        return self.db_name
+
+    def __exit__(self, type, value, traceback):
+        config.CURRENT.DB = self.default_db_name

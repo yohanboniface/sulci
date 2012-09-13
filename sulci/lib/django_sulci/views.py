@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import time
 
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
@@ -8,6 +9,7 @@ from django.views.generic import FormView
 
 from sulci.textmining import SemanticalTagger
 from sulci.log import sulci_logger, MemoryStorageHandler, HTMLColorFormatter
+from sulci.base import UseDB
 
 
 class SulciForm(forms.Form):
@@ -68,30 +70,34 @@ class WSView(object):
         if request.method == "POST":
             form = SulciForm(request.POST)
             if form.is_valid():
-                print form.cleaned_data
-                content = form.cleaned_data["content"]
-                limit = form.cleaned_data["limit"]
-                min_score = form.cleaned_data["min_score"]
-                if form.cleaned_data["debug"]:
-                    debug = []
-                    handler = MemoryStorageHandler(10, target=debug)
-                    formatter = HTMLColorFormatter("%(message)s")
-                    handler.setFormatter(formatter)
-                    sulci_logger.addHandler(handler)
-                S = SemanticalTagger(content)
-                descriptors = [(unicode(d), round(score, 2)) for d, score in S.get_descriptors(min_score)[:limit]]
-                if form.cleaned_data['keyentities']:
-                    keyentities = [(unicode(k), round(k.frequency_relative_pmi_confidence, 2)) for k in S.keyentities]
-                else:
-                    keyentities = None
-                c = {
-                    "descriptors": descriptors,
-                    "keyentities": keyentities,
-                }
-                if form.cleaned_data["debug"]:
-                    S.debug()
-                    handler.flush()
-                    c["debug"] = [handler.format(d) for d in debug]
+                db_name = form.cleaned_data["corpus"]
+                with UseDB(db_name):
+                    t1 = time.time()
+                    content = form.cleaned_data["content"]
+                    limit = form.cleaned_data["limit"]
+                    min_score = form.cleaned_data["min_score"]
+                    if form.cleaned_data["debug"]:
+                        debug = []
+                        handler = MemoryStorageHandler(10, target=debug)
+                        formatter = HTMLColorFormatter("%(message)s")
+                        handler.setFormatter(formatter)
+                        sulci_logger.addHandler(handler)
+                    S = SemanticalTagger(content)
+                    descriptors = [(unicode(d), round(score, 2)) for d, score in S.get_descriptors(min_score)[:limit]]
+                    if form.cleaned_data['keyentities']:
+                        keyentities = [(unicode(k), round(k.frequency_relative_pmi_confidence, 2)) for k in S.keyentities]
+                    else:
+                        keyentities = None
+                    c = {
+                        "descriptors": descriptors,
+                        "keyentities": keyentities,
+                    }
+                    if form.cleaned_data["debug"]:
+                        S.debug()
+                        handler.flush()
+                        c["debug"] = [handler.format(d) for d in debug]
+                    t2 = time.time()
+                    c['time'] = round(t2 - t1, 2)
             else:
                 c = {'errors': form.errors}
         else:
