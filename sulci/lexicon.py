@@ -22,12 +22,13 @@ class Lexicon(TextManager):
     The lexicon is a list of unique words and theirs possible POS tags.
     """
 
+    _loaded = {}
+
     def __init__(self, path="corpus"):
         self.CORPUS_EXT = ".lxc.lem.crp"
         self.VALID_EXT = ".lxc"
         self.PENDING_EXT = ".pdg"
         self.PATH = path
-        self._loaded = None
         self._raw_content = ""
         self._prefixes = None
         self._suffixes = None
@@ -57,16 +58,16 @@ class Lexicon(TextManager):
 
         The representation will be a dict {"word1": [{tag1 : lemme1}]}
         """
-        if self._loaded is None:  # Caching and lazy loading
+        if not self.PATH in self._loaded:  # Caching and lazy loading
             sulci_logger.debug("Loading lexicon...", "RED", True)
             lx = load_file("%s/lexicon.lxc" % self.PATH)
-            self._loaded = {}
+            self._loaded[self.PATH] = {}
             for line in lx.split("\n"):
                 if line:
                     lexicon_entity = LexiconEntity(line)
                     self.add_factors(lexicon_entity.word)
-                    self._loaded[lexicon_entity.word] = lexicon_entity
-        return self._loaded
+                    self._loaded[self.PATH][lexicon_entity.word] = lexicon_entity
+        return self._loaded[self.PATH]
 
     def add_factors(self, token):
         """
