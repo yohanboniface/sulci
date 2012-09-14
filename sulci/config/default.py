@@ -12,6 +12,11 @@ DATABASES = {
         "port": 6379,
         "db": 1
     },
+    "rezo": {
+        "host": "localhost",
+        "port": 6379,
+        "db": 2
+    },
     "tests": {
         "host": "localhost",
         "port": 6379,
@@ -19,3 +24,4 @@ DATABASES = {
     }
 }
 DEFAULT_DATABASE = "lemondediplo"
+TRAINING_DATABASE = "rezo"
