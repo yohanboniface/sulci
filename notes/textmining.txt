@@ -692,6 +692,7 @@ Mettre 0 comme valeur par défaut quand on attache un descripteur ? Ou sinon com
 
 Dans l'apprentissage, au lieu de partir du principe que 1 trigger déclenche un descripteur, partir du principe que TOUS les triggers liés ont permis de déclencher CHAQUE descripteur, puis à l'article suivant qui contient tel descripteur, faire une intersection des triggers, et ainsi de suite
 
+
 Ressources en ligne
 -------------------
 
@@ -712,6 +713,12 @@ the weight of the connection / the max_weight of the descriptor
 => this means that a connection has a 100 % weight (1.0) when it's the higher 
 connection for the triiger AND the higher connection for the descriptor.
 clean connections pondered_weight < 0.01
+
+===
+API
+===
+Ajouter un "indice de proximité du texte soumis avec le corpus" ? En gros avec le nombre d'occurrences dans les données d'apprentissage des triggers actifs.
+
 
 ================================================
 Natural Language Processing with Python - résumé

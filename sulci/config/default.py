@@ -23,5 +23,5 @@ DATABASES = {
         "db": 15
     }
 }
-DEFAULT_DATABASE = "lemondediplo"
+DEFAULT_DATABASE = "liberation"
 TRAINING_DATABASE = "rezo"

@@ -92,7 +92,7 @@ class Descriptor(BaseRedisModel):
     description = fields.HashableField()
     count = fields.HashableField(default=0)
     max_weight = fields.HashableField(default=0)
-#    is_alias_of = model.ReferenceField('Descriptor')
+    is_alias_of_id = fields.HashableField()
 
     def __init__(self, *args, **kwargs):
         self._max_weight = None
@@ -112,9 +112,10 @@ class Descriptor(BaseRedisModel):
         """
         Returns the primeval descriptor when self is alias of another.
         """
-        if self.is_alias_of is None:
+        if not self.is_alias_of_id.hget():
             return self
-        return self.is_alias_of.primeval
+        primeval = Descriptor(self.is_alias_of_id.hget())
+        return primeval.primeval
 
     def remove_useless_connections(self, min=0.01):
         """
@@ -128,6 +129,10 @@ class Descriptor(BaseRedisModel):
             if weight < min:
                 sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s (weight: %f)" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget(), weight))
                 inst.delete()
+
+    @property
+    def synapses(self):
+        return TriggerToDescriptor.collection(descriptor_id=self.pk.get())
 
 
 class TriggerToDescriptor(BaseRedisModel):
@@ -305,7 +310,7 @@ class Trigger(BaseRedisModel):
         self[descriptor] = score
 
     @classmethod
-    def remove_useless(cls):
+    def remove_orphans(cls):
         """
         After cleaning connections, some trigger could remain
         without any connection. So delete it.
