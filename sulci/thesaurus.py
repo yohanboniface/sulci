@@ -116,6 +116,19 @@ class Descriptor(BaseRedisModel):
             return self
         return self.is_alias_of.primeval
 
+    def remove_useless_connections(self, min=0.01):
+        """
+        Delete all the useless connections.
+
+        First loop on all the descriptors to consume less RAM.
+        """
+        instances = TriggerToDescriptor.instances(descriptor_id=self.pk.get())
+        for inst in instances:
+            weight = inst.pondered_weight
+            if weight < min:
+                sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s (weight: %f)" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget(), weight))
+                inst.delete()
+
 
 class TriggerToDescriptor(BaseRedisModel):
     """
@@ -202,9 +215,9 @@ class TriggerToDescriptor(BaseRedisModel):
         return inst, created
 
     @classmethod
-    def remove_useless_connections(cls):
+    def remove_unique_connections(cls):
         """
-        Delete all the useless connections.
+        Delete all the connections which occurred one during training.
 
         First loop on all the descriptors to consume less RAM.
         """
@@ -220,6 +233,15 @@ class TriggerToDescriptor(BaseRedisModel):
                 if weight <= 1:
                     sulci_logger.info("Removing TriggerToDescriptor %s, between Trigger %s and Descriptor %s" % (inst.pk.get(), inst.trigger_id.hget(), inst.descriptor_id.hget()))
                     inst.delete()
+
+    @classmethod
+    def remove_useless_connections(cls, min=0.01):
+        """
+        Remove all the connections where pondered_weight is lower than
+        min (by defaul 0.01)
+        """
+        for descriptor in Descriptor.instances().sort():
+            descriptor.remove_useless_connections(min)
 
 
 class Trigger(BaseRedisModel):
@@ -282,11 +304,13 @@ class Trigger(BaseRedisModel):
         """
         self[descriptor] = score
 
-    def clean_connections(self):
+    @classmethod
+    def remove_useless(cls):
         """
-        Remove the negative connections.
+        After cleaning connections, some trigger could remain
+        without any connection. So delete it.
         """
-        for descriptor in self._descriptors.copy().__iter__():
-            if self[descriptor] < 0:
-                del self[descriptor]
-                sulci_logger.debug(u"Removed connection %s - %s" % (self, descriptor), "RED")
+        for trigger in cls.instances().sort():
+            if len(trigger._synapses) == 0:
+                sulci_logger.info(u"Removing trigger %s" % trigger)
+                trigger.delete()
