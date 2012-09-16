@@ -132,7 +132,7 @@ class Descriptor(BaseRedisModel):
 
     @property
     def synapses(self):
-        return TriggerToDescriptor.collection(descriptor_id=self.pk.get())
+        return TriggerToDescriptor.collection(descriptor_id=self.pk.get()).sort(by='-weight')
 
 
 class TriggerToDescriptor(BaseRedisModel):
