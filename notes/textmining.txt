@@ -116,6 +116,8 @@ Un cas chiant : "le maire de Paris Bertrand Delanoë", dans le cas où ces trois
 Sans corpus, ça me paraît assez indémerdable.
 
 Considérer certains mots comme stop_words seulement s'ils sont "seuls dans leur contexte" ? Genre "ensuite", "comme", etc.
+=> stopwords => never keep them
+=> usualwords => keep them unless they are alone
 
 Essai : si un stemm n'a qu'une occurrence, que cette occurrence est en position 1 dans sa phrase, et que le mot en position 2 n'est pas istitle, alors le istitle de ce stemm doit être false.
 oui mais => "Pourquoi Panafieu ?" (Vérifier aussi que ces deux termes ne sont pas une collocation par ailleurs ?)

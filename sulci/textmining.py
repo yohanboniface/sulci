@@ -597,7 +597,7 @@ class KeyEntity(RetrievableObject):
         """
         if self._confidences["heuristical_mutual_information"] is None:
             #We test just from interessant stemms, but we keep original position
-            candidates = [(k, v) for k, v in enumerate(self) if v.is_valid()]
+            candidates = [(k, v) for k, v in enumerate(self) if v.has_meaning()]
             alone_count = {}
             if len(self) == 1:
                 return 1  # Just one word, PMI doesn't make sense
@@ -744,10 +744,10 @@ class Stemm(RetrievableObject):
     def tag(self):
         return self.main_occurrence.tag
 
-    def is_valid(self):
+    def has_meaning(self):
         return self.main_occurrence.has_meaning()
 
-    def is_valid_alone(self):
+    def has_meaning_alone(self):
         return self.main_occurrence.has_meaning_alone()
 
     def has_interest(self):
@@ -755,14 +755,14 @@ class Stemm(RetrievableObject):
         Do we take it in count as potential KeyEntity?
         If count is less than x, but main_occurrence is a title, we try to keep it
         """
-        return self.is_valid() and (self.count > 2 or self.istitle())
+        return self.has_meaning() and (self.count > 2 or self.istitle())
 
     def has_interest_alone(self):
         """
         Do we take it in count if alone ??
         If count is less than x, but main_occurrence is a title, we try to keep it
         """
-        return self.is_valid_alone() and (self.count >= self.text.medium_word_count or self.istitle())
+        return self.has_meaning_alone() and (self.count >= self.text.medium_word_count or self.istitle())
 
     @property
     def main_occurrence(self):
@@ -820,5 +820,5 @@ class GlobalPMI(BaseRedisModel):
     def global_pmi(self, ngram):
         ngram_probability = self.global_probability(ngram)
         # use iterable also for one element
-        members_probability = product(self.global_probability([s]) for s in ngram if s.is_valid_alone())
+        members_probability = product(self.global_probability([s]) for s in ngram if s.has_meaning_alone())
         return math.log(ngram_probability / members_probability)
