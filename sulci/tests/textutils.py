@@ -22,6 +22,9 @@ class TextUtilsTests(unittest.TestCase):
     def test_unescape_entities(self):
         self.assertEqual(unescape_entities('&eacute;'), u"é")
         self.assertEqual(unescape_entities('&amp;'), u"&")
+        self.assertEqual(unescape_entities('&#39;'), u"'")
+        self.assertEqual(unescape_entities('&#x0027;'), u"'")
+        self.assertEqual(unescape_entities('l&#39;acc&egrave;s'), u"l'accès")
 
     def test_modern_istitle(self):
         self.failIf(modern_istitle("al-Assad") != True)

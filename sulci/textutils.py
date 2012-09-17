@@ -17,7 +17,19 @@ def strip_tags(value):
 
 
 def unescape_entities(text):
-    # TODO: unescape also XML entities
+
+    def _unescape_xml(m):
+        # from http://www.w3.org/QA/2008/04/unescape-html-entities-python.html
+        t = m.group(0)
+        try:
+            if t[:3] == "&#x":
+                return unichr(int(t[3:-1], 16))
+            else:
+                return unichr(int(t[2:-1]))
+        except ValueError:
+            return t  # leave as is
+
+    text = re.sub(ur"&#\w+;", _unescape_xml, text)
     return HTML_PARSER.unescape(text)
 
 
