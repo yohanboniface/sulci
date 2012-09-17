@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
+import os
 import unittest
 import argparse
+
+os.environ["SULCI_CONFIG_MODULE"] = "sulci.config.example"
 
 from sulci.tests import textutils, sample, token, stemmedtext, semanticaltagger
 
