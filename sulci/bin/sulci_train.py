@@ -101,6 +101,7 @@ class Command(SulciBaseCommand):
 
     def handle(self, *args, **options):
         with UseDB(config.TRAINING_DATABASE):
+            sulci_logger.info(u"STARTING TRAINING WITH DATABASE «%s»" % config.TRAINING_DATABASE, "RED", True)
             C = Corpus()
             L = Lexicon()
             M = Lemmatizer(L)
