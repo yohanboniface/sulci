@@ -317,8 +317,8 @@ class SemanticalTagger(object):
         for kp in sorted(self.keyentities, key=lambda kp: kp.trigger_score, reverse=True)[:20]:
             sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp.trigger_score), "YELLOW")
         sulci_logger.debug(u"Keyentities by gobal pmi confidence", "BLUE", True)
-        for kp in sorted(self.keyentities, key=lambda kp: kp._confidences['global_mutual_information'], reverse=True)[:20]:
-            sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp._confidences['global_mutual_information']), "YELLOW")
+        # for kp in sorted(self.keyentities, key=lambda kp: kp._confidences['global_mutual_information'], reverse=True)[:20]:
+        #     sulci_logger.debug(u"%s (%f)" % (unicode(kp), kp._confidences['global_mutual_information']), "YELLOW")
         sulci_logger.debug(u"Triggers and relation with descriptors", "BLUE", True)
         for t, score in self.triggers:
             if len(t._synapses) > 0:
@@ -513,8 +513,8 @@ class KeyEntity(RetrievableObject):
         self._confidences["pos"] = self.pos_confidence()
         self._confidences["heuristical_mutual_information"] = self.heuristical_mutual_information_confidence()
         self._confidences["statistical_mutual_information"] = self.statistical_mutual_information_confidence()
-        self._confidences["global_mutual_information"] = self.global_mutual_information_confidence()
-        self._confidences["global_probability"] = self.global_probability_confidence()
+        # self._confidences["global_mutual_information"] = self.global_mutual_information_confidence()
+        # self._confidences["global_probability"] = self.global_probability_confidence()
 
     def frequency_confidence(self):
         """
