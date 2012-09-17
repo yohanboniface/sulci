@@ -27,12 +27,12 @@ class TextUtilsTests(unittest.TestCase):
         self.assertEqual(unescape_entities('l&#39;acc&egrave;s'), u"l'accès")
 
     def test_modern_istitle(self):
-        self.failIf(modern_istitle("al-Assad") != True)
-        self.failIf(modern_istitle("el-Assad") != True)
-        self.failIf(modern_istitle("iPhone") != True)
-        self.failIf(modern_istitle("eMac") != True)
-        self.failIf(modern_istitle("Basic") != True)
-        self.failIf(modern_istitle("BASIC") != True)
+        self.assertTrue(modern_istitle("al-Assad"))
+        self.assertTrue(modern_istitle("el-Assad"))
+        self.assertTrue(modern_istitle("iPhone"))
+        self.assertTrue(modern_istitle("eMac"))
+        self.assertTrue(modern_istitle("Basic"))
+        self.assertTrue(modern_istitle("BASIC"))
 
     def test_normalize_text(self):
         self.failIf(u"’" in normalize_text(u"’"))
