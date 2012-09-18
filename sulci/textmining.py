@@ -202,21 +202,52 @@ class SemanticalTagger(object):
         We have to begin from the shortest ones.
         """
         sulci_logger.debug(u"Deduplicating keyentities...", "BLUE", highlight=True)
-        tmp_keyentities = sorted(self.keyentities, key=lambda kp: len(kp))
+        # It's important to start from the longer ones, to use longer as group
+        # keys
+        tmp_keyentities = sorted(self.keyentities, key=lambda kp: len(kp), reverse=True)
         sulci_logger.debug([unicode(kp) for kp in tmp_keyentities], "GRAY")
-        for idx, one in enumerate(tmp_keyentities):
-            for two in tmp_keyentities[idx + 1:]:
-                if one in self.keyentities and two in self.keyentities:
-                    if one.is_duplicate(two):
-                        sulci_logger.debug(u"%s is duplicate %s" % (unicode(one), unicode(two)), "MAGENTA")
-                        if one > two:  # and not two.is_strong()
-                            sulci_logger.debug(u"%s will be deleted" % unicode(two), "RED")
-                            self.keyentities.remove(two)
-                        elif two > one:
-                            sulci_logger.debug(u"%s will be deleted" % unicode(one), "RED")
-                            self.keyentities.remove(one)
-                        else:
-                            sulci_logger.debug(u"No deletion")
+        groups = {}
+        # Try to group the keyentities to avoid exponantial loops
+        # (comparing every ke with each other does not sounds like a
+        # good idea...)
+        # Just remember that a ke can be linked to more than one group
+        # ("Phase" linked to "essai de Phase I" and "essai de Phase II"
+        # for example)
+        for ke_candidate in tmp_keyentities:
+            group_found = False
+            for ke_parent in groups.iterkeys():
+                if ke_candidate.is_duplicate(ke_parent):
+                    groups[ke_parent].append(ke_candidate)
+                    group_found = True
+            if not group_found:
+                groups[ke_candidate] = []
+                groups[ke_candidate].append(ke_candidate)
+
+        # Deduplicate "group by group":
+        # - less looping than comparing all the dataset
+        # - some ke can be removed in one group but keeped in another
+        for group in groups.itervalues():
+            for idx, one in enumerate(group[:]):
+                for two in group[idx + 1:]:
+                    if one in group and two in group:
+                        if one.is_duplicate(two):
+                            sulci_logger.debug(u"%s is duplicate %s" % (unicode(one), unicode(two)), "MAGENTA")
+                            if one > two:  # and not two.is_strong()
+                                sulci_logger.debug(u"%s will be deleted" % unicode(two), "RED")
+                                group.remove(two)
+                            elif two > one:
+                                sulci_logger.debug(u"%s will be deleted" % unicode(one), "RED")
+                                group.remove(one)
+                            else:
+                                sulci_logger.debug(u"No deletion")
+
+        # Finally add the keeped ke in the property
+        tmp_keyentities = []
+        for group in groups.itervalues():
+            for ke in group:
+                if not ke in tmp_keyentities:
+                    tmp_keyentities.append(ke)
+        self.keyentities = tmp_keyentities
         sulci_logger.debug(u"... keyentities deduplicated", "BLUE", highlight=True)
 
     def keyentities_for_trainer(self):
