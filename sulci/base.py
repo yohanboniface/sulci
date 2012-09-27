@@ -466,6 +466,8 @@ class SulciDatabase(RedisDatabase):
 
     def __init__(self):
         self._connections = {}
+        self._models = dict()
+
 
     @property
     def connection(self):
