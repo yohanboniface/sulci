@@ -1,2 +1,2 @@
 GenericCache==1.0.2
-git+git://github.com/liberation/redis-limpyd.git
+git+git://github.com/yohanboniface/redis-limpyd.git
