@@ -1,0 +1,3 @@
+include README.rst
+recursive-include sulci/lib/django_sulci/static *
+recursive-include sulci/lib/django_sulci/templates *
