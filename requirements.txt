@@ -1,3 +1,2 @@
-Django
 GenericCache==1.0.2
 git+git://github.com/liberation/redis-limpyd.git
