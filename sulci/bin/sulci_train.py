@@ -75,14 +75,14 @@ class Command(SulciBaseCommand):
             "--semantical",
             action="store_true",
             dest="semantical",
-            help="Launch the sementical training. Launch it with python -O."
+            help="Launch the sementical training."
         )
         self.parser.add_argument(
             "-p",
             "--pmi",
             action="store_true",
             dest="pmi",
-            help="Launch the PMI training. Launch it with python -O."
+            help="Launch the PMI training."
         )
         self.parser.add_argument(
             "-a",
@@ -118,8 +118,7 @@ class Command(SulciBaseCommand):
                 # Create slaves
                 for i in xrange(0, self.SUBPROCESSES):
                     sulci_logger.info(u"Opening slave subprocess %d" % i, "BLUE", True)
-                    python_kind = not __debug__ and ["-O"] or []
-                    subprocess.Popen(["python"] + python_kind + ["sulci_train.py", training_kind, "--mode=slave"])
+                    subprocess.Popen(["sulci_train.py", training_kind, "--mode=slave"])
                 # Set the mode to the trainer
                 self.MODE = "master"
                 # Wait to leave time to slave to launch

@@ -22,6 +22,12 @@ setup(
     include_package_data=True,
     package_data={'sulci': ['corpus/*', 'templates/sulci/*']},
     install_requires=reqs,
+    scripts=[
+        'sulci/bin/sulci_cli.py',
+        'sulci/bin/sulci_monit.py',
+        'sulci/bin/sulci_train.py',
+        'sulci/bin/sulci_validate.py',
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
