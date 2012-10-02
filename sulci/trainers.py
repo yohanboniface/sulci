@@ -58,9 +58,15 @@ class ContentBaseTrainer(ZMQTrainer):
     """
 
     def do(self, *args, **kwargs):
-        if self.mode == "slave":
-            self.slave()
-        else:
+        try:
+            if self.mode == "slave":
+                self.slave()
+            else:
+                self.master(**kwargs)
+        except KeyboardInterrupt:
+            self.stop()
+
+    def master(self, **kwargs):
             t_init = time.time()
             if self.mode == "master":
                 self.setup_socket_master()
@@ -99,8 +105,12 @@ class ContentBaseTrainer(ZMQTrainer):
                         # with python -O (so not __debug__, so no log)
                         print "MASTER -- %s -- %s remaining to process -- Avg: %s s -- ETA : %s" %\
                                (status, forloop_remaining, round(average, 2), ETA.strftime("%a %d %R"))
-            if self.mode == "master":
-                self.pubsocket.send(" stop")
+                self.stop()
+
+    def stop(self):
+        if self.mode == "master":
+            print "MASTER -- Sending stop order"
+            self.pubsocket.send(" stop")
 
     def slave(self):
         self.setup_socket_slave()
@@ -112,6 +122,7 @@ class ContentBaseTrainer(ZMQTrainer):
                 # All the subprocess receive the same socket
                 action = self.subsocket.recv()[1:]
                 if action == "stop":
+                    print "SLAVE %s -- Stopping due to stop order received" % os.getpid()
                     return
             # This is the REP mode
             # We receive an action to do, with a pk
