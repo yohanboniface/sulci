@@ -272,7 +272,7 @@ class GlobalPMITrainer(ContentBaseTrainer):
             self.global_pmi.add_ngram(values['stemms'], amount=values['count'])
 
 
-class RuleTrainer(object):
+class RuleTrainer(ZMQTrainer):
     """
     Main trainer class for rules based, for factorisation.
     """
@@ -286,37 +286,6 @@ class RuleTrainer(object):
             self.pubsocket.send(" stop")
         else:
             self.train()
-
-    def setup_socket_master(self):
-        """
-        Configure the sockets for the master trainer.
-        """
-        import zmq
-        # This is a socket load-balanced to every workers
-        # listening the canal.
-        self.reqsocket = zmq.Socket(zmq.Context(), zmq.XREQ)
-        self.reqsocket.bind("ipc:///tmp/sulci.action")
-        # This is a publisher socket, used to distribute data.
-        # No response is expected.
-        self.pubsocket = zmq.Socket(zmq.Context(), zmq.PUB)
-        self.pubsocket.bind("ipc:///tmp/sulci.apply")
-
-    def setup_socket_slave(self):
-        """
-        Configure sockets for the workers (slaves).
-        """
-        import zmq
-        self.repsocket = zmq.Socket(zmq.Context(), zmq.XREP)
-        self.repsocket.connect("ipc:///tmp/sulci.action")
-        # This is the subscriber socket. Its used to subscribe to a canal
-        # to receive data.
-        self.subsocket = zmq.Socket(zmq.Context(), zmq.SUB)
-        self.subsocket.connect("ipc:///tmp/sulci.apply")
-        self.subpoller = zmq.Poller()
-        self.subpoller.register(self.subsocket, zmq.POLLIN)
-        self.reppoller = zmq.Poller()
-        self.reppoller.register(self.repsocket, zmq.POLLIN)
-        self.subsocket.setsockopt(zmq.SUBSCRIBE, "")
 
     def slave(self):
         self.setup_socket_slave()
