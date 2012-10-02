@@ -57,7 +57,7 @@ class ContentBaseTrainer(ZMQTrainer):
     Factorize here the training based on content processing (articles...).
     """
 
-    def do(self, *args):
+    def do(self, *args, **kwargs):
         if self.mode == "slave":
             self.slave()
         else:
@@ -65,7 +65,8 @@ class ContentBaseTrainer(ZMQTrainer):
             if self.mode == "master":
                 self.setup_socket_master()
                 print "MASTER -- ready"
-            qs = config.content_model_pks_for_trainer()
+            start = kwargs.get("start", None)
+            qs = config.content_model_pks_for_trainer(start=start)
             # if self.mode == "master":
             #     qs = qs.only("id")
             # We make it by step, to limit RAM consuming

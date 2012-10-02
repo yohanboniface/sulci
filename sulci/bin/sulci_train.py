@@ -71,6 +71,15 @@ class Command(SulciBaseCommand):
             help="Launch trainer with x subprocesses"
         )
         self.parser.add_argument(
+            "-S",
+            "--start",
+            action="store",
+            type=str,
+            dest="start",
+            default=None,
+            help="Start at x (optional)"
+        )
+        self.parser.add_argument(
             "-n",
             "--semantical",
             action="store_true",
@@ -118,7 +127,10 @@ class Command(SulciBaseCommand):
                 # Create slaves
                 for i in xrange(0, self.SUBPROCESSES):
                     sulci_logger.info(u"Opening slave subprocess %d" % i, "BLUE", True)
-                    subprocess.Popen(["sulci_train.py", training_kind, "--mode=slave"])
+                    sub_args = ["sulci_train.py", training_kind, "--mode=slave"]
+                    if self.START is not None:
+                        sub_args.append('--start=%s' % self.START)
+                    subprocess.Popen(sub_args)
                 # Set the mode to the trainer
                 self.MODE = "master"
                 # Wait to leave time to slave to launch
@@ -146,7 +158,7 @@ class Command(SulciBaseCommand):
                 else:
                     if self.FORCE:
                         S.begin()
-                    S.do()
+                    S.do(start=self.START)
     #                if TRAINER_MODE == "master" and FORCE:
     #                    S.clean_connections()
             if self.ADD_CANDIDATE:
