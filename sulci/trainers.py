@@ -29,7 +29,7 @@ class ZMQTrainer(object):
         self.reqsocket.bind("ipc:///tmp/sulci.action")
         # This is a publisher socket, used to distribute data.
         # No response is expected.
-        self.pubsocket = zmq.Socket(zmq.Context(), zmq.PUB)
+        self.pubsocket = context.socket(zmq.PUB)
         self.pubsocket.bind("ipc:///tmp/sulci.apply")
 
     def setup_socket_slave(self):
@@ -43,13 +43,11 @@ class ZMQTrainer(object):
         self.repsocket.connect("ipc:///tmp/sulci.action")
         # This is the subscriber socket. Its used to subscribe to a canal
         # to receive data.
-        self.subsocket = zmq.Socket(zmq.Context(), zmq.SUB)
+        self.subsocket = context.socket(zmq.SUB)
         self.subsocket.connect("ipc:///tmp/sulci.apply")
+        self.subsocket.setsockopt(zmq.SUBSCRIBE, "")
         self.subpoller = zmq.Poller()
         self.subpoller.register(self.subsocket, zmq.POLLIN)
-#        self.reppoller = zmq.Poller()
-#        self.reppoller.register(self.repsocket, zmq.POLLIN)
-        self.subsocket.setsockopt(zmq.SUBSCRIBE, "")
 
 
 class ContentBaseTrainer(ZMQTrainer):
@@ -109,7 +107,7 @@ class ContentBaseTrainer(ZMQTrainer):
 
     def stop(self):
         if self.mode == "master":
-            print "MASTER -- Sending stop order"
+            print "\nMASTER -- Sending stop order"
             self.pubsocket.send(" stop")
 
     def slave(self):
