@@ -98,7 +98,7 @@ class ContentBaseTrainer(ZMQTrainer):
                         t_diff = t_now - t_init
                         average = t_diff / (total - forloop_remaining)
                         time_remaining = average * forloop_remaining
-                        ETA = datetime.datetime.now() + datetime.timedelta(0, time_remaining)
+                        ETA = datetime.datetime.now() + datetime.timedelta(seconds=time_remaining)
                         # Using print, as I launch this huge script
                         # with python -O (so not __debug__, so no log)
                         print "MASTER -- %s -- %s remaining to process -- Avg: %s s -- ETA : %s" %\
