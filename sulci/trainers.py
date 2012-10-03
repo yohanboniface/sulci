@@ -103,7 +103,7 @@ class ContentBaseTrainer(ZMQTrainer):
                         # with python -O (so not __debug__, so no log)
                         print "MASTER -- %s -- %s remaining to process -- Avg: %s s -- ETA : %s" %\
                                (status, forloop_remaining, round(average, 2), ETA.strftime("%a %d %R"))
-                self.stop()
+            self.stop()
 
     def stop(self):
         if self.mode == "master":
