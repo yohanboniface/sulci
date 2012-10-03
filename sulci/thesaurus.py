@@ -243,7 +243,7 @@ class TriggerToDescriptor(BaseRedisModel):
     def remove_useless_connections(cls, min=0.01):
         """
         Remove all the connections where pondered_weight is lower than
-        min (by defaul 0.01)
+        `min` (by default 0.01)
         """
         for descriptor in Descriptor.instances().sort():
             descriptor.remove_useless_connections(min)
