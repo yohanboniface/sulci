@@ -41,12 +41,12 @@
                 $('#submit_button').show()
                 var html = result_to_html(data.descriptors)
                 if (html) {
-                    html = "<h3>Descriptors</h3>" + html
+                    html = "<h3>Descripteurs</h3>" + html
                     $("#descriptors").html(html);
                 }
                 var html = result_to_html(data.keyentities)
                 if (html) {
-                    html = "<h3>Extracted entities</h3>" + html
+                    html = "<h3>Entités clés</h3>" + html
                     $("#keyentities").html(html);
                 }
                 $(document).scrollTop( $("#descriptors").offset().top );
