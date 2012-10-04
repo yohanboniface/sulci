@@ -73,8 +73,8 @@
     </div>
     <div class="col8">
         <div id="main_form">
-            <h3>Tester le web service</h3>
-            <p>Renseigner le formulaire ci-dessous. <br />Ou envoyez une requête POST sur <a href="{% url sulci_ws %}">{% url sulci_ws %}</a> pour l'utiliser <i>right now</i> dans votre projet!</p>
+            <h3>Tester le service web</h3>
+            <p>Renseignez le formulaire ci-dessous pour tester Sulci. <br />Ou envoyez une requête POST sur <a href="{% url sulci_ws %}">{% url sulci_ws %}</a> pour l'utiliser <i>right now</i> dans votre projet!</p>
             <form action="{% url sulci_ws %}" method="post" id="sulci_form" />
             {% for field in form %}
             <p>
