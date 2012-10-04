@@ -85,7 +85,8 @@ class WSView(object):
                     S = SemanticalTagger(content)
                     descriptors = [(unicode(d), round(score, 2)) for d, score in S.get_descriptors(min_score)[:limit]]
                     if form.cleaned_data['keyentities']:
-                        keyentities = [(unicode(k), round(k.frequency_relative_pmi_confidence, 2)) for k in S.keyentities]
+                        sorted_ke = sorted(S.keyentities, key=lambda k: k.frequency_relative_pmi_confidence, reverse=True)
+                        keyentities = [(unicode(k), round(k.frequency_relative_pmi_confidence * 100, 2)) for k in sorted_ke]
                     else:
                         keyentities = None
                     c = {
