@@ -169,7 +169,6 @@ em {
     font: bold 0.79em Verdana,sans-serif;
     letter-spacing: 2px;
     margin-left: 0.25em;
-    text-transform: uppercase;
 }
 .warning em {
     font: bold 0.8em Verdana,sans-serif;
@@ -181,9 +180,6 @@ em {
 }
 .entity_list em {
     font: bold 0.9em Verdana,sans-serif;
-    letter-spacing: 2px;
-    margin-left: 0.25em;
-    text-transform: uppercase;
 }
 .js-toggle-content {
     margin: 5px 10px;
