@@ -69,12 +69,12 @@
 </head>
 <body>
     <div class="col12">
-        <h1>Sulci : french text mining</h1>
+        <h1>SULCI - text mining <i>en français</i></h1>
     </div>
     <div class="col8">
         <div id="main_form">
-            <h3>Testing the web service</h3>
-            <p>Just fill in the form to test the web service. <br />Or send a POST request to <a href="{% url sulci_ws %}">{% url sulci_ws %}</a> to start using it from your project!</p>
+            <h3>Tester le web service</h3>
+            <p>Renseigner le formulaire ci-dessous. <br />Ou envoyez une requête POST sur <a href="{% url sulci_ws %}">{% url sulci_ws %}</a> pour l'utiliser <i>right now</i> dans votre projet!</p>
             <form action="{% url sulci_ws %}" method="post" id="sulci_form" />
             {% for field in form %}
             <p>
@@ -92,19 +92,19 @@
         <div id="keyentities" class="entity_list"></div>
     </div>
     <div class="col4">
-        <h3>About</h3>
-        <p>Sulci is a <em>French</em> text-mining open source, initially developped in the <a href="http://www.liberation.fr">Libération</a> lab, for its internal use. Now it has been released and made public. And two new corpus have been trained: le Monde diplomatique and Rezo.net.</p>
-        <p>It's in <i>molto alpha</i> stage, but nevertheless used in production by Libération.</p>
-        <p>The Sulci training process is <em>supervised</em>, which means that it works better with texts close to the corpus used in training; and it makes <em>semantic inference</em>, which means that it will output only entities of the <i>thesaurus</i> for the training (nevertheless, you can ask it to output also the <i>extract keyentities</i> from the processed content).</p>
-        <p>Planned: training with Wikipedia corpus; training with Twitter corpus.</p>
-        <p>Further reading:</p>
+        <h3>À propos</h3>
+        <p>Sulci est un outil open source de text-mining qui se concentre sur le <em>français</em>, développé dans le labo de <a href="http://www.liberation.fr">Libération</a>, à l'origine pour son propre usage interne. Le code a été libéré, et ce service web mis en ligne pour une utilisation publique. Deux nouveaux corpus ont ausi été utilisés: <z href="http://www.monde-diplomatique.fr">le Monde diplomatique</a> et <a href="http://rezo.net">Rezo.net</a>.</p>
+        <p>C'est une version <i>molto alpha</i>, mais néanmoins utilisée en production à Libération.</p>
+        <p>L'entraînement de Sulci est <em>supervisé</em>, ce qui signifie notamment qu'il est plus efficace sur les textes proches, dans la forme et sur le fond, du corpus utilisé en entrée; il fonctionne par <em>inférence sémantique</em>, ce qui signifie qu'il ne peut sortir que des entrées du <i>thesaurus</i> utilisé lors de l'apprentissage (néanmoins, il est possible d'avoir les <i>entités clés</i> directement issues du texte analysé).</p>
+        <p>Prévu: un apprentissage avec le corpus de Wikipédia; un avec celui de Twitter.</p>
+        <p>Plus d'infos:</p>
         <ul>
-            <li><a href="https://github.com/yohanboniface/sulci">source code</a></li>
-            <li><a href="http://sulci.readthedocs.org/en/latest/">developper documentation</a></li>
-            <li><a href="http://fabelier.org/sulci_fabelier/presentation.html">slides of the Fabelier workshop</a></li>
-            <li>IRC chan: #sulci on irc.freenode.net</li>
+            <li><a href="https://github.com/yohanboniface/sulci">code source</a></li>
+            <li><a href="http://sulci.readthedocs.org/en/latest/">documentation pour les développeurs</a></li>
+            <li><a href="http://fabelier.org/sulci_fabelier/presentation.html">slides du workshop au Fabelier</a></li>
+            <li>canal IRC: #sulci sur irc.freenode.net</li>
         </ul>
-        <p>Service hosted by <em><a href="http://www.enix.org">Enix</a></em></p>
+        <p>Hébergé par <em><a href="http://www.enix.org">Enix</a></em></p>
     </div>
     <div class="col12" id="sulci_debug">
     </div>
