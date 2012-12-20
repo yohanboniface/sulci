@@ -8,9 +8,9 @@ French newspaper.
 
 This code is "work in progress", but it's yet used in production at Libération.
 
-Therefore, here is a demo page with the frozen 0.1 alpha version:
+Therefore, here is a webservice online:
  
- http://alpha.sulci.dotcloud.com
+ http://sulci.fr
 
 To use it, to get more info, have a look a the 
 `documentation <http://readthedocs.org/docs/sulci/>`_.
