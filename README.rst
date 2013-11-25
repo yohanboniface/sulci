@@ -10,7 +10,7 @@ This code is "work in progress", but it's yet used in production at Libération.
 
 Therefore, here is a webservice online:
  
- http://sulci.fr
+ http://sulci.enix.org
 
 To use it, to get more info, have a look a the 
 `documentation <http://readthedocs.org/docs/sulci/>`_.
